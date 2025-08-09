@@ -63,7 +63,6 @@ This website is built with modern, scalable technologies:
    ```bash
    stack setup
    stack build --dependencies-only
-   npm install
    ```
 
 3. **Build and run:**
@@ -209,10 +208,14 @@ psyop.ca/
 
 ### Image Optimization
 
-Optimize images for web delivery:
+Optimize images for web delivery (requires Node.js):
 
 ```bash
-npm run optimize-images
+# Install sharp dependency first
+npm install sharp
+
+# Run optimization script
+node scripts/optimize-images.js
 ```
 
 ### Code Style

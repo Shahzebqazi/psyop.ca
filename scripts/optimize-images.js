@@ -1,8 +1,20 @@
 #!/usr/bin/env node
 
-const sharp = require('sharp');
+// Optional image optimization script for PSYOP website
+// This script is separate from the main Haskell application
+// Run with: npm install sharp && node scripts/optimize-images.js
+
 const fs = require('fs');
 const path = require('path');
+
+// Check if sharp is available
+let sharp;
+try {
+  sharp = require('sharp');
+} catch (error) {
+  console.error('Sharp not found. Install with: npm install sharp');
+  process.exit(1);
+}
 
 async function optimizeImage() {
   const inputPath = 'static/single_spotify_soundcloud_bandcamp.jpg';

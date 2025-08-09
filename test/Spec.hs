@@ -24,20 +24,30 @@ spec = with (return app) $ do
     it "responds with 200" $ do
       get "/" `shouldRespondWith` 200
 
-    it "renders the album art image on home page" $ do
+    it "renders the logo on home page" $ do
       response <- get "/"
       liftIO $ do
         simpleStatus response `shouldBe` status200
         simpleBody response `shouldSatisfy` 
-          \body -> bodyContains "single_spotify_soundcloud_bandcamp.jpg" body &&
-                   bodyContains "alt=\"PSYOP Album Art\"" body
+          \body -> bodyContains "psyop-logo.png" body &&
+                   bodyContains "alt=\"PSYOP Logo\"" body
 
     it "contains proper home page content" $ do
       response <- get "/"
       liftIO $ do
         simpleStatus response `shouldBe` status200
         simpleBody response `shouldSatisfy` 
-          \body -> bodyContains "PSYOP Album Art" body
+          \body -> bodyContains "MOONLIGHT PARADOX" body &&
+                   bodyContains "NEW TRACK" body
+
+    it "contains navigation menu" $ do
+      response <- get "/"
+      liftIO $ do
+        simpleStatus response `shouldBe` status200
+        simpleBody response `shouldSatisfy` 
+          \body -> bodyContains "HOME" body &&
+                   bodyContains "ABOUT" body &&
+                   bodyContains "SOCIALS" body
 
   describe "GET /about" $ do
     it "responds with 200" $ do
@@ -50,6 +60,25 @@ spec = with (return app) $ do
         simpleBody response `shouldSatisfy` 
           \body -> bodyContains "About PSYOP" body
 
-  describe "GET /static/single_spotify_soundcloud_bandcamp.jpg" $ do
-    it "serves static image file" $ do
-      get "/static/single_spotify_soundcloud_bandcamp.jpg" `shouldRespondWith` 200
+  describe "GET /static/psyop-logo.png" $ do
+    it "serves static logo file" $ do
+      get "/static/psyop-logo.png" `shouldRespondWith` 200
+
+  describe "GET /contact" $ do
+    it "responds with 200" $ do
+      get "/contact" `shouldRespondWith` 200
+
+    it "contains contact information" $ do
+      response <- get "/contact"
+      liftIO $ do
+        simpleStatus response `shouldBe` status200
+        simpleBody response `shouldSatisfy` 
+          \body -> bodyContains "admin@psyop.ca" body
+
+  describe "GET /links" $ do
+    it "responds with 200" $ do
+      get "/links" `shouldRespondWith` 200
+
+  describe "GET /admin" $ do
+    it "responds with 200" $ do
+      get "/admin" `shouldRespondWith` 200

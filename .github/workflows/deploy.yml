@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_IMAGE: your-dockerhub-username/psyop-website
+  DOCKER_IMAGE: psyop/psyop-website
   KUBE_CONFIG_PATH: ./k8s
 
 jobs:
@@ -16,26 +16,36 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Haskell
+      uses: haskell/actions/setup@v2
       with:
-        node-version: '18'
-        cache: 'npm'
+        ghc-version: '9.4'
+        stack-version: 'latest'
+    
+    - name: Cache Haskell dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.stack
+          .stack-work
+        key: ${{ runner.os }}-stack-${{ hashFiles('stack.yaml.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-stack-
     
     - name: Install dependencies
-      run: npm ci
+      run: stack build --dependencies-only --allow-different-user
     
     - name: Run unit tests
-      run: npm run test:unit
+      run: stack test --allow-different-user
     
-    - name: Build website
-      run: npm run build
+    - name: Build Haskell application
+      run: stack build --allow-different-user
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: website-build
-        path: dist/
+        path: .stack-work/
 
   build-and-push:
     needs: test
@@ -45,32 +55,21 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Build website
-      run: npm run build
-    
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     
-    - name: Login to Docker Hub
+    - name: Login to Container Registry
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        registry: registry.digitalocean.com
+        username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+        password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
     
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.DOCKER_IMAGE }}
+        images: registry.digitalocean.com/psyop/${{ env.DOCKER_IMAGE }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -103,9 +102,9 @@ jobs:
         IMAGE_TAG="${GITHUB_REF_NAME}-${SHA_TAG}"
         
         # Update the image tag in deployment.yaml
-        sed -i "s|image: .*|image: ${{ env.DOCKER_IMAGE }}:${IMAGE_TAG}|" k8s/deployment.yaml
+        sed -i "s|image: .*|image: registry.digitalocean.com/psyop/${{ env.DOCKER_IMAGE }}:${IMAGE_TAG}|" k8s/deployment.yaml
         
-        echo "Updated image tag to: ${{ env.DOCKER_IMAGE }}:${IMAGE_TAG}"
+        echo "Updated image tag to: registry.digitalocean.com/psyop/${{ env.DOCKER_IMAGE }}:${IMAGE_TAG}"
     
     - name: Commit updated manifests
       run: |

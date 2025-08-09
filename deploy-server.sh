@@ -5,10 +5,14 @@
 
 set -e
 
-# Configuration
-SERVER_HOST="157.245.87.253"
-SERVER_USER="root"
-DEPLOY_PATH="/var/www/psyop.ca"
+# Configuration - use environment variables with defaults
+SERVER_HOST="${DEPLOY_SERVER_HOST:-157.245.87.253}"
+SERVER_USER="${DEPLOY_SERVER_USER:-root}"
+DEPLOY_PATH="${DEPLOY_PATH:-/var/www/psyop.ca}"
+SSH_TIMEOUT="${SSH_TIMEOUT:-30}"
+
+# SSH connection options for reliability
+SSH_OPTS="-o ConnectTimeout=${SSH_TIMEOUT} -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 # Colors for output
 RED='\033[0;31m'
@@ -55,19 +59,19 @@ setup_server() {
     log "Setting up server environment..."
     
     log "Updating system packages..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "apt update && apt upgrade -y"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "apt update && apt upgrade -y" || error "Failed to update system packages"
     
     log "Installing required packages..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "apt install -y git curl build-essential nginx certbot python3-certbot-nginx"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "apt install -y git curl build-essential nginx certbot python3-certbot-nginx" || error "Failed to install required packages"
     
     log "Installing Docker..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "if ! command -v docker &> /dev/null; then curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && systemctl enable docker && systemctl start docker; fi"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "if ! command -v docker &> /dev/null; then curl -fsSL https://get.docker.com -o get-docker.sh && timeout 300 sh get-docker.sh && systemctl enable docker && systemctl start docker; fi" || error "Failed to install Docker"
     
     log "Installing Docker Compose..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "if ! command -v docker-compose &> /dev/null; then curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose; fi"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "if ! command -v docker-compose &> /dev/null; then curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-\$(uname -s)-\$(uname -m)' -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose; fi" || error "Failed to install Docker Compose"
     
     log "Creating deployment directory..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "mkdir -p /var/www/psyop.ca"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "mkdir -p ${DEPLOY_PATH}" || error "Failed to create deployment directory"
     
     success "Server environment configured"
 }
@@ -80,14 +84,11 @@ deploy_code() {
     COMMIT_HASH=$(git rev-parse HEAD)
     REPO_URL=$(git remote get-url origin)
     
-    log "Navigating to deployment directory..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} || exit 1"
-    
     log "Cloning or updating repository..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && if [ ! -d '.git' ]; then git clone ${REPO_URL} .; else git fetch origin && git reset --hard origin/main; fi"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && if [ ! -d '.git' ]; then git clone ${REPO_URL} .; else git fetch origin && git reset --hard origin/main; fi" || error "Failed to clone/update repository"
     
     log "Checking out commit ${COMMIT_HASH}..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && git checkout ${COMMIT_HASH}"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && git checkout ${COMMIT_HASH}" || error "Failed to checkout commit ${COMMIT_HASH}"
     
     success "Code deployed to server"
 }
@@ -97,23 +98,23 @@ build_and_start() {
     log "Building and starting application on server..."
     
     log "Building Docker image..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && docker build -t psyop-website:latest ."
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && timeout 600 docker build -t psyop-website:latest ." || error "Failed to build Docker image"
     
     log "Stopping existing container..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "docker stop psyop-website || true && docker rm psyop-website || true"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "docker stop psyop-website || true && docker rm psyop-website || true"
     
     log "Starting new container..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "docker run -d --name psyop-website --restart unless-stopped -p 8080:8080 psyop-website:latest"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "docker run -d --name psyop-website --restart unless-stopped -p 8080:8080 psyop-website:latest" || error "Failed to start container"
     
     log "Waiting for container to be ready..."
-    sleep 10
+    sleep 15
     
     log "Checking if container is running..."
-    if ssh "${SERVER_USER}@${SERVER_HOST}" "docker ps | grep -q psyop-website"; then
+    if ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "docker ps | grep -q psyop-website"; then
         success "Application started successfully"
     else
         error "Failed to start application"
-        ssh "${SERVER_USER}@${SERVER_HOST}" "docker logs psyop-website"
+        ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "docker logs psyop-website"
         exit 1
     fi
 }
@@ -122,7 +123,7 @@ build_and_start() {
 setup_nginx() {
     log "Configuring Nginx..."
     
-    ssh "${SERVER_USER}@${SERVER_HOST}" << 'EOF'
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" << 'EOF'
         # Create Nginx configuration
         cat > /etc/nginx/sites-available/psyop.ca << 'NGINX_CONF'
 server {
@@ -164,8 +165,9 @@ server {
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; img-src 'self' data:; script-src 'self'; connect-src 'self'" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
 }
 NGINX_CONF
         
@@ -191,9 +193,16 @@ EOF
 setup_ssl() {
     log "Setting up SSL certificate..."
     
-    ssh "${SERVER_USER}@${SERVER_HOST}" << 'EOF'
-        # Obtain SSL certificate
-        certbot --nginx -d psyop.ca -d www.psyop.ca --non-interactive --agree-tos --email admin@psyop.ca
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" << 'EOF'
+        # Obtain SSL certificate with explicit timeout and retry logic
+        for i in {1..3}; do
+            if timeout 120 certbot --nginx -d psyop.ca -d www.psyop.ca --non-interactive --agree-tos --email admin@psyop.ca --no-eff-email; then
+                break
+            else
+                echo "SSL certificate attempt $i failed, retrying..."
+                sleep 10
+            fi
+        done
         
         # Setup auto-renewal
         echo "0 12 * * * /usr/bin/certbot renew --quiet" | crontab -
@@ -209,20 +218,20 @@ verify_deployment() {
     log "Verifying deployment..."
     
     log "Checking Docker container status..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Docker Container Status ===' && docker ps | grep psyop-website"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "echo '=== Docker Container Status ===' && docker ps | grep psyop-website"
     
     log "Running application health check..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Application Health Check ===' && curl -f http://localhost:8080/ || echo 'Health check failed'"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "echo '=== Application Health Check ===' && timeout 30 curl -f http://localhost:8080/ || echo 'Health check failed'"
     
     log "Checking Nginx status..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Nginx Status ===' && systemctl status nginx --no-pager"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "echo '=== Nginx Status ===' && systemctl status nginx --no-pager"
     
     log "Checking disk usage..."
-    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Disk Usage ===' && df -h"
+    ssh ${SSH_OPTS} "${SERVER_USER}@${SERVER_HOST}" "echo '=== Disk Usage ===' && df -h"
     
     # Test external access
     log "Testing external access..."
-    if curl -f -s "http://${SERVER_HOST}" > /dev/null; then
+    if timeout 30 curl -f -s "http://${SERVER_HOST}" > /dev/null; then
         success "Website is accessible via HTTP"
     else
         warn "Website not accessible via HTTP yet"
