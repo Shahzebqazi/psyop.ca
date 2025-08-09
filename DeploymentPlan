@@ -1,0 +1,77 @@
+# psyop.ca Deployment Plan
+
+# Project Overview
+
+## My band needs a website to showcase our music, announce tours, link to social media and streaming services.
+
+## Team and Roles
+github.com/Shahzebqazi - Web Developer
+
+## Prerequisites
+Server - Digital Ocean
+(Server access, DNS management, admin) Credentials Mangement
+DNS - Squarespace
+Database - Website is static. For the forseable future*
+Version Control - Git
+SSl/TLS - 
+Mailchimp - Newsletter
+APIs - Spotify Artist, Distrokid, Bandcamp
+Website Administration - admin@psyop.ca/dev@psyop.ca
+Email Server - pm.me + proton bridge
+
+## Development Strategy
+DevOps/GitOps, Configuration Repo, website repo, Configuration YAML, 
+
+## Stack
+Nginx, HTML/CSS/Sass, Haskell.
+Git, Github actions CI/CD, Docker, Kubernetes.
+
+## DevOps
+
+### Docker
+- Deployment Manifest
+- Service Manifest
+- Docker Hub
+
+### Orchestration Platform config
+- Flux
+- Permissions
+- Deployment files and configuration repo
+- cert-manager
+
+### Build script
+-Sass
+-assets
+
+Devtoolchain
+
+Test Suite
+Development Tests
+Integration Tests
+Unit Tests
+JEST
+E2E tess
+
+Deployment
+On success of the testing suite, the website is pushed to Docker Hub and the CI/CD pipeline updates the image tag in the configuration repo
+
+
+Content and Media Assets
+File Optimization. 
+File Naming Conventions and Directory Structure.
+
+Step-by-Step Instructions
+Documentation
+Readme
+
+### Rollback Plan
+Handled via GitOps
+
+### Post-Deployment Checklist
+
+Verify the correct Docker image tag is deployed in Kubernetes.
+Verify the website is live and loading correctly.
+Confirm HTTPS is working.
+Check for broken links.
+Monitor server logs for errors.
+Test all contact forms and links to social media.

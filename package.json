@@ -1,0 +1,24 @@
+{
+  "name": "psyop-website",
+  "version": "1.0.0",
+  "description": "Official website for PSYOP band",
+  "main": "src/index.html",
+  "scripts": {
+    "build": "npm run build:css && npm run build:assets",
+    "build:css": "sass src/styles/main.scss dist/styles/main.css --style compressed",
+    "build:assets": "node scripts/build.js",
+    "dev": "sass --watch src/styles/main.scss:dist/styles/main.css & python3 -m http.server 8000 --directory dist",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "jest",
+    "test:e2e": "echo 'E2E tests not implemented yet'",
+    "clean": "rm -rf dist && mkdir -p dist/styles dist/assets"
+  },
+  "keywords": ["band", "music", "website"],
+  "author": "PSYOP",
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.70.0",
+    "jest": "^29.7.0"
+  },
+  "dependencies": {}
+}
