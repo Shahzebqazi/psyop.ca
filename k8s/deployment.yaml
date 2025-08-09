@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: psyop-website
-        image: your-dockerhub-username/psyop-website:latest
+        image: psyop/psyop-website:latest
         ports:
         - containerPort: 8080
           protocol: TCP
@@ -47,7 +47,7 @@ spec:
           timeoutSeconds: 3
           failureThreshold: 3
         env:
-        - name: NODE_ENV
+        - name: ENV
           value: "production"
       restartPolicy: Always
       securityContext:

@@ -1,50 +1,66 @@
-# Multi-stage build for psyop.ca website
-FROM node:18-alpine AS build
+# Multi-stage build for psyop.ca Haskell website
+FROM haskell:9.4 AS build
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files (create these next)
-COPY package*.json ./
+# Copy stack configuration
+COPY stack.yaml stack.yaml.lock ./
+COPY package.yaml ./
+COPY psyop-website.cabal ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Setup stack and install dependencies
+RUN stack setup
+RUN stack build --dependencies-only
 
 # Copy source code
+COPY app/ ./app/
 COPY src/ ./src/
-COPY scripts/ ./scripts/
+COPY test/ ./test/
 
-# Build the website (compile Sass, optimize assets)
-RUN npm run build
+# Build the application
+RUN stack build --copy-bins
 
 # Production stage
-FROM nginx:alpine
+FROM ubuntu:22.04
 
-# Copy custom nginx configuration
-COPY config/nginx.conf /etc/nginx/nginx.conf
-
-# Copy built website from build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libgmp10 \
+    netbase \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S nginx -u 1001
+RUN groupadd -g 1001 psyop && \
+    useradd -r -u 1001 -g psyop psyop
+
+# Create app directory and copy binary
+WORKDIR /app
+COPY --from=build /root/.local/bin/psyop-website-exe /usr/local/bin/psyop-website-exe
+
+# Copy static assets
+COPY static/ ./static/
 
 # Set permissions
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chown -R nginx:nginx /var/cache/nginx && \
-    chown -R nginx:nginx /var/log/nginx && \
-    chown -R nginx:nginx /etc/nginx/conf.d
+RUN chown -R psyop:psyop /app
 
 # Switch to non-root user
-USER nginx
+USER psyop
 
-# Expose port 8080 (non-privileged port)
+# Expose port 8080
 EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/ || exit 1
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the Haskell application
+CMD ["/usr/local/bin/psyop-website-exe"]
