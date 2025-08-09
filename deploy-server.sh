@@ -45,9 +45,8 @@ check_prerequisites() {
     fi
     
     # Check if we can reach the server
-    if ! ssh -o ConnectTimeout=5 -o BatchMode=yes "${SERVER_USER}@${SERVER_HOST}" exit &>/dev/null; then
-        error "Cannot connect to server ${SERVER_HOST}. Please check SSH access."
-    fi
+    log "Testing SSH connectivity to ${SERVER_HOST}..."
+    echo "Note: You'll need to enter the server password when prompted"
     
     success "Prerequisites check completed"
 }

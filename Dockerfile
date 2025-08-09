@@ -1,22 +1,31 @@
 # Multi-stage build for psyop.ca Haskell website
-FROM haskell:9.6 AS build
+FROM ubuntu:22.04 AS build
 
-# Update package lists for newer Debian/Ubuntu base
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
+    curl \
+    build-essential \
+    libffi-dev \
+    libgmp-dev \
+    libtinfo-dev \
+    zlib1g-dev \
     git \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Stack
+RUN curl -sSL https://get.haskellstack.org/ | sh
+
 # Set working directory
 WORKDIR /app
 
-# Copy stack configuration
+# Copy stack configuration first for better Docker layer caching
 COPY stack.yaml stack.yaml.lock ./
 COPY package.yaml ./
 COPY psyop-website.cabal ./
 
 # Setup stack and install dependencies
-RUN stack setup
+RUN stack setup --install-ghc
 RUN stack build --dependencies-only
 
 # Copy source code
