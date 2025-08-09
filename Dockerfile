@@ -24,9 +24,9 @@ COPY stack.yaml stack.yaml.lock ./
 COPY package.yaml ./
 COPY psyop-website.cabal ./
 
-# Setup stack and install dependencies
-RUN stack setup --install-ghc
-RUN stack build --dependencies-only
+# Setup stack environment and install dependencies
+RUN stack setup --install-ghc --allow-different-user
+RUN stack build --dependencies-only --allow-different-user
 
 # Copy source code
 COPY app/ ./app/
@@ -34,7 +34,7 @@ COPY src/ ./src/
 COPY test/ ./test/
 
 # Build the application
-RUN stack build --copy-bins
+RUN stack build --copy-bins --allow-different-user
 
 # Production stage
 FROM ubuntu:22.04
