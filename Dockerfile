@@ -1,7 +1,7 @@
 # Multi-stage build for psyop.ca Haskell website
-FROM haskell:9.4 AS build
+FROM haskell:9.6 AS build
 
-# Install system dependencies
+# Update package lists for newer Debian/Ubuntu base
 RUN apt-get update && apt-get install -y \
     git \
     ca-certificates \
