@@ -31,7 +31,7 @@ fi
 # This action will permanently remove all uncommitted changes.
 # ==============================================================================
 echo "Rolling back to the previous commit..."
-cd "$DEPLOYMENT_DIR"
+cd "$DEPLOYMENT_DIR" || exit 1
 git reset --hard HEAD^
 
 # A sanity check to show the current commit after the rollback.

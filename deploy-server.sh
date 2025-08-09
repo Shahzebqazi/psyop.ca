@@ -9,7 +9,6 @@ set -e
 SERVER_HOST="157.245.87.253"
 SERVER_USER="root"
 DEPLOY_PATH="/var/www/psyop.ca"
-SERVICE_NAME="psyop-website"
 
 # Colors for output
 RED='\033[0;31m'
@@ -94,11 +93,11 @@ deploy_code() {
     
     ssh "${SERVER_USER}@${SERVER_HOST}" << EOF
         # Navigate to deployment directory
-        cd ${DEPLOY_PATH}
+        cd ${DEPLOY_PATH} || exit 1
         
         # Clone or update repository
         if [ ! -d ".git" ]; then
-            git clone $(git remote get-url origin) .
+            git clone \$(git remote get-url origin) .
         else
             git fetch origin
             git reset --hard origin/main
@@ -118,7 +117,7 @@ build_and_start() {
     log "Building and starting application on server..."
     
     ssh "${SERVER_USER}@${SERVER_HOST}" << EOF
-        cd ${DEPLOY_PATH}
+        cd ${DEPLOY_PATH} || exit 1
         
         # Build Docker image
         docker build -t psyop-website:latest .
