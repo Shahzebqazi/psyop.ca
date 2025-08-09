@@ -54,32 +54,20 @@ check_prerequisites() {
 setup_server() {
     log "Setting up server environment..."
     
-    ssh "${SERVER_USER}@${SERVER_HOST}" << 'EOF'
-        # Update system packages
-        apt update && apt upgrade -y
-        
-        # Install required packages
-        apt install -y git curl build-essential nginx certbot python3-certbot-nginx
-        
-        # Install Docker
-        if ! command -v docker &> /dev/null; then
-            curl -fsSL https://get.docker.com -o get-docker.sh
-            sh get-docker.sh
-            systemctl enable docker
-            systemctl start docker
-        fi
-        
-        # Install Docker Compose
-        if ! command -v docker-compose &> /dev/null; then
-            curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-        fi
-        
-        # Create deployment directory
-        mkdir -p /var/www/psyop.ca
-        
-        echo "Server environment setup completed"
-EOF
+    log "Updating system packages..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "apt update && apt upgrade -y"
+    
+    log "Installing required packages..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "apt install -y git curl build-essential nginx certbot python3-certbot-nginx"
+    
+    log "Installing Docker..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "if ! command -v docker &> /dev/null; then curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh && systemctl enable docker && systemctl start docker; fi"
+    
+    log "Installing Docker Compose..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "if ! command -v docker-compose &> /dev/null; then curl -L 'https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)' -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose; fi"
+    
+    log "Creating deployment directory..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "mkdir -p /var/www/psyop.ca"
     
     success "Server environment configured"
 }
@@ -90,24 +78,16 @@ deploy_code() {
     
     # Get current commit hash
     COMMIT_HASH=$(git rev-parse HEAD)
+    REPO_URL=$(git remote get-url origin)
     
-    ssh "${SERVER_USER}@${SERVER_HOST}" << EOF
-        # Navigate to deployment directory
-        cd ${DEPLOY_PATH} || exit 1
-        
-        # Clone or update repository
-        if [ ! -d ".git" ]; then
-            git clone \$(git remote get-url origin) .
-        else
-            git fetch origin
-            git reset --hard origin/main
-        fi
-        
-        # Checkout specific commit
-        git checkout ${COMMIT_HASH}
-        
-        echo "Code deployment completed"
-EOF
+    log "Navigating to deployment directory..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} || exit 1"
+    
+    log "Cloning or updating repository..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && if [ ! -d '.git' ]; then git clone ${REPO_URL} .; else git fetch origin && git reset --hard origin/main; fi"
+    
+    log "Checking out commit ${COMMIT_HASH}..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && git checkout ${COMMIT_HASH}"
     
     success "Code deployed to server"
 }
@@ -116,37 +96,26 @@ EOF
 build_and_start() {
     log "Building and starting application on server..."
     
-    ssh "${SERVER_USER}@${SERVER_HOST}" << EOF
-        cd ${DEPLOY_PATH} || exit 1
-        
-        # Build Docker image
-        docker build -t psyop-website:latest .
-        
-        # Stop existing container if running
-        docker stop psyop-website || true
-        docker rm psyop-website || true
-        
-        # Start new container
-        docker run -d \
-            --name psyop-website \
-            --restart unless-stopped \
-            -p 8080:8080 \
-            psyop-website:latest
-        
-        # Wait for container to be ready
-        sleep 10
-        
-        # Check if container is running
-        if docker ps | grep -q psyop-website; then
-            echo "Application started successfully"
-        else
-            echo "Failed to start application"
-            docker logs psyop-website
-            exit 1
-        fi
-EOF
+    log "Building Docker image..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "cd ${DEPLOY_PATH} && docker build -t psyop-website:latest ."
     
-    success "Application built and started"
+    log "Stopping existing container..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "docker stop psyop-website || true && docker rm psyop-website || true"
+    
+    log "Starting new container..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "docker run -d --name psyop-website --restart unless-stopped -p 8080:8080 psyop-website:latest"
+    
+    log "Waiting for container to be ready..."
+    sleep 10
+    
+    log "Checking if container is running..."
+    if ssh "${SERVER_USER}@${SERVER_HOST}" "docker ps | grep -q psyop-website"; then
+        success "Application started successfully"
+    else
+        error "Failed to start application"
+        ssh "${SERVER_USER}@${SERVER_HOST}" "docker logs psyop-website"
+        exit 1
+    fi
 }
 
 # Configure Nginx
@@ -239,20 +208,17 @@ EOF
 verify_deployment() {
     log "Verifying deployment..."
     
-    # Check if container is running
-    ssh "${SERVER_USER}@${SERVER_HOST}" << 'EOF'
-        echo "=== Docker Container Status ==="
-        docker ps | grep psyop-website
-        
-        echo "=== Application Health Check ==="
-        curl -f http://localhost:8080/ || echo "Health check failed"
-        
-        echo "=== Nginx Status ==="
-        systemctl status nginx --no-pager
-        
-        echo "=== Disk Usage ==="
-        df -h
-EOF
+    log "Checking Docker container status..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Docker Container Status ===' && docker ps | grep psyop-website"
+    
+    log "Running application health check..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Application Health Check ===' && curl -f http://localhost:8080/ || echo 'Health check failed'"
+    
+    log "Checking Nginx status..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Nginx Status ===' && systemctl status nginx --no-pager"
+    
+    log "Checking disk usage..."
+    ssh "${SERVER_USER}@${SERVER_HOST}" "echo '=== Disk Usage ===' && df -h"
     
     # Test external access
     log "Testing external access..."
