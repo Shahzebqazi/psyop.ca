@@ -1,0 +1,19 @@
+[Unit]
+Description=PSYOP Website Webhook Server
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=psyop
+WorkingDirectory=/opt/psyop-website
+ExecStart=/usr/bin/python3 /opt/psyop-website/webhook-server.py
+Restart=always
+RestartSec=3
+Environment=WEBHOOK_SECRET=your-webhook-secret-here
+Environment=WEBHOOK_PORT=9000
+Environment=REPO_PATH=/opt/psyop-website
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
