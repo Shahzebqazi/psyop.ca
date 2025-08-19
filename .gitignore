@@ -85,6 +85,8 @@ temp/
 build/
 dist/
 .build/
+src/Main
+app/Main
 
 # Environment files
 .env

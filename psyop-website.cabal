@@ -86,6 +86,7 @@ description:    🎵 PSYOP Official Website
                 Test: stack test  
                 Run: stack exec psyop-website-exe
                 Local server: http://localhost:8080
+                Scripts: ./scripts/[script-name].sh
                 .
                 🌐 DEPLOYMENT
                 The project includes automated deployment to DigitalOcean:
@@ -96,14 +97,17 @@ description:    🎵 PSYOP Official Website
                 - Systemd service management
                 .
                 📁 PROJECT STRUCTURE
-                - app/ - Application entry point (Main.hs)
-                - src/ - Source code (Lib.hs - core logic)
+                - src/ - Source code (Main.hs entry point, Lib.hs core logic)
                 - test/ - Test suites (Spec.hs)
                 - static/ - Static assets (CSS, images)
                 - config/ - Configuration files
-                - auto-deploy.sh - Main deployment script
-                - webhook-server.py - GitHub webhook receiver
-                - server-setup.sh - Server preparation
+                - scripts/ - Deployment and utility scripts
+                  - auto-deploy.sh - Main deployment script
+                  - webhook-server.py - GitHub webhook receiver
+                  - server-setup.sh - Server preparation
+                  - deploy-digitalocean.sh - DigitalOcean deployment
+                  - git_rollback.sh - Git rollback utility
+                  - load-env.sh - Environment variable loader
                 .
                 🚨 MONITORING & HEALTH CHECKS
                 - Application: curl http://localhost:8080/
@@ -141,6 +145,12 @@ extra-source-files:
     env.template
     static/style.css
     config/nginx.conf
+    scripts/auto-deploy.sh
+    scripts/deploy-digitalocean.sh
+    scripts/git_rollback.sh
+    scripts/load-env.sh
+    scripts/server-setup.sh
+    scripts/webhook-server.py
 
 source-repository head
   type: git
@@ -149,6 +159,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Main
   other-modules:
       Paths_psyop_website
   autogen-modules:
@@ -175,11 +186,12 @@ library
 executable psyop-website-exe
   main-is: Main.hs
   other-modules:
+      Lib
       Paths_psyop_website
   autogen-modules:
       Paths_psyop_website
   hs-source-dirs:
-      app
+      src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5

@@ -13,6 +13,7 @@ extra-source-files:
 - env.template
 - static/*
 - config/*
+- scripts/*
 
 # Project metadata
 synopsis:            Official website for PSYOP electronic music project
@@ -99,6 +100,7 @@ description: |
   Test: stack test  
   Run: stack exec psyop-website-exe
   Local server: http://localhost:8080
+  Scripts: ./scripts/[script-name].sh
   
   🌐 DEPLOYMENT
   The project includes automated deployment to DigitalOcean:
@@ -109,14 +111,17 @@ description: |
   - Systemd service management
   
   📁 PROJECT STRUCTURE
-  - app/ - Application entry point (Main.hs)
-  - src/ - Source code (Lib.hs - core logic)
+  - src/ - Source code (Main.hs entry point, Lib.hs core logic)
   - test/ - Test suites (Spec.hs)
   - static/ - Static assets (CSS, images)
   - config/ - Configuration files
-  - auto-deploy.sh - Main deployment script
-  - webhook-server.py - GitHub webhook receiver
-  - server-setup.sh - Server preparation
+  - scripts/ - Deployment and utility scripts
+    - auto-deploy.sh - Main deployment script
+    - webhook-server.py - GitHub webhook receiver
+    - server-setup.sh - Server preparation
+    - deploy-digitalocean.sh - DigitalOcean deployment
+    - git_rollback.sh - Git rollback utility
+    - load-env.sh - Environment variable loader
   
   🚨 MONITORING & HEALTH CHECKS
   - Application: curl http://localhost:8080/
@@ -174,7 +179,7 @@ library:
 executables:
   psyop-website-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         src
     ghc-options:
     - -threaded
     - -rtsopts
