@@ -53,13 +53,13 @@ show_help() {
     echo "  ./stack-dev status   # Check status"
     echo ""
     echo "This provides the same functionality as:"
-    echo "  runhaskell config/dev-server.hs [COMMAND]"
+echo "  runhaskell .config/dev-server.hs [COMMAND]"
 }
 
 # Function to check if dev-server.hs exists
 check_dev_server() {
-    if [ ! -f "config/dev-server.hs" ]; then
-        print_error "config/dev-server.hs not found!"
+    if [ ! -f ".config/dev-server.hs" ]; then
+        print_error ".config/dev-server.hs not found!"
         print_error "Please ensure you're running this script from the project root"
         exit 1
     fi
@@ -68,13 +68,13 @@ check_dev_server() {
 # Function to run the dev-server command
 run_dev_server() {
     local command="$1"
-    print_info "Running: runhaskell config/dev-server.hs $command"
+    print_info "Running: runhaskell .config/dev-server.hs $command"
     
     if command -v runhaskell >/dev/null 2>&1; then
-        runhaskell config/dev-server.hs "$command"
+        runhaskell .config/dev-server.hs "$command"
     elif command -v stack >/dev/null 2>&1; then
         print_info "runhaskell not found, using stack exec runhaskell"
-        stack exec runhaskell config/dev-server.hs "$command"
+        stack exec runhaskell .config/dev-server.hs "$command"
     else
         print_error "Neither runhaskell nor stack found!"
         print_error "Please install Haskell Stack: https://docs.haskellstack.org/"

@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PSYOP - Electronic Music</title>
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Three.js for WebGL physics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
 <!-- Dynamic background system -->
 <div class="dynamic-background" id="dynamic-background">
-    <!-- Lovecraftian horror transition background -->
-    <div class="lovecraftian-transition" id="lovecraftian-transition"></div>
+    <!-- Transition overlay for smooth image changes -->
+    <div class="transition-overlay" id="transition-overlay"></div>
     <!-- White images for vertical screens -->
     <img src="/assets/white/promo_1.jpg" class="background-image" data-index="0" alt="Background 1">
     <img src="/assets/white/promo_2.jpg" class="background-image" data-index="1" alt="Background 2">
@@ -57,6 +62,72 @@
 <main>
   <section id="home" class="page">
     <div class="page-content">
+      <!-- Polaroid String Gallery - Hung Side by Side -->
+      <div class="polaroid-string-gallery">
+        <!-- String line with Halloween decorations -->
+        <div class="string-line">
+          <!-- Spider web on the left -->
+          <div class="spider-web left-web"></div>
+          
+          <!-- Pumpkin decoration -->
+          <div class="pumpkin-decoration"></div>
+          
+          <!-- Bat decoration -->
+          <div class="bat-decoration"></div>
+          
+          <!-- Spider web on the right -->
+          <div class="spider-web right-web"></div>
+        </div>
+        
+        <!-- Polaroids hung on the string -->
+        <div class="polaroid-row">
+          <!-- psyop 01 Moonlight Paradox -->
+          <div class="polaroid-container" id="polaroid1">
+            <div class="string-clip"></div>
+            <div class="polaroid-image">
+              <div class="polaroid-caption">psyop 01 Moonlight Paradox /ln April 2025</div>
+              <img 
+                src="/assets/white/promo_5.jpg" 
+                alt="PSYOP 01 Moonlight Paradox" 
+                loading="lazy"
+                decoding="async"
+                onload="this.style.opacity='1'"
+                style="opacity: 0; transition: opacity 0.5s ease-in-out;">
+            </div>
+          </div>
+          
+          <!-- psyop 02 Great in Vain -->
+          <div class="polaroid-container" id="polaroid2">
+            <div class="string-clip"></div>
+            <div class="polaroid-image">
+              <div class="polaroid-caption">psyop 02 Great in Vain /ln August 2025</div>
+              <img 
+                src="/assets/white/promo_1.jpg" 
+                alt="PSYOP 02 Great in Vain" 
+                loading="lazy"
+                decoding="async"
+                onload="this.style.opacity='1'"
+                style="opacity: 0; transition: opacity 0.5s ease-in-out;">
+            </div>
+          </div>
+          
+          <!-- @psyopband -->
+          <div class="polaroid-container" id="polaroid3" onclick="window.open('https://instagram.com/psyopband', '_blank')">
+            <div class="string-clip"></div>
+            <div class="polaroid-image clickable">
+              <div class="polaroid-caption">@psyopband</div>
+              <img 
+                src="/assets/white/promo_2.jpg" 
+                alt="PSYOP Band Photo" 
+                loading="lazy"
+                decoding="async"
+                onload="this.style.opacity='1'"
+                style="opacity: 0; transition: opacity 0.5s ease-in-out;">
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div class="scroll-indicator">
         <div class="scroll-text">Scroll Down</div>
         <div class="scroll-arrow">
@@ -70,6 +141,51 @@
   
   <section id="music" class="page">
     <div class="page-content">
+      <h2>Music</h2>
+      <div class="music-tracks">
+        <!-- psyop 01 Moonlight Paradox -->
+        <div class="track-item">
+          <div class="track-artwork">
+            <img 
+              src="/assets/white/promo_5.jpg" 
+              alt="psyop 01 Moonlight Paradox" 
+              loading="lazy"
+              decoding="async"
+              onload="this.style.opacity='1'"
+              style="opacity: 0; transition: opacity 0.5s ease-in-out;">
+          </div>
+          <div class="track-info">
+            <h3>psyop 01 Moonlight Paradox</h3>
+            <p class="track-status">April 2025</p>
+            <a href="https://distrokid.com/hyperfollow/psyop21/moonlight-paradox" 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               class="track-link">
+              Listen Now
+            </a>
+          </div>
+        </div>
+        
+        <!-- psyop 02 Great in Vain -->
+        <div class="track-item">
+          <div class="track-artwork">
+            <img 
+              src="/assets/white/promo_1.jpg" 
+              alt="psyop 02 Great in Vain" 
+              loading="lazy"
+              decoding="async"
+              onload="this.style.opacity='1'"
+              style="opacity: 0; transition: opacity 0.5s ease-in-out;">
+          </div>
+          <div class="track-info">
+            <h3>psyop 02 Great in Vain</h3>
+            <p class="track-status">August 2025</p>
+            <a href="#" class="track-link disabled">
+              Coming Soon
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
   
@@ -95,6 +211,7 @@
             this.recentImages = []; // Track recently used images
             this.minRepeatDistance = 6; // Minimum images before repetition
             this.usedCount = 0; // Simple counter instead of array length
+            this.scrollTimeout = null; // For scroll idle detection
             this.init();
         }
 
@@ -113,6 +230,9 @@
             
             // Initialize manual menu highlighting
             this.initManualMenuHighlighting();
+            
+            // Initialize background state (start with scrolling state)
+            this.backgroundContainer.classList.add('scrolling');
         }
 
         handleScroll() {
@@ -125,6 +245,15 @@
             
             // Update background image based on scroll progress (every half page)
             this.updateBackgroundImageByScroll(scrollProgress);
+            
+            // Update menu highlighting based on scroll position
+            this.updateMenuHighlighting(scrollPosition);
+            
+            // Handle scroll idle detection for background blur effect
+            this.handleScrollIdle();
+            
+            // Animate Polaroid based on scroll
+            this.animatePolaroid(scrollPosition);
         }
 
         updateBackgroundImage(sectionIndex) {
@@ -185,12 +314,12 @@
             // Ensure index is within bounds
             const clampedIndex = Math.min(Math.max(index, 0), images.length - 1);
             
-            // Show Lovecraftian transition background
-            const lovecraftianTransition = document.getElementById('lovecraftian-transition');
-            if (lovecraftianTransition) {
-                lovecraftianTransition.classList.add('active');
+            // Show transition overlay
+            const transitionOverlay = document.getElementById('transition-overlay');
+            if (transitionOverlay) {
+                transitionOverlay.classList.add('active');
             } else {
-                console.warn('Lovecraftian transition element not found');
+                console.warn('Transition overlay element not found');
             }
             
             // Hide all images first
@@ -205,12 +334,12 @@
                     console.error(`Image at index ${clampedIndex} not found`);
                 }
                 
-                // Hide Lovecraftian transition after image is visible
+                // Hide transition overlay after image is visible
                 setTimeout(() => {
-                    if (lovecraftianTransition) {
-                        lovecraftianTransition.classList.remove('active');
+                    if (transitionOverlay) {
+                        transitionOverlay.classList.remove('active');
                     }
-                }, 800);
+                }, 600);
                 
                 // Update current index
                 this.currentImageIndex = clampedIndex;
@@ -218,29 +347,40 @@
         }
 
         findNonRepeatingImage(baseIndex, totalImages) {
-            // Start with the base index
-            let candidateIndex = baseIndex;
+            // Special transition logic: alternate between promo_9.jpg (index 8) and promo_12.jpg (index 11)
+            const promo9Index = 8;  // promo_9.jpg
+            const promo12Index = 11; // promo_12.jpg
             
-            // Check if this image has been used recently
-            for (let attempts = 0; attempts < totalImages; attempts++) {
-                // Ensure index is within bounds
-                candidateIndex = (candidateIndex + attempts) % totalImages;
+            // If we're currently showing promo_9, switch to promo_12, and vice versa
+            if (this.currentImageIndex === promo9Index) {
+                return promo12Index;
+            } else if (this.currentImageIndex === promo12Index) {
+                return promo9Index;
+            } else {
+                // For other images, use the original non-repeating logic
+                let candidateIndex = baseIndex;
                 
-                // Check if this image hasn't been used in the last minRepeatDistance images
-                if (!this.recentImages.includes(candidateIndex)) {
-                    // Add to recent images and remove oldest if we exceed the limit
-                    this.recentImages.push(candidateIndex);
-                    if (this.recentImages.length > this.minRepeatDistance) {
-                        this.recentImages.shift();
+                // Check if this image has been used recently
+                for (let attempts = 0; attempts < totalImages; attempts++) {
+                    // Ensure index is within bounds
+                    candidateIndex = (baseIndex + attempts) % totalImages;
+                    
+                    // Check if this image hasn't been used in the last minRepeatDistance images
+                    if (!this.recentImages.includes(candidateIndex)) {
+                        // Add to recent images and remove oldest if we exceed the limit
+                        this.recentImages.push(candidateIndex);
+                        if (this.recentImages.length > this.minRepeatDistance) {
+                            this.recentImages.shift();
+                        }
+                        return candidateIndex;
                     }
-                    return candidateIndex;
                 }
+                
+                // If all images have been used recently, reset and use base index
+                this.recentImages = [];
+                this.recentImages.push(baseIndex);
+                return baseIndex;
             }
-            
-            // If all images have been used recently, reset and use base index
-            this.recentImages = [];
-            this.recentImages.push(baseIndex);
-            return baseIndex;
         }
 
         handleResize() {
@@ -254,6 +394,91 @@
             }
         }
 
+        handleScrollIdle() {
+            // Clear existing timeout
+            if (this.scrollTimeout) {
+                clearTimeout(this.scrollTimeout);
+            }
+            
+            // Remove idle class (show scrolling state)
+            this.backgroundContainer.classList.remove('idle');
+            this.backgroundContainer.classList.add('scrolling');
+            
+            // Set timeout to add idle class after scrolling stops
+            this.scrollTimeout = setTimeout(() => {
+                this.backgroundContainer.classList.remove('scrolling');
+                this.backgroundContainer.classList.add('idle');
+            }, 1000); // 1 second delay before applying blur
+        }
+        
+        updateMenuHighlighting(scrollPosition) {
+            const sections = ['home', 'music', 'links', 'shows'];
+            const menuLinks = document.querySelectorAll('.menu-link');
+            const windowHeight = window.innerHeight;
+            
+            // Find which section is currently in view
+            let currentSection = 'home';
+            sections.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top <= windowHeight * 0.5 && rect.bottom >= windowHeight * 0.5) {
+                        currentSection = sectionId;
+                    }
+                }
+            });
+            
+            // Update menu highlighting
+            menuLinks.forEach(link => {
+                const href = link.getAttribute('href').substring(1);
+                if (href === currentSection) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+        
+        animatePolaroid(scrollPosition) {
+            const polaroids = ['polaroid1', 'polaroid2', 'polaroid3'];
+            
+            polaroids.forEach((id, index) => {
+                const polaroid = document.getElementById(id);
+                if (!polaroid) return;
+                
+                const windowHeight = window.innerHeight;
+                const polaroidRect = polaroid.getBoundingClientRect();
+                const polaroidCenter = polaroidRect.top + polaroidRect.height / 2;
+                const viewportCenter = windowHeight / 2;
+                
+                // Calculate distance from viewport center
+                const distanceFromCenter = polaroidCenter - viewportCenter;
+                const maxDistance = windowHeight / 2;
+                const scrollProgress = Math.abs(distanceFromCenter) / maxDistance;
+                
+                // Apply parallax effect with different offsets for each Polaroid
+                const offsetMultipliers = [0.2, 0.3, 0.4]; // Reduced parallax for string layout
+                const offsetMultiplier = offsetMultipliers[index] || 0.3;
+                const parallaxOffset = distanceFromCenter * offsetMultiplier;
+                const rotation = -1 + (scrollProgress * 2); // Reduced rotation for string layout
+                const scale = 1 - (scrollProgress * 0.05); // Reduced scale effect
+                
+                polaroid.style.transform = `
+                    translateY(${parallaxOffset}px) 
+                    rotate(${rotation}deg) 
+                    scale(${scale})
+                    translateZ(${scrollProgress * 10}px)
+                `;
+                
+                // Add floating animation when in view
+                if (Math.abs(distanceFromCenter) < windowHeight * 0.3) {
+                    polaroid.classList.add('scroll-animate');
+                } else {
+                    polaroid.classList.remove('scroll-animate');
+                }
+            });
+        }
+        
         initManualMenuHighlighting() {
             const menuLinks = document.querySelectorAll('.menu-link');
             
@@ -294,6 +519,8 @@
 
     // Initialize the dynamic background system
     const dynamicBackground = new DynamicBackground();
+    
+
 </script>
 
 </body>

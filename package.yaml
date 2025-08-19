@@ -131,8 +131,7 @@ description: |
   │   ├── dev-server.hs       # Development server with setup tools
   │   ├── nginx.conf          # Production nginx configuration
   │   └── dev/                # Development tools
-  │       ├── stack-dev       # Stack-like development commands
-  │       └── test-ui         # UI/UX testing script
+  │       └── stack-dev       # Stack-like development commands
   ├── public/                  # Static frontend files
   │   ├── index.html          # Main HTML page with JavaScript
   │   └── css/                # Stylesheets

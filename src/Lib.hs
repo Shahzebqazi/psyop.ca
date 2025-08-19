@@ -1,4 +1,9 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Lib
     ( startApp
@@ -11,7 +16,9 @@ import Servant
 import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
+import Text.Blaze.Html (preEscapedToHtml)
 import Control.Monad.IO.Class (liftIO)
+import Data.Proxy
 
 -- Simple configuration
 data Config = Config
@@ -30,6 +37,8 @@ type API = Get '[HTML] Html
       :<|> "about" :> Get '[HTML] Html
       :<|> "contact" :> Get '[HTML] Html
       :<|> "health" :> Get '[HTML] Html
+      :<|> "css" :> Raw
+      :<|> "assets" :> Raw
       :<|> Raw
 
 -- HTML content type for Servant
@@ -51,25 +60,16 @@ server = homePage
     :<|> aboutPage
     :<|> contactPage
     :<|> healthPage
+    :<|> serveDirectoryFileServer "public/css"
+    :<|> serveDirectoryFileServer "assets"
     :<|> serveDirectoryFileServer "public"
 
 -- Page handlers
 homePage :: Handler Html
-homePage = liftIO $ readFile "public/index.html" >>= return . toHtml
+homePage = liftIO $ readFile "public/index.html" >>= return . preEscapedToHtml
 
 musicPage :: Handler Html
-musicPage = return $ pageTemplate "PSYOP - Music" $ do
-    H.div ! A.class_ "content-section" $ do
-        H.h1 "Music"
-        H.p "Discover PSYOP's latest tracks and releases."
-        H.div ! A.class_ "music-grid" $ do
-            H.div ! A.class_ "track-item" $ do
-                H.h3 "MOONLIGHT PARADOX"
-                H.p "Latest release - Available now on all platforms"
-                H.a ! A.href "https://distrokid.com/hyperfollow/psyop21/moonlight-paradox" 
-                    ! A.target "_blank"
-                    ! A.rel "noopener noreferrer"
-                    ! A.class_ "listen-button" $ "LISTEN NOW"
+musicPage = liftIO $ readFile "public/index.html" >>= return . preEscapedToHtml
 
 showsPage :: Handler Html
 showsPage = return $ pageTemplate "PSYOP - Upcoming Shows" $ do
@@ -105,17 +105,43 @@ linksPage = return $ pageTemplate "PSYOP - Links" $ do
     H.h1 "Links"
     H.div ! A.class_ "links-grid" $ do
         H.div ! A.class_ "link-category" $ do
+            H.h2 "Contact"
+            H.div ! A.class_ "contact-links" $ do
+                H.div ! A.class_ "contact-item" $ do
+                    H.img ! A.src "/assets/icons/contact/email.svg" ! A.alt "Email" ! A.class_ "contact-icon"
+                    H.a ! A.href "mailto:info@psyop.ca" $ "info@psyop.ca"
+                H.div ! A.class_ "contact-item" $ do
+                    H.img ! A.src "/assets/icons/contact/email.svg" ! A.alt "Email" ! A.class_ "contact-icon"
+                    H.a ! A.href "mailto:booking@psyop.ca" $ "booking@psyop.ca"
+        
+        H.div ! A.class_ "link-category" $ do
             H.h2 "Music Platforms"
-            H.ul $ do
-                H.li $ H.a ! A.href "#" $ "Spotify"
-                H.li $ H.a ! A.href "#" $ "Bandcamp"
-                H.li $ H.a ! A.href "#" $ "SoundCloud"
+            H.div ! A.class_ "platform-links" $ do
+                H.div ! A.class_ "platform-item" $ do
+                    H.img ! A.src "/assets/icons/streaming/spotify.svg" ! A.alt "Spotify" ! A.class_ "platform-icon"
+                    H.a ! A.href "https://open.spotify.com/artist/psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Spotify"
+                H.div ! A.class_ "platform-item" $ do
+                    H.img ! A.src "/assets/icons/streaming/bandcamp.svg" ! A.alt "Bandcamp" ! A.class_ "platform-icon"
+                    H.a ! A.href "https://psyop.bandcamp.com" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Bandcamp"
+                H.div ! A.class_ "platform-item" $ do
+                    H.img ! A.src "/assets/icons/streaming/soundcloud.svg" ! A.alt "SoundCloud" ! A.class_ "platform-icon"
+                    H.a ! A.href "https://soundcloud.com/psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "SoundCloud"
+                H.div ! A.class_ "platform-item" $ do
+                    H.img ! A.src "/assets/icons/streaming/apple_music.svg" ! A.alt "Apple Music" ! A.class_ "platform-icon"
+                    H.a ! A.href "https://music.apple.com/artist/psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Apple Music"
+        
         H.div ! A.class_ "link-category" $ do
             H.h2 "Social Media"
-            H.ul $ do
-                H.li $ H.a ! A.href "#" $ "Instagram"
-                H.li $ H.a ! A.href "#" $ "Twitter"
-                H.li $ H.a ! A.href "#" $ "Facebook"
+            H.div ! A.class_ "social-links" $ do
+                H.div ! A.class_ "social-item" $ do
+                    H.img ! A.src "/assets/icons/social/instagram.svg" ! A.alt "Instagram" ! A.class_ "social-icon"
+                    H.a ! A.href "https://instagram.com/psyopband" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Instagram"
+                H.div ! A.class_ "social-item" $ do
+                    H.img ! A.src "/assets/icons/social/twitter.svg" ! A.alt "Twitter" ! A.class_ "social-icon"
+                    H.a ! A.href "https://twitter.com/psyopband" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Twitter"
+                H.div ! A.class_ "social-item" $ do
+                    H.img ! A.src "/assets/icons/social/facebook.svg" ! A.alt "Facebook" ! A.class_ "social-icon"
+                    H.a ! A.href "https://facebook.com/psyopband" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Facebook"
 
 healthPage :: Handler Html
 healthPage = return $ pageTemplate "PSYOP - Health Check" $ do

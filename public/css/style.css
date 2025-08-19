@@ -18,43 +18,9 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* Add a subtle pattern overlay */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
-    z-index: -2;
-    pointer-events: none;
-}
+/* Remove redundant body overlays - using dynamic background system instead */
 
-/* Add animated grid pattern */
-body::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    z-index: -1;
-    pointer-events: none;
-    animation: gridMove 20s linear infinite;
-}
-
-@keyframes gridMove {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(50px, 50px); }
-}
+/* Removed unused gridMove animation */
 
 /* Dynamic background system */
 .dynamic-background {
@@ -63,28 +29,34 @@ body::after {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -3;
+    z-index: -2;
     overflow: hidden;
+    transition: filter 0.8s ease-in-out;
 }
 
-/* Lovecraftian horror transition background */
-.lovecraftian-transition {
+.dynamic-background.scrolling {
+    filter: blur(0px);
+}
+
+.dynamic-background.idle {
+    filter: blur(8px);
+}
+
+/* Simple transition overlay for smooth image changes */
+.transition-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -2;
+    z-index: -1;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.6s ease-in-out;
-    background: 
-        radial-gradient(circle at 30% 70%, rgba(139, 0, 0, 0.4) 0%, transparent 60%),
-        radial-gradient(circle at 70% 30%, rgba(0, 0, 0, 0.6) 0%, transparent 60%),
-        radial-gradient(circle at 50% 50%, rgba(25, 25, 112, 0.3) 0%, transparent 70%);
+    transition: opacity 0.4s ease-in-out;
+    background: rgba(0, 0, 0, 0.3);
 }
 
-.lovecraftian-transition.active {
+.transition-overlay.active {
     opacity: 1;
 }
 
@@ -446,12 +418,12 @@ main {
 
 #main-menu a {
     text-decoration: none;
-    color: #aaa;
+    color: #666;
     font-size: 18px;
     font-weight: 500;
     transition: all 0.3s ease-in-out;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 0;
     position: relative;
     overflow: hidden;
 }
@@ -462,7 +434,7 @@ main {
 }
 
 #main-menu a.active {
-    color: #fff;
+    color: #000;
     background: rgba(220, 20, 60, 0.9);
     box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
     transform: translateY(-2px);
@@ -486,12 +458,12 @@ main {
 /* Menu link specific styling - consolidated */
 .menu-link {
     text-decoration: none;
-    color: #aaa;
+    color: #666;
     font-size: 18px;
     font-weight: 500;
     transition: all 0.3s ease-in-out;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 0;
     position: relative;
     overflow: hidden;
 }
@@ -502,7 +474,7 @@ main {
 }
 
 .menu-link.active {
-    color: #fff;
+    color: #000;
     background: rgba(220, 20, 60, 0.9);
     box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
     transform: translateY(-2px);
@@ -527,19 +499,11 @@ main {
 h2 {
     font-size: 3em;
     text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    background: linear-gradient(45deg, #fff, #a8e6cf, #dcedc1);
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: textGlow 3s ease-in-out infinite alternate;
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    color: #000;
 }
 
-@keyframes textGlow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
-}
+
 
 /* Enhanced text styling */
 h3 {
@@ -703,5 +667,727 @@ p {
     }
     50% {
         transform: translateY(-10px);
+    }
+}
+
+/* Polaroid String Gallery - Hung Side by Side */
+.polaroid-string-gallery {
+    position: relative;
+    margin: 60px auto;
+    max-width: 1200px;
+}
+
+.string-line {
+    position: relative;
+    height: 4px;
+    background: linear-gradient(90deg, #8B4513, #D2691E, #8B4513);
+    border-radius: 2px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.polaroid-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+
+.polaroid-container {
+    position: relative;
+    width: 280px;
+    height: 370px;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    /* Performance optimizations */
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    margin-bottom: 20px;
+}
+
+.string-clip {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: #C0C0C0;
+    border-radius: 50%;
+    border: 3px solid #8B4513;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.string-clip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: #8B4513;
+    border-radius: 50%;
+}
+
+/* Halloween CSS Art Elements */
+
+/* Spider Web */
+.spider-web {
+    position: absolute;
+    top: -20px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.8;
+}
+
+.spider-web.left-web {
+    left: 20px;
+}
+
+.spider-web.right-web {
+    right: 20px;
+}
+
+.spider-web::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, #fff 8px, #fff 9px, transparent 9px),
+        linear-gradient(45deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%),
+        linear-gradient(-45deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%),
+        linear-gradient(0deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%),
+        linear-gradient(90deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%);
+    background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 40px 40px;
+    background-position: center, center, center, center, center;
+    animation: webSway 4s ease-in-out infinite;
+}
+
+/* Pumpkin */
+.pumpkin-decoration {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 35px;
+    background: #FF6B35;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.pumpkin-decoration::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 8px;
+    background: #228B22;
+    border-radius: 50% 50% 0 0;
+}
+
+.pumpkin-decoration::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: 
+        radial-gradient(circle at 30% 30%, #FF6B35 0, #FF6B35 2px, transparent 2px),
+        radial-gradient(circle at 70% 30%, #FF6B35 0, #FF6B35 2px, transparent 2px),
+        radial-gradient(circle at 50% 60%, #FF6B35 0, #FF6B35 2px, transparent 2px);
+    background-size: 4px 4px, 4px 4px, 4px 4px;
+    background-position: 0 0, 0 0, 0 0;
+}
+
+/* Bat */
+.bat-decoration {
+    position: absolute;
+    top: -25px;
+    right: 80px;
+    width: 25px;
+    height: 20px;
+    animation: batFlap 2s ease-in-out infinite;
+}
+
+.bat-decoration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 8px;
+    background: #000;
+    border-radius: 50% 50% 0 0;
+}
+
+.bat-decoration::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 25px;
+    height: 12px;
+    background: #000;
+    border-radius: 50% 50% 0 0;
+    transform-origin: center top;
+    animation: batWings 2s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes webSway {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(2deg); }
+}
+
+@keyframes batFlap {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-3px); }
+}
+
+@keyframes batWings {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.8); }
+}
+
+.polaroid-image {
+    width: 100%;
+    height: 100%;
+    background: white;
+    padding: 40px 15px 15px 15px;
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        0 8px 25px rgba(0, 0, 0, 0.2);
+    transform: rotate(-2deg) translateZ(0);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.polaroid-image:hover {
+    transform: rotate(0deg) translateZ(20px) scale(1.05);
+    box-shadow: 
+        0 8px 30px rgba(0, 0, 0, 0.4),
+        0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.polaroid-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: 
+        sepia(0.3) 
+        contrast(1.1) 
+        brightness(1.05) 
+        saturate(1.2)
+        hue-rotate(5deg);
+    transition: filter 0.3s ease-in-out;
+    /* Performance optimizations for fast rendering */
+    will-change: transform, filter;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.polaroid-image:hover img {
+    filter: 
+        sepia(0.2) 
+        contrast(1.2) 
+        brightness(1.1) 
+        saturate(1.3)
+        hue-rotate(0deg);
+}
+
+.polaroid-caption {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Scroll Animation Classes */
+.polaroid-container.scroll-animate {
+    animation: polaroidFloat 6s ease-in-out infinite;
+}
+
+@keyframes polaroidFloat {
+    0%, 100% {
+        transform: rotate(-2deg) translateY(0px) translateZ(0);
+    }
+    50% {
+        transform: rotate(-1deg) translateY(-15px) translateZ(10px);
+    }
+}
+
+/* Clickable Polaroid Styling */
+.polaroid-image.clickable {
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.polaroid-image.clickable:hover {
+    transform: rotate(0deg) translateZ(30px) scale(1.08);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.polaroid-image.clickable::after {
+    content: '📸 Click to visit Instagram';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 11px;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+.polaroid-image.clickable:hover::after {
+    opacity: 1;
+}
+
+/* Responsive Polaroid String Gallery */
+@media (max-width: 768px) {
+    .polaroid-string-gallery {
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    
+    .polaroid-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        position: relative;
+        height: 400px;
+    }
+    
+    .polaroid-container {
+        position: absolute;
+        width: 250px;
+        height: 330px;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1;
+        margin-bottom: 0;
+    }
+    
+    /* Stack the cards with slight offsets */
+    .polaroid-container:nth-child(1) {
+        top: 0;
+        z-index: 3;
+    }
+    
+    .polaroid-container:nth-child(2) {
+        top: 20px;
+        z-index: 2;
+        transform: translateX(-50%) scale(0.95);
+        opacity: 0.8;
+    }
+    
+    .polaroid-container:nth-child(3) {
+        top: 40px;
+        z-index: 1;
+        transform: translateX(-50%) scale(0.9);
+        opacity: 0.6;
+    }
+    
+    /* Hover effects to reveal cards */
+    .polaroid-container:hover {
+        z-index: 10;
+        transform: translateX(-50%) scale(1.05);
+        opacity: 1;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .polaroid-container:hover ~ .polaroid-container {
+        transform: translateX(-50%) scale(0.9);
+        opacity: 0.4;
+    }
+    
+    .polaroid-image {
+        padding: 40px 12px 12px 12px;
+    }
+    
+    .polaroid-caption {
+        font-size: 12px;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        padding: 6px 10px;
+    }
+    
+    .string-line {
+        display: none;
+    }
+    
+    .string-clip {
+        display: none;
+    }
+    
+    .spider-web.left-web {
+        left: 10px;
+    }
+    
+    .spider-web.right-web {
+        right: 10px;
+    }
+    
+    .bat-decoration {
+        right: 40px;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .polaroid-row {
+        height: 350px;
+    }
+    
+    .polaroid-container {
+        width: 220px;
+        height: 300px;
+    }
+    
+    .polaroid-caption {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+}
+
+@media (min-width: 1200px) {
+    /* Wide screen - side by side layout */
+    .polaroid-row {
+        gap: 60px;
+        justify-content: center;
+    }
+    
+    .polaroid-container {
+        margin: 0;
+    }
+}
+
+/* Music Page Styling */
+.music-tracks {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.track-item {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 30px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    backdrop-filter: none;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+
+
+.track-artwork {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease-in-out;
+}
+
+.track-artwork:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+}
+
+.track-artwork img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Performance optimizations for fast rendering */
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.track-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.track-info h3 {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.track-status {
+    font-size: 1.1em;
+    color: #000;
+    font-style: italic;
+    margin: 0;
+    padding: 8px 16px;
+    background: transparent;
+    border-radius: 0;
+    display: inline-block;
+    width: fit-content;
+}
+
+.track-link {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.track-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease-in-out;
+}
+
+.track-link:hover::before {
+    left: 100%;
+}
+
+.track-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+    background: linear-gradient(45deg, #ff5252, #d84315);
+}
+
+.track-link.disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.track-link.disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    background: #666;
+}
+
+/* Responsive Music Layout */
+@media (max-aspect-ratio: 1/1) {
+    /* Vertical/Mobile Layout */
+    .track-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+        padding: 25px;
+    }
+    
+    .track-artwork {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .track-info h3 {
+        font-size: 1.8em;
+    }
+    
+    .music-tracks {
+        gap: 30px;
+        padding: 15px;
+    }
+}
+
+/* WebGL Polaroid String Physics */
+.webgl-polaroid-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#webgl-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.polaroid-overlays {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.polaroid-overlay {
+    position: absolute;
+    width: 280px;
+    height: 370px;
+    pointer-events: auto;
+    transition: transform 0.1s ease-out;
+}
+
+.polaroid-overlay .polaroid-caption {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 12px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+.polaroid-overlay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: 
+        sepia(0.3) 
+        contrast(1.1) 
+        brightness(1.05) 
+        saturate(1.2)
+        hue-rotate(5deg);
+    transition: filter 0.3s ease-in-out;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.polaroid-overlay.clickable {
+    cursor: pointer;
+}
+
+.polaroid-overlay.clickable:hover img {
+    filter: 
+        sepia(0.2) 
+        contrast(1.2) 
+        brightness(1.1) 
+        saturate(1.3)
+        hue-rotate(0deg);
+    transform: scale(1.05);
+}
+
+@media (min-aspect-ratio: 1/1) {
+    /* Wide Screen Layout */
+    .track-item {
+        flex-direction: row;
+        text-align: left;
+        gap: 40px;
+        padding: 40px;
+    }
+    
+    .track-artwork {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .track-info h3 {
+        font-size: 2.5em;
+    }
+    
+    .music-tracks {
+        gap: 50px;
+        padding: 30px;
+    }
+}
+
+@media (aspect-ratio: 1/1) {
+    /* Square Screen Layout */
+    .track-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 25px;
+        padding: 30px;
+    }
+    
+    .track-artwork {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .track-info h3 {
+        font-size: 2.0em;
+    }
+    
+    .music-tracks {
+        gap: 35px;
+        padding: 20px;
+    }
+}
+
+/* Future-proof grid layout for more tracks */
+@media (min-width: 1200px) {
+    .music-tracks {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+    }
+    
+    .track-item {
+        margin: 0;
     }
 }
