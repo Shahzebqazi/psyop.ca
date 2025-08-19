@@ -8,7 +8,6 @@ copyright:           "${PACKAGE_COPYRIGHT:-2025 PSYOP}"
 
 extra-source-files:
 - README.md
-- CHANGELOG.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -33,10 +32,6 @@ dependencies:
 - containers
 - mtl
 - transformers
-- JuicyPixels
-- JuicyPixels-extra
-- directory
-- filepath
 
 
 ghc-options:
@@ -64,15 +59,7 @@ executables:
     dependencies:
     - psyop-website
 
-  image-optimizer:
-    main:                ImageOptimizer.hs
-    source-dirs:         tools
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - psyop-website
+
 
 tests:
   psyop-website-test:

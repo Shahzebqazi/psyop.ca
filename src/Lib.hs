@@ -8,10 +8,7 @@
 module Lib
     ( startApp
     , app
-    , module ImageUtils
     ) where
-
-import ImageUtils
 
 import Network.Wai
 import Network.Wai.Handler.Warp
@@ -20,9 +17,6 @@ import Servant
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
-import System.Environment (lookupEnv)
-import Data.Maybe (fromMaybe)
-import qualified Data.ByteString.Lazy as LBS
 
 -- Define our API routes
 type API = Get '[HTML] Html
@@ -56,9 +50,7 @@ homePage = return $ pageTemplateHome "PSYOP - Home" $ do
     H.div ! A.class_ "hero-homepage" $ do
         -- Logo Section
         H.div ! A.class_ "logo-section" $ do
-            H.img ! A.src "/static/psyop-logo.png" 
-                  ! A.alt "PSYOP Logo"
-                  ! A.class_ "main-logo"
+            H.h1 ! A.class_ "main-logo" $ "PSYOP"
         
         -- Navigation Menu
         H.nav ! A.class_ "hero-nav" $ do
@@ -95,8 +87,7 @@ contactPage = return $ pageTemplate "PSYOP - Contact" $ do
     H.div ! A.class_ "contact-info" $ do
         H.p $ do
             "Email: "
-            H.a ! A.href ("mailto:" <> toHtml (fromMaybe "admin@psyop.ca" (lookupEnv "ADMIN_EMAIL"))) $ 
-              toHtml (fromMaybe "admin@psyop.ca" (lookupEnv "ADMIN_EMAIL"))
+            H.a ! A.href "mailto:admin@psyop.ca" $ "admin@psyop.ca"
     H.div ! A.class_ "social-links" $ do
         H.a ! A.href "#" ! A.class_ "social-link" $ "Instagram"
         H.a ! A.href "#" ! A.class_ "social-link" $ "Twitter"
@@ -172,8 +163,7 @@ pageTemplate title content = docTypeHtml $ do
                 H.div ! A.class_ "footer-section" $ do
                     H.h4 "Connect"
                     H.p $ do
-                        H.a ! A.href ("mailto:" <> toHtml (fromMaybe "admin@psyop.ca" (lookupEnv "ADMIN_EMAIL"))) $ 
-                          toHtml (fromMaybe "admin@psyop.ca" (lookupEnv "ADMIN_EMAIL"))
+                        H.a ! A.href "mailto:admin@psyop.ca" $ "admin@psyop.ca"
                 H.div ! A.class_ "footer-section" $ do
                     H.p ! A.class_ "footer-copyright" $ "© 2025 PSYOP. All rights reserved."
 

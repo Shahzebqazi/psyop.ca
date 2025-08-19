@@ -10,8 +10,6 @@ import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.List (isInfixOf)
 import Lib (app)
-import System.Environment (lookupEnv)
-import Data.Maybe (fromMaybe)
 
 -- Helper function to check if a string is contained in lazy bytestring
 bodyContains :: String -> LBS.ByteString -> Bool
@@ -31,8 +29,8 @@ spec = with (return app) $ do
       liftIO $ do
         simpleStatus response `shouldBe` status200
         simpleBody response `shouldSatisfy` 
-          \body -> bodyContains "psyop-logo.png" body &&
-                   bodyContains "alt=\"PSYOP Logo\"" body
+          \body -> bodyContains "PSYOP" body &&
+                   bodyContains "main-logo" body
 
     it "contains proper home page content" $ do
       response <- get "/"
@@ -62,9 +60,9 @@ spec = with (return app) $ do
         simpleBody response `shouldSatisfy` 
           \body -> bodyContains "About PSYOP" body
 
-  describe "GET /static/psyop-logo.png" $ do
-    it "serves static logo file" $ do
-      get "/static/psyop-logo.png" `shouldRespondWith` 200
+  describe "GET /static/style.css" $ do
+    it "serves static CSS file" $ do
+      get "/static/style.css" `shouldRespondWith` 200
 
   describe "GET /contact" $ do
     it "responds with 200" $ do
@@ -75,7 +73,7 @@ spec = with (return app) $ do
       liftIO $ do
         simpleStatus response `shouldBe` status200
         simpleBody response `shouldSatisfy` 
-          \body -> bodyContains (fromMaybe "admin@psyop.ca" (lookupEnv "ADMIN_EMAIL")) body
+          \body -> bodyContains "admin@psyop.ca" body
 
   describe "GET /links" $ do
     it "responds with 200" $ do
