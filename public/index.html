@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSYOP - Electronic Music</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- Dynamic background system -->
+<div class="dynamic-background" id="dynamic-background">
+    <!-- Lovecraftian horror transition background -->
+    <div class="lovecraftian-transition" id="lovecraftian-transition"></div>
+    <!-- White images for vertical screens -->
+    <img src="/assets/white/promo_1.jpg" class="background-image" data-index="0" alt="Background 1">
+    <img src="/assets/white/promo_2.jpg" class="background-image" data-index="1" alt="Background 2">
+    <img src="/assets/white/promo_3.jpg" class="background-image" data-index="2" alt="Background 3">
+    <img src="/assets/white/promo_4.jpg" class="background-image" data-index="3" alt="Background 4">
+    <img src="/assets/white/promo_5.jpg" class="background-image" data-index="4" alt="Background 5">
+    <img src="/assets/white/promo_6.jpg" class="background-image" data-index="5" alt="Background 6">
+    <img src="/assets/white/promo_7.jpg" class="background-image" data-index="6" alt="Background 7">
+    <img src="/assets/white/promo_8.jpg" class="background-image" data-index="7" alt="Background 8">
+    <img src="/assets/white/promo_9.jpg" class="background-image" data-index="8" alt="Background 9">
+    <img src="/assets/white/promo_10.jpg" class="background-image" data-index="9" alt="Background 10">
+    <img src="/assets/white/promo_11.jpg" class="background-image" data-index="10" alt="Background 11">
+    <img src="/assets/white/promo_12.jpg" class="background-image" data-index="11" alt="Background 12">
+    
+    <!-- Red images for wide screens -->
+    <img src="/assets/red_white/promo_1.jpg" class="background-image red-image" data-index="0" alt="Red Background 1">
+    <img src="/assets/red_white/promo_2.jpg" class="background-image red-image" data-index="1" alt="Red Background 2">
+    <img src="/assets/red_white/promo_3.jpg" class="background-image red-image" data-index="2" alt="Red Background 3">
+    <img src="/assets/red_white/promo_4.jpg" class="background-image red-image" data-index="3" alt="Red Background 4">
+    <img src="/assets/red_white/promo_5.jpg" class="background-image red-image" data-index="4" alt="Red Background 5">
+    <img src="/assets/red_white/promo_6.jpg" class="background-image red-image" data-index="5" alt="Red Background 6">
+    <img src="/assets/red_white/promo_1.jpg" class="background-image red-image" data-index="6" alt="Red Background 7">
+    <img src="/assets/red_white/promo_2.jpg" class="background-image red-image" data-index="7" alt="Red Background 8">
+    <img src="/assets/red_white/promo_3.jpg" class="background-image red-image" data-index="8" alt="Red Background 9">
+    <img src="/assets/red_white/promo_4.jpg" class="background-image red-image" data-index="9" alt="Red Background 10">
+    <img src="/assets/red_white/promo_5.jpg" class="background-image red-image" data-index="10" alt="Red Background 11">
+    <img src="/assets/red_white/promo_6.jpg" class="background-image red-image" data-index="11" alt="Red Background 12">
+</div>
+
+<!-- The menu, placed on top of the animated background -->
+<header id="main-menu">
+  <nav>
+    <ul>
+      <li><a href="#home" class="menu-link active">Home</a></li>
+      <li><a href="#music" class="menu-link">Music</a></li>
+      <li><a href="#links" class="menu-link">Links</a></li>
+      <li><a href="#shows" class="menu-link">Upcoming Shows</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- Main content for scrolling -->
+<main>
+  <section id="home" class="page">
+    <div class="page-content">
+      <div class="scroll-indicator">
+        <div class="scroll-text">Scroll Down</div>
+        <div class="scroll-arrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section id="music" class="page">
+    <div class="page-content">
+    </div>
+  </section>
+  
+  <section id="links" class="page">
+    <div class="page-content">
+    </div>
+  </section>
+  
+  <section id="shows" class="page">
+    <div class="page-content">
+    </div>
+  </section>
+</main>
+
+<script>
+    // Dynamic background system
+    class DynamicBackground {
+            constructor() {
+        this.backgroundContainer = document.getElementById('dynamic-background');
+        this.backgroundImages = document.querySelectorAll('.background-image');
+        this.currentImageIndex = 0;
+        this.isWideScreen = window.innerWidth > window.innerHeight;
+        this.recentImages = []; // Track recently used images
+        this.minRepeatDistance = 6; // Minimum images before repetition
+        this.init();
+    }
+
+        init() {
+            // Show first image
+            this.showImage(0);
+            
+            // Log available images for debugging
+            const whiteImages = document.querySelectorAll('.background-image:not(.red-image)');
+            const redImages = document.querySelectorAll('.red-image');
+            console.log(`Available images - White: ${whiteImages.length}, Red: ${redImages.length}`);
+            
+            // Add event listeners
+            window.addEventListener('scroll', this.handleScroll.bind(this));
+            window.addEventListener('resize', this.handleResize.bind(this));
+            
+            // Initialize manual menu highlighting
+            this.initManualMenuHighlighting();
+        }
+
+        handleScroll() {
+            const scrollPosition = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.body.scrollHeight;
+            
+            // Calculate scroll progress as a percentage (0 to 1)
+            const scrollProgress = scrollPosition / (documentHeight - windowHeight);
+            
+            // Update background image based on scroll progress (every half page)
+            this.updateBackgroundImageByScroll(scrollProgress);
+        }
+
+        updateBackgroundImage(sectionIndex) {
+            // Determine which image set to use based on screen orientation
+            const images = this.isWideScreen ? 
+                document.querySelectorAll('.red-image') : 
+                document.querySelectorAll('.background-image:not(.red-image)');
+            
+            if (images.length === 0) return;
+            
+            // Calculate image index based on section
+            const imageIndex = sectionIndex % images.length;
+            
+            if (imageIndex !== this.currentImageIndex) {
+                this.showImage(imageIndex);
+                this.currentImageIndex = imageIndex;
+            }
+        }
+
+        updateBackgroundImageByScroll(scrollProgress) {
+            // Determine which image set to use based on screen orientation
+            const images = this.isWideScreen ? 
+                document.querySelectorAll('.red-image') : 
+                document.querySelectorAll('.background-image:not(.red-image)');
+            
+            if (images.length === 0) return;
+            
+            // Calculate base image index based on scroll progress
+            const baseImageIndex = Math.floor(scrollProgress * images.length);
+            
+            // Find an image that hasn't been used recently
+            const smartIndex = this.findNonRepeatingImage(baseImageIndex, images.length);
+            
+            if (smartIndex !== this.currentImageIndex) {
+                console.log(`Scroll: ${scrollProgress.toFixed(3)}, Smart Image: ${smartIndex + 1}/${images.length}`);
+                this.showImage(smartIndex);
+                this.currentImageIndex = smartIndex;
+            }
+        }
+
+        showImage(index) {
+            // Get the appropriate image set
+            const images = this.isWideScreen ? 
+                document.querySelectorAll('.red-image') : 
+                document.querySelectorAll('.background-image:not(.red-image)');
+            
+            if (images.length === 0) return;
+            
+            // Ensure index is within bounds
+            const clampedIndex = Math.min(Math.max(index, 0), images.length - 1);
+            
+            // Show Lovecraftian transition background
+            const lovecraftianTransition = document.getElementById('lovecraftian-transition');
+            lovecraftianTransition.classList.add('active');
+            
+            // Hide all images first
+            this.backgroundImages.forEach(img => img.classList.remove('active'));
+            
+            // Show the target image after a short delay
+            setTimeout(() => {
+                if (images[clampedIndex]) {
+                    images[clampedIndex].classList.add('active');
+                }
+                
+                // Hide Lovecraftian transition after image is visible
+                setTimeout(() => {
+                    lovecraftianTransition.classList.remove('active');
+                }, 800);
+                
+                // Update current index
+                this.currentImageIndex = clampedIndex;
+            }, 300);
+        }
+
+        findNonRepeatingImage(baseIndex, totalImages) {
+            // Start with the base index
+            let candidateIndex = baseIndex;
+            
+            // Check if this image has been used recently
+            for (let attempts = 0; attempts < totalImages; attempts++) {
+                // Ensure index is within bounds
+                candidateIndex = (candidateIndex + attempts) % totalImages;
+                
+                // Check if this image hasn't been used in the last minRepeatDistance images
+                if (!this.recentImages.includes(candidateIndex)) {
+                    // Add to recent images and remove oldest if we exceed the limit
+                    this.recentImages.push(candidateIndex);
+                    if (this.recentImages.length > this.minRepeatDistance) {
+                        this.recentImages.shift();
+                    }
+                    return candidateIndex;
+                }
+            }
+            
+            // If all images have been used recently, reset and use base index
+            this.recentImages = [];
+            this.recentImages.push(baseIndex);
+            return baseIndex;
+        }
+
+        handleResize() {
+            const wasWideScreen = this.isWideScreen;
+            this.isWideScreen = window.innerWidth > window.innerHeight;
+            
+            // If orientation changed, update image display
+            if (wasWideScreen !== this.isWideScreen) {
+                this.showImage(this.currentImageIndex);
+            }
+        }
+
+        initManualMenuHighlighting() {
+            const menuLinks = document.querySelectorAll('.menu-link');
+            
+            // Add click event listeners to each menu link
+            menuLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    // Remove active class from all links
+                    menuLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    link.classList.add('active');
+                    
+                    // Smooth scroll to section
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+            
+            // Set home as initially active
+            const homeLink = document.querySelector('a[href="#home"]');
+            if (homeLink) {
+                homeLink.classList.add('active');
+            }
+        }
+    }
+
+    // Initialize the dynamic background system
+    const dynamicBackground = new DynamicBackground();
+</script>
+
+</body>
+</html>
