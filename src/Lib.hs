@@ -1,80 +1,27 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Lib
     ( startApp
     , app
-    , ImageSequence(..)
-    , createImageSequence
-    , nextImage
-    , getCurrentImage
-    , getSequenceStats
-    , testNoRepetition
     ) where
 
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
-
-import Text.Blaze.Html5 as H
+import Text.Blaze.Html5 as H hiding (map)
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
-import Data.List (nub)
 import Control.Monad.IO.Class (liftIO)
 
--- Image Sequence Model
-data ImageSequence = ImageSequence
-    { totalImages :: Int
-    , currentIndex :: Int
-    , usedIndices :: [Int]
-    , sequenceOrder :: [Int]
+-- Simple configuration
+data Config = Config
+    { serverPort :: Int
     } deriving (Show, Eq)
 
--- Create a new image sequence with n unique items
-createImageSequence :: Int -> ImageSequence
-createImageSequence n = ImageSequence
-    { totalImages = n
-    , currentIndex = 0
-    , usedIndices = []
-    , sequenceOrder = [0..n-1]
-    }
+defaultConfig :: Config
+defaultConfig = Config { serverPort = 8080 }
 
--- Get the next image index without repetition
-nextImage :: ImageSequence -> ImageSequence
-nextImage imgSeq@(ImageSequence n current used order)
-    | length used >= n = imgSeq { usedIndices = [], currentIndex = 0 }  -- Reset when all used
-    | otherwise = 
-        let nextIdx = order !! current
-            newUsed = nextIdx : used
-            newCurrent = (current + 1) `mod` n
-        in imgSeq 
-            { currentIndex = newCurrent
-            , usedIndices = newUsed
-            }
-
--- Get the current image index
-getCurrentImage :: ImageSequence -> Int
-getCurrentImage = currentIndex
-
--- Get statistics about the sequence
-getSequenceStats :: ImageSequence -> (Int, Int, [Int])
-getSequenceStats (ImageSequence n current used _) = (n, current, used)
-
--- Test function to verify no repetition within n items
-testNoRepetition :: Int -> Bool
-testNoRepetition n = 
-    let imgSeq = createImageSequence n
-        -- Check that the first n images are all different
-        firstNImages = take n $ iterate nextImage imgSeq
-        firstNIndices = Prelude.map getCurrentImage firstNImages
-        hasRepetition = length firstNIndices /= length (nub firstNIndices)
-    in not hasRepetition
-
--- Define our API routes
+-- Define API routes
 type API = Get '[HTML] Html
       :<|> "home" :> Get '[HTML] Html
       :<|> "music" :> Get '[HTML] Html
@@ -82,10 +29,8 @@ type API = Get '[HTML] Html
       :<|> "shows" :> Get '[HTML] Html
       :<|> "about" :> Get '[HTML] Html
       :<|> "contact" :> Get '[HTML] Html
-      :<|> "admin" :> Get '[HTML] Html
-      :<|> "test" :> Get '[HTML] Html
-      :<|> "css" :> Raw
-      :<|> "public" :> Raw
+      :<|> "health" :> Get '[HTML] Html
+      :<|> Raw
 
 -- HTML content type for Servant
 data HTML
@@ -99,22 +44,18 @@ instance MimeRender HTML Html where
 -- API implementation
 server :: Server API
 server = homePage
-    :<|> homePage      -- /home
-    :<|> musicPage     -- /music  
-    :<|> linksPage     -- /links
-    :<|> showsPage     -- /shows
+    :<|> homePage
+    :<|> musicPage
+    :<|> linksPage
+    :<|> showsPage
     :<|> aboutPage
     :<|> contactPage
-    :<|> adminPage
-    :<|> testPage
-    :<|> serveDirectoryFileServer "css"
+    :<|> healthPage
     :<|> serveDirectoryFileServer "public"
 
 -- Page handlers
 homePage :: Handler Html
-homePage = do
-    -- Serve the actual HTML content from public/index.html
-    liftIO $ readFile "public/index.html" >>= return . toHtml
+homePage = liftIO $ readFile "public/index.html" >>= return . toHtml
 
 musicPage :: Handler Html
 musicPage = return $ pageTemplate "PSYOP - Music" $ do
@@ -138,7 +79,6 @@ showsPage = return $ pageTemplate "PSYOP - Upcoming Shows" $ do
         H.div ! A.class_ "shows-placeholder" $ do
             H.p "No upcoming shows scheduled at this time."
             H.p "Follow us on social media for updates!"
-
 
 aboutPage :: Handler Html
 aboutPage = return $ pageTemplate "PSYOP - About" $ do
@@ -177,55 +117,15 @@ linksPage = return $ pageTemplate "PSYOP - Links" $ do
                 H.li $ H.a ! A.href "#" $ "Twitter"
                 H.li $ H.a ! A.href "#" $ "Facebook"
 
-
-
-adminPage :: Handler Html
-adminPage = return $ pageTemplate "PSYOP - Admin" $ do
-    H.h1 "Admin Panel"
-    H.p "Admin functionality coming soon..."
-
-testPage :: Handler Html
-testPage = return $ pageTemplate "PSYOP - Image Sequence Tests" $ do
-    H.h1 "Image Sequence Model Tests"
-    H.h2 "Testing Non-Repetition for Different Sizes"
-    
-    H.div ! A.class_ "test-results" $ do
-        H.h3 "Test Results:"
-        H.ul $ do
-            H.li $ do
-                H.strong "10 items: "
-                H.span ! A.class_ (if testNoRepetition 10 then "pass" else "fail") $ 
-                    if testNoRepetition 10 then "PASS" else "FAIL"
-            H.li $ do
-                H.strong "50 items: "
-                H.span ! A.class_ (if testNoRepetition 50 then "pass" else "fail") $ 
-                    if testNoRepetition 50 then "PASS" else "FAIL"
-            H.li $ do
-                H.strong "100 items: "
-                H.span ! A.class_ (if testNoRepetition 100 then "pass" else "fail") $ 
-                    if testNoRepetition 100 then "PASS" else "FAIL"
-    
-    H.h2 "Sequence Examples:"
-    H.div ! A.class_ "sequence-examples" $ do
-        H.h3 "10-item sequence (first 20 steps):"
-        H.pre $ toHtml $ show $ take 20 $ Prelude.map getCurrentImage $ iterate nextImage (createImageSequence 10)
-        
-        H.h3 "50-item sequence (first 20 steps):"
-        H.pre $ toHtml $ show $ take 20 $ Prelude.map getCurrentImage $ iterate nextImage (createImageSequence 50)
-        
-        H.h3 "100-item sequence (first 20 steps):"
-        H.pre $ toHtml $ show $ take 20 $ Prelude.map getCurrentImage $ iterate nextImage (createImageSequence 100)
-    
-    H.h2 "Lovecraftian Transition Test:"
-    H.div ! A.class_ "lovecraftian-test" $ do
-        H.p "Scroll on the main page to see Lovecraftian horror transitions between images!"
-        H.p "The transitions feature:"
-        H.ul $ do
-            H.li "Floating red eyes (representing eldritch watchers)"
-            H.li "Dark mouths/voids (representing cosmic horrors)"
-            H.li "Writhing tentacles (representing otherworldly entities)"
-            H.li "Ethereal whispers (subtle white orbs)"
-        H.p "All elements are created using pure CSS/SVG - no external images required!"
+healthPage :: Handler Html
+healthPage = return $ pageTemplate "PSYOP - Health Check" $ do
+    H.div ! A.class_ "content-section" $ do
+        H.h1 "System Health"
+        H.div ! A.class_ "health-status" $ do
+            H.h2 "All Systems Operational"
+            H.p $ do
+                "Server running on port " 
+                H.span ! A.class_ "port-number" $ toHtml (show $ serverPort defaultConfig)
 
 -- Common page template
 pageTemplate :: String -> Html -> Html
@@ -273,4 +173,4 @@ api = Proxy
 
 -- Start the server
 startApp :: IO ()
-startApp = run 8080 app
+startApp = run (serverPort defaultConfig) app

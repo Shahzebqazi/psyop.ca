@@ -87,15 +87,16 @@
 <script>
     // Dynamic background system
     class DynamicBackground {
-            constructor() {
-        this.backgroundContainer = document.getElementById('dynamic-background');
-        this.backgroundImages = document.querySelectorAll('.background-image');
-        this.currentImageIndex = 0;
-        this.isWideScreen = window.innerWidth > window.innerHeight;
-        this.recentImages = []; // Track recently used images
-        this.minRepeatDistance = 6; // Minimum images before repetition
-        this.init();
-    }
+        constructor() {
+            this.backgroundContainer = document.getElementById('dynamic-background');
+            this.backgroundImages = document.querySelectorAll('.background-image');
+            this.currentImageIndex = 0;
+            this.isWideScreen = window.innerWidth > window.innerHeight;
+            this.recentImages = []; // Track recently used images
+            this.minRepeatDistance = 6; // Minimum images before repetition
+            this.usedCount = 0; // Simple counter instead of array length
+            this.init();
+        }
 
         init() {
             // Show first image
@@ -132,7 +133,10 @@
                 document.querySelectorAll('.red-image') : 
                 document.querySelectorAll('.background-image:not(.red-image)');
             
-            if (images.length === 0) return;
+            if (images.length === 0) {
+                console.warn('No images found for current screen orientation');
+                return;
+            }
             
             // Calculate image index based on section
             const imageIndex = sectionIndex % images.length;
@@ -149,7 +153,10 @@
                 document.querySelectorAll('.red-image') : 
                 document.querySelectorAll('.background-image:not(.red-image)');
             
-            if (images.length === 0) return;
+            if (images.length === 0) {
+                console.warn('No images found for current screen orientation');
+                return;
+            }
             
             // Calculate base image index based on scroll progress
             const baseImageIndex = Math.floor(scrollProgress * images.length);
@@ -170,14 +177,21 @@
                 document.querySelectorAll('.red-image') : 
                 document.querySelectorAll('.background-image:not(.red-image)');
             
-            if (images.length === 0) return;
+            if (images.length === 0) {
+                console.warn(`No images found for ${this.isWideScreen ? 'wide' : 'vertical'} screen orientation`);
+                return;
+            }
             
             // Ensure index is within bounds
             const clampedIndex = Math.min(Math.max(index, 0), images.length - 1);
             
             // Show Lovecraftian transition background
             const lovecraftianTransition = document.getElementById('lovecraftian-transition');
-            lovecraftianTransition.classList.add('active');
+            if (lovecraftianTransition) {
+                lovecraftianTransition.classList.add('active');
+            } else {
+                console.warn('Lovecraftian transition element not found');
+            }
             
             // Hide all images first
             this.backgroundImages.forEach(img => img.classList.remove('active'));
@@ -186,11 +200,16 @@
             setTimeout(() => {
                 if (images[clampedIndex]) {
                     images[clampedIndex].classList.add('active');
+                    this.usedCount++;
+                } else {
+                    console.error(`Image at index ${clampedIndex} not found`);
                 }
                 
                 // Hide Lovecraftian transition after image is visible
                 setTimeout(() => {
-                    lovecraftianTransition.classList.remove('active');
+                    if (lovecraftianTransition) {
+                        lovecraftianTransition.classList.remove('active');
+                    }
                 }, 800);
                 
                 // Update current index
@@ -230,12 +249,18 @@
             
             // If orientation changed, update image display
             if (wasWideScreen !== this.isWideScreen) {
+                console.log(`Screen orientation changed to ${this.isWideScreen ? 'wide' : 'vertical'}`);
                 this.showImage(this.currentImageIndex);
             }
         }
 
         initManualMenuHighlighting() {
             const menuLinks = document.querySelectorAll('.menu-link');
+            
+            if (menuLinks.length === 0) {
+                console.warn('No menu links found');
+                return;
+            }
             
             // Add click event listeners to each menu link
             menuLinks.forEach(link => {
@@ -251,6 +276,8 @@
                     const targetSection = document.getElementById(targetId);
                     if (targetSection) {
                         targetSection.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        console.warn(`Target section ${targetId} not found`);
                     }
                 });
             });
@@ -259,6 +286,8 @@
             const homeLink = document.querySelector('a[href="#home"]');
             if (homeLink) {
                 homeLink.classList.add('active');
+            } else {
+                console.warn('Home link not found');
             }
         }
     }

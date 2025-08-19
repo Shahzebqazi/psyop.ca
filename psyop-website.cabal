@@ -132,9 +132,9 @@ description:    PSYOP Electronic Music Website - A modern, dynamic website featu
                 │       ├── stack-dev       # Stack-like development commands
                 │       └── test-ui         # UI/UX testing script
                 ├── public/                  # Static frontend files
-                │   └── index.html          # Main HTML page with JavaScript
-                ├── css/                     # Stylesheets
-                │   └── style.css           # Main stylesheet with animations
+                │   ├── index.html          # Main HTML page with JavaScript
+                │   └── css/                # Stylesheets
+                │       └── style.css       # Main stylesheet with animations
                 ├── assets/                  # Image assets
                 │   ├── white/              # Images for vertical screens
                 │   └── red_white/          # Images for wide screens
@@ -226,7 +226,6 @@ build-type:     Simple
 extra-source-files:
     LICENSE
     env.template
-    css/style.css
     public/index.html
     .config/dev-server.hs
     .config/nginx.conf

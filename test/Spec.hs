@@ -9,7 +9,7 @@ import Control.Monad.IO.Class (liftIO)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.List (isInfixOf)
-import Lib (app, ImageSequence(..), createImageSequence, nextImage, getCurrentImage, testNoRepetition)
+import Lib (app, ImageSequence(..), mkImageSequence, mkSequenceSize, nextImage, getCurrentImage, testNoRepetition, ImageIndex(..), SequenceSize(..))
 
 -- Helper function to check if a string is contained in lazy bytestring
 bodyContains :: String -> LBS.ByteString -> Bool
@@ -99,21 +99,43 @@ spec = do
                        bodyContains "50 items" body &&
                        bodyContains "100 items" body
 
+      describe "GET /health" $ do
+        it "responds with 200" $ do
+          get "/health" `shouldRespondWith` 200
+
+        it "contains health check information" $ do
+          response <- get "/health"
+          liftIO $ do
+            simpleStatus response `shouldBe` status200
+            simpleBody response `shouldSatisfy` 
+              \body -> bodyContains "System Health" body &&
+                       bodyContains "All Systems Operational" body &&
+                       bodyContains "Configuration" body
+
   describe "Image Sequence Model Tests" $ do
     it "creates sequence with correct number of items" $ do
-      let seq10 = createImageSequence 10
-          seq50 = createImageSequence 50
-          seq100 = createImageSequence 100
-      totalImages seq10 `shouldBe` 10
-      totalImages seq50 `shouldBe` 50
-      totalImages seq100 `shouldBe` 100
+      let Just size10 = mkSequenceSize 10
+          Just size50 = mkSequenceSize 50
+          Just size100 = mkSequenceSize 100
+          seq10 = mkImageSequence size10
+          seq50 = mkImageSequence size50
+          seq100 = mkImageSequence size100
+      totalImages seq10 `shouldBe` SequenceSize 10
+      totalImages seq50 `shouldBe` SequenceSize 50
+      totalImages seq100 `shouldBe` SequenceSize 100
+
+    it "rejects invalid sequence sizes" $ do
+      mkSequenceSize 0 `shouldBe` Nothing
+      mkSequenceSize (-1) `shouldBe` Nothing
+      mkSequenceSize 1001 `shouldBe` Nothing
 
     it "nextImage advances sequence correctly" $ do
-      let seq = createImageSequence 5
+      let Just size = mkSequenceSize 5
+          seq = mkImageSequence size
           nextSeq = nextImage seq
-      currentIndex seq `shouldBe` 0
-      currentIndex nextSeq `shouldBe` 1
-      length (usedIndices nextSeq) `shouldBe` 1
+      currentIndex seq `shouldBe` ImageIndex 0
+      currentIndex nextSeq `shouldBe` ImageIndex 1
+      usedCount nextSeq `shouldBe` 1
 
     it "ensures no repetition within sequence length" $ do
       testNoRepetition 10 `shouldBe` True
@@ -121,6 +143,7 @@ spec = do
       testNoRepetition 100 `shouldBe` True
 
     it "getCurrentImage returns correct index" $ do
-      let seq = createImageSequence 7
+      let Just size = mkSequenceSize 7
+          seq = mkImageSequence size
           currentIdx = getCurrentImage seq
-      currentIdx `shouldBe` 0
+      currentIdx `shouldBe` ImageIndex 0

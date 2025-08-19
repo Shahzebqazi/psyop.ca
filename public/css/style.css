@@ -603,6 +603,47 @@ p {
     color: #d4af37;
 }
 
+/* Health check page styling */
+.health-status {
+    background: rgba(0, 255, 0, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.health-status h2 {
+    color: #4CAF50;
+    margin-bottom: 15px;
+}
+
+.port-number, .timestamp, .config-value {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: #00ff00;
+}
+
+.config-info {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.config-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.config-info li {
+    margin: 10px 0;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    border-left: 3px solid #4CAF50;
+}
+
 /* Scroll indicator styling */
 .scroll-indicator {
     position: fixed;
