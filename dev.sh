@@ -20,9 +20,9 @@ case "$1" in
         ;;
     restart)
         echo "Restarting PSYOP development server..."
-        ./dev-server.sh stop
+        ./dev.sh stop
         sleep 2
-        ./dev-server.sh start
+        ./dev.sh start
         ;;
     status)
         if pgrep -f "psyop-website-exe" > /dev/null; then

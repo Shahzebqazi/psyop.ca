@@ -281,7 +281,7 @@ class SetupRunner {
     // Check if dev-server.hs exists
     func setupFileExists() -> Bool {
         let fileManager = FileManager.default
-        return fileManager.fileExists(atPath: "config/dev-server.hs")
+        return fileManager.fileExists(atPath: ".config/dev-server.hs")
     }
     
     // Check if we're in the right directory
@@ -304,7 +304,7 @@ class SetupRunner {
         logInfo("Running development server setup...")
         
         if !setupFileExists() {
-            logError("config/dev-server.hs not found in current directory")
+            logError(".config/dev-server.hs not found in current directory")
             return false
         }
         
@@ -315,21 +315,21 @@ class SetupRunner {
         
         // Try to run setup with runhaskell first
         logInfo("Attempting to run setup with runhaskell...")
-        if runCommand("runhaskell config/dev-server.hs setup") {
+        if runCommand("runhaskell .config/dev-server.hs setup") {
             logSuccess("Development server setup completed successfully")
             return true
         }
         
         // Fallback to stack exec
         logWarning("runhaskell failed, trying with stack...")
-        if runCommand("stack exec runhaskell config/dev-server.hs setup") {
+        if runCommand("stack exec runhaskell .config/dev-server.hs setup") {
             logSuccess("Development server setup completed successfully with stack")
             return true
         }
         
         // Final fallback to ghc
         logWarning("stack failed, trying with ghc...")
-        if runCommand("ghc config/dev-server.hs && ./dev-server setup") {
+        if runCommand("ghc .config/dev-server.hs && ./.config/dev-server setup") {
             logSuccess("Development server setup completed successfully with ghc")
             return true
         }
