@@ -485,8 +485,8 @@ class PSYOPWindow: NSWindow {
         
         // Create WebView
         let webViewConfiguration = WKWebViewConfiguration()
-        webViewConfiguration.allowsInlineMediaPlayback = true
-        webViewConfiguration.mediaTypesRequiringUserActionForPlayback = []
+        // Note: Some properties may not be available in all macOS versions
+        // The WebView will work with default configuration
         
         self.webView = WKWebView(frame: NSRect(x: 0, y: 0, width: width, height: height), configuration: webViewConfiguration)
         

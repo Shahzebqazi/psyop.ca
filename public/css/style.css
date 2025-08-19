@@ -4,19 +4,12 @@ body {
     margin: 0;
     padding: 0;
     color: #fff;
-    background: linear-gradient(135deg, #0a0e1a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
+    background: transparent;
     position: relative;
     overflow-x: hidden;
 }
 
-/* Animated gradient background */
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+
 
 /* Remove redundant body overlays - using dynamic background system instead */
 
@@ -67,7 +60,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,0,0,0.4)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,0,0,0.5)"/><circle cx="40" cy="80" r="2.5" fill="rgba(255,0,0,0.4)"/><circle cx="70" cy="70" r="1" fill="rgba(255,0,0,0.5)"/><circle cx="15" cy="60" r="1.8" fill="rgba(255,0,0,0.3)"/><circle cx="85" cy="80" r="2.2" fill="rgba(255,0,0,0.4)"/></svg>'),
         url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><ellipse cx="30" cy="40" rx="8" ry="3" fill="rgba(0,0,0,0.6)"/><ellipse cx="70" cy="60" rx="6" ry="2" fill="rgba(0,0,0,0.7)"/><ellipse cx="50" cy="20" rx="5" ry="2.5" fill="rgba(0,0,0,0.5)"/><ellipse cx="10" cy="70" rx="7" ry="2" fill="rgba(0,0,0,0.6)"/></svg>');
     background-size: 200px 200px, 150px 150px;
@@ -83,8 +76,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,50 Q40,30 60,50 Q80,70 100,50" stroke="rgba(139,0,0,0.5)" stroke-width="1.5" fill="none"/><path d="M0,30 Q30,50 50,30 Q70,10 100,30" stroke="rgba(25,25,112,0.5)" stroke-width="1.5" fill="none"/><path d="M10,80 Q25,60 40,80 Q55,100 70,80 Q85,60 100,80" stroke="rgba(0,0,0,0.6)" stroke-width="1" fill="none"/></svg>'),
+    background-image:
+        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,50 Q40,30 60,50 Q80,70 100,50" stroke="rgba(139,0,0,0.5)" stroke-width="1.5" fill="none"/><path d="M0,30 Q30,50 50,30 Q70,10 100,30" stroke="rgba(139,0,0,0.5)" stroke-width="1.5" fill="none"/><path d="M10,80 Q25,60 40,80 Q55,100 70,80 Q85,60 100,80" stroke="rgba(0,0,0,0.6)" stroke-width="1" fill="none"/></svg>'),
         url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="25" cy="25" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
     background-size: 300px 300px, 200px 200px;
     background-position: 50px 100px, 150px 50px;
@@ -93,16 +86,39 @@ body {
 }
 
 @keyframes horrorFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    25% { transform: translateY(-10px) rotate(2deg); }
-    50% { transform: translateY(5px) rotate(-1deg); }
-    75% { transform: translateY(-5px) rotate(1deg); }
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-10px) rotate(2deg);
+    }
+
+    50% {
+        transform: translateY(5px) rotate(-1deg);
+    }
+
+    75% {
+        transform: translateY(-5px) rotate(1deg);
+    }
 }
 
 @keyframes horrorWrithe {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    33% { transform: scale(1.1) rotate(5deg); }
-    66% { transform: scale(0.9) rotate(-3deg); }
+
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    33% {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    66% {
+        transform: scale(0.9) rotate(-3deg);
+    }
 }
 
 .background-image {
@@ -140,12 +156,12 @@ body {
         width: 100vw;
         height: 100vh;
     }
-    
+
     .background-image {
         width: 100%;
         height: 100%;
     }
-    
+
     /* All images visible by default, JavaScript handles display logic */
     .background-image {
         display: block;
@@ -159,25 +175,47 @@ body {
         height: 100vh;
         left: 0;
     }
-    
+
     .background-image {
         width: 100%;
         height: 100%;
     }
-    
+
     /* All images visible by default, JavaScript handles display logic */
     .background-image {
         display: block;
     }
-    
+
     .page-content {
         background: transparent;
         backdrop-filter: none;
+    }
+
+    /* Add right-side blurred band picture for widescreen */
+    .page::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 50vw;
+        height: 100vh;
+        background-image: url('/assets/band_pic.jpg');
+        background-size: cover;
+        background-position: center;
+        filter: blur(8px) brightness(0.4) contrast(1.2);
+        z-index: -3;
+        opacity: 0.7;
+    }
+
+    /* Remove the duplicate background system */
+    .page::after {
+        display: none;
     }
 }
 
 /* WebGL canvas - responsive positioning */
 @media (min-aspect-ratio: 16/9) {
+
     /* Wide screens - canvas covers left pane only */
     #background-shader {
         width: 50vw;
@@ -188,6 +226,7 @@ body {
 }
 
 @media (aspect-ratio: 1/1) {
+
     /* Square screens - canvas covers full background, centered */
     #background-shader {
         width: 100vw;
@@ -198,6 +237,7 @@ body {
 }
 
 @media (max-aspect-ratio: 9/16) {
+
     /* Mobile screens - canvas covers full background, centered */
     #background-shader {
         width: 100vw;
@@ -211,7 +251,8 @@ body {
 main {
     position: relative;
     z-index: 1;
-    padding-top: 80px; /* Space for the header menu */
+    padding-top: 80px;
+    /* Space for the header menu */
 }
 
 /* Page sections for scrolling */
@@ -225,37 +266,46 @@ main {
     padding: 0 20px;
     box-sizing: border-box;
     position: relative;
+    /* Ensure page content doesn't interfere with fixed polaroid stack */
+    z-index: 1;
 }
 
 /* Responsive layout based on aspect ratio */
 @media (max-aspect-ratio: 1/1) {
+
     /* Vertical screen - content takes full width */
     .page {
         flex-direction: column;
-        justify-content: flex-start;
-        padding-top: 100px;
+        justify-content: center;
+        align-items: center;
+        padding-top: 0;
         transition: all 0.5s ease-in-out;
         width: 100%;
+        /* Ensure content is centered and doesn't interfere with polaroid stack */
+        position: relative;
+        z-index: 1;
     }
-    
+
+    /* Remove old conflicting polaroid rules - use the clean system above */
+
     .page h2 {
         margin-bottom: 30px;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page h3 {
         margin-top: 40px;
         margin-bottom: 20px;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page ul {
         text-align: left;
         max-width: 600px;
         margin: 20px auto;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page li {
         margin-bottom: 15px;
         transition: all 0.3s ease-in-out;
@@ -263,6 +313,7 @@ main {
 }
 
 @media (min-aspect-ratio: 1/1) {
+
     /* Wide screen - two-pane layout with background images on the left */
     .page {
         flex-direction: row;
@@ -273,7 +324,7 @@ main {
         height: 100vh;
         transition: all 0.5s ease-in-out;
     }
-    
+
     .page-content {
         flex: 1;
         background: transparent;
@@ -284,7 +335,7 @@ main {
         transition: all 0.5s ease-in-out;
         backdrop-filter: none;
     }
-    
+
     .page h2 {
         margin-bottom: 30px;
         text-align: left;
@@ -292,7 +343,7 @@ main {
         font-size: 2.5em;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page h3 {
         margin-top: 30px;
         margin-bottom: 20px;
@@ -301,7 +352,7 @@ main {
         font-size: 1.8em;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page p {
         color: white;
         font-size: 1.1em;
@@ -309,14 +360,14 @@ main {
         margin-bottom: 20px;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page ul {
         text-align: left;
         margin: 20px 0;
         color: white;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page li {
         margin-bottom: 15px;
         text-align: left;
@@ -325,7 +376,7 @@ main {
         line-height: 1.5;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page strong {
         color: white;
         transition: all 0.3s ease-in-out;
@@ -333,6 +384,7 @@ main {
 }
 
 @media (max-aspect-ratio: 9/16) {
+
     /* Mobile screens - content takes full width with background images */
     .page {
         flex-direction: column;
@@ -341,7 +393,7 @@ main {
         transition: all 0.5s ease-in-out;
         width: 100%;
     }
-    
+
     .page-content {
         flex: 1;
         padding: 0 20px;
@@ -349,26 +401,26 @@ main {
         background: transparent;
         backdrop-filter: none;
     }
-    
+
     .page h2 {
         margin-bottom: 20px;
         font-size: 2.5em;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page h3 {
         margin-top: 30px;
         margin-bottom: 15px;
         font-size: 1.8em;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page ul {
         text-align: left;
         margin: 15px 0;
         transition: all 0.3s ease-in-out;
     }
-    
+
     .page li {
         margin-bottom: 12px;
         font-size: 0.9em;
@@ -386,7 +438,7 @@ main {
     background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(20px);
     padding: 15px 0;
-    box-shadow: 
+    box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     animation: fadeInDown 0.5s ease-out forwards;
@@ -398,6 +450,7 @@ main {
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -426,6 +479,14 @@ main {
     border-radius: 0;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    /* Show pointer cursor */
+    display: inline-block;
+    /* Ensure proper clickable area */
+    min-width: 80px;
+    /* Ensure minimum clickable width */
+    text-align: center;
+    /* Center text within clickable area */
 }
 
 #main-menu a:hover {
@@ -514,6 +575,64 @@ p {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
+/* Fix text colors for widescreen mode */
+@media (min-aspect-ratio: 1/1) {
+    h2 {
+        color: white !important;
+        text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    h3 {
+        color: white !important;
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    p {
+        color: white !important;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    /* Ensure all text in widescreen mode is white */
+    .page * {
+        color: white !important;
+    }
+
+    /* Override any black text colors */
+    .page h1,
+    .page h2,
+    .page h3,
+    .page h4,
+    .page h5,
+    .page h6 {
+        color: white !important;
+    }
+
+    .page p,
+    .page span,
+    .page div,
+    .page a {
+        color: white !important;
+    }
+
+    /* Ensure polaroid captions are visible in widescreen */
+    .polaroid-caption {
+        color: #333 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        text-shadow: none !important;
+    }
+
+    /* Ensure music track info is visible */
+    .track-info h3 {
+        color: white !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8) !important;
+    }
+
+    .track-status {
+        color: white !important;
+        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8) !important;
+    }
+}
+
 /* Test page styling */
 .test-results {
     background: rgba(0, 0, 0, 0.1);
@@ -581,7 +700,9 @@ p {
     margin-bottom: 15px;
 }
 
-.port-number, .timestamp, .config-value {
+.port-number,
+.timestamp,
+.config-value {
     background: rgba(0, 0, 0, 0.2);
     padding: 2px 8px;
     border-radius: 4px;
@@ -618,10 +739,13 @@ p {
     z-index: 10;
     opacity: 0;
     animation: fadeInUp 1s ease-out 2s forwards;
+    cursor: pointer;
+    transition: all 0.5s ease-in-out;
 }
 
 .scroll-text {
-    display: none; /* Hide the text */
+    display: none;
+    /* Hide the text */
 }
 
 .scroll-arrow {
@@ -629,16 +753,26 @@ p {
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
     animation: pulseGlow 2s ease-in-out infinite, floatUpDown 3s ease-in-out infinite;
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .scroll-arrow:hover {
     transform: scale(1.2);
     color: #ff5252;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 20px rgba(255, 107, 107, 0.6));
 }
 
 .scroll-arrow svg {
     width: 32px;
     height: 32px;
+    transition: all 0.3s ease;
+}
+
+/* Hide scroll indicator after use */
+.scroll-indicator.hidden {
+    opacity: 0 !important;
+    transform: translateX(-50%) translateY(20px) !important;
+    pointer-events: none;
 }
 
 @keyframes fadeInUp {
@@ -646,6 +780,7 @@ p {
         opacity: 0;
         transform: translateX(-50%) translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
@@ -653,61 +788,722 @@ p {
 }
 
 @keyframes pulseGlow {
-    0%, 100% {
+
+    0%,
+    100% {
         filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 15px rgba(255, 107, 107, 0.4));
     }
+
     50% {
         filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 25px rgba(255, 107, 107, 0.8));
     }
 }
 
 @keyframes floatUpDown {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0);
     }
+
     50% {
         transform: translateY(-10px);
     }
 }
 
-/* Polaroid String Gallery - Hung Side by Side */
-.polaroid-string-gallery {
+/* ===== POLAROID STACK - CLEAN CENTERING SYSTEM ===== */
+
+/* Main polaroid stack container - perfectly centered on page */
+.polaroid-stack {
+    position: fixed;
+    /* Change to fixed positioning for true viewport centering */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    z-index: 10;
+    /* Clean, simple centering - no conflicting properties */
+    pointer-events: auto;
+    /* Ensure it can receive hover events */
+}
+
+/* Extended hover zone for navigation buttons */
+.polaroid-stack::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: -100px;
+    right: -100px;
+    bottom: -100px;
+    z-index: 5;
+}
+
+/* Polaroid container - no conflicting centering */
+.polaroid-stack-container {
     position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Individual polaroid items - centered within their container */
+.stack-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    opacity: 1;
+    transform-origin: center center;
+    /* Ensure stable positioning - no scroll interference */
+    will-change: transform, opacity;
+}
+
+.stack-item.active {
+    z-index: 10;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Z-index layering for stack effect */
+.stack-item:nth-child(1) {
+    z-index: 3;
+}
+
+.stack-item:nth-child(2) {
+    z-index: 2;
+}
+
+.stack-item:nth-child(3) {
+    z-index: 1;
+}
+
+/* Navigation arrows - positioned relative to polaroid stack */
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 20;
+    display: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    font-weight: bold;
+}
+
+.nav-arrow:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.nav-left {
+    left: -70px;
+}
+
+.nav-right {
+    right: -70px;
+}
+
+/* Mobile: Always show arrows */
+@media (max-width: 768px) {
+    .nav-arrow {
+        display: block;
+    }
+
+    .polaroid-stack {
+        width: 350px;
+        height: 350px;
+    }
+}
+
+/* Desktop: Show arrows on hover */
+@media (min-width: 769px) {
+    .nav-arrow {
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-arrow.visible {
+        opacity: 1;
+    }
+}
+
+.polaroid-frame {
+    background: white;
+    padding: 20px 20px 40px 20px;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        0 8px 25px rgba(0, 0, 0, 0.2);
+    transform: rotate(-2deg);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    width: 300px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    /* Ensure proper centering by center of the frame */
+    transform-origin: center center;
+}
+
+.polaroid-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* Remove any inline spacing issues */
+    border: 2px solid red;
+    /* Keep the red border for testing */
+}
+
+.polaroid-frame:hover {
+    transform: rotate(0deg) scale(1.05);
+    box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.4),
+        0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.polaroid-frame img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    filter:
+        sepia(0.3) contrast(1.1) brightness(1.05) saturate(1.2) hue-rotate(5deg);
+    transition: filter 0.3s ease-in-out;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.polaroid-frame:hover img {
+    filter:
+        sepia(0.2) contrast(1.2) brightness(1.1) saturate(1.3) hue-rotate(0deg);
+}
+
+.polaroid-caption {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-top: 15px;
+    /* Reduced from 20px to prevent overlap */
+    letter-spacing: 0.5px;
+    padding: 0 10px;
+    /* Ensure caption doesn't overlap with image */
+    position: relative;
+    z-index: 1;
+    /* Removed white background for transparent text */
+}
+
+/* Music Cards Gallery Styling */
+.music-cards-gallery {
     margin: 60px auto;
+    padding: 40px 20px;
     max-width: 1200px;
 }
 
-.string-line {
-    position: relative;
-    height: 4px;
-    background: linear-gradient(90deg, #8B4513, #D2691E, #8B4513);
-    border-radius: 2px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.polaroid-row {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+.cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 40px;
-    flex-wrap: wrap;
-    padding: 20px;
+    align-items: start;
 }
 
-.polaroid-container {
+.music-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 4px 16px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.music-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.music-card.clickable:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.2),
+        0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
     position: relative;
-    width: 280px;
-    height: 370px;
-    perspective: 1000px;
-    transform-style: preserve-3d;
-    /* Performance optimizations */
-    will-change: transform;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    margin-bottom: 20px;
 }
 
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+
+.music-card:hover .card-image img {
+    transform: scale(1.05);
+}
+
+.card-content {
+    padding: 24px;
+    color: #333;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #1a1a1a;
+    font-family: 'Orbitron', monospace;
+}
+
+.card-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 16px 0;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-description {
+    font-size: 14px;
+    color: #555;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+}
+
+.card-link {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.card-link:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.card-link.disabled {
+    background: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.card-link.disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* High-Quality Halloween Theme Elements */
+
+/* Enhanced String with Glow Effect */
+.string-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            #8B4513 20%,
+            #D2691E 50%,
+            #8B4513 80%,
+            transparent 100%);
+    box-shadow:
+        0 0 10px rgba(139, 69, 19, 0.6),
+        0 0 20px rgba(210, 105, 30, 0.4),
+        0 0 30px rgba(139, 69, 19, 0.2);
+    animation: stringGlow 3s ease-in-out infinite;
+}
+
+/* Professional Spider Web */
+.spider-web {
+    position: absolute;
+    top: -25px;
+    width: 60px;
+    height: 60px;
+    opacity: 0.9;
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+}
+
+.spider-web.left-web {
+    left: 30px;
+    transform: rotate(-15deg);
+}
+
+.spider-web.right-web {
+    right: 30px;
+    transform: rotate(15deg);
+}
+
+.spider-web::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 50% 50%, transparent 0, transparent 12px, rgba(255, 255, 255, 0.9) 12px, rgba(255, 255, 255, 0.9) 13px, transparent 13px),
+        conic-gradient(from 0deg, transparent 0deg, rgba(255, 255, 255, 0.8) 45deg, transparent 90deg, rgba(255, 255, 255, 0.8) 135deg, transparent 180deg, rgba(255, 255, 255, 0.8) 225deg, transparent 270deg, rgba(255, 255, 255, 0.8) 315deg, transparent 360deg),
+        radial-gradient(circle at 50% 50%, transparent 0, transparent 25px, rgba(255, 255, 255, 0.6) 25px, rgba(255, 255, 255, 0.6) 26px, transparent 26px);
+    background-size: 60px 60px, 60px 60px, 60px 60px;
+    background-position: center, center, center;
+    animation: webSway 6s ease-in-out infinite, webPulse 4s ease-in-out infinite;
+}
+
+/* Enhanced Pumpkin with Realistic Details */
+.pumpkin-decoration {
+    position: absolute;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 35px;
+    height: 40px;
+    background: linear-gradient(135deg,
+            #FF6B35 0%,
+            #FF8C42 25%,
+            #FF6B35 50%,
+            #E55A2B 75%,
+            #FF6B35 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.4),
+        inset 0 2px 8px rgba(255, 255, 255, 0.2),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+    animation: pumpkinGlow 4s ease-in-out infinite;
+}
+
+.pumpkin-decoration::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px;
+    height: 10px;
+    background: linear-gradient(135deg, #228B22 0%, #32CD32 50%, #228B22 100%);
+    border-radius: 50% 50% 0 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.pumpkin-decoration::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 25px;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(255, 107, 53, 0.8) 0, rgba(255, 107, 53, 0.8) 3px, transparent 3px),
+        radial-gradient(circle at 70% 30%, rgba(255, 107, 53, 0.8) 0, rgba(255, 107, 53, 0.8) 3px, transparent 3px),
+        radial-gradient(circle at 50% 60%, rgba(255, 107, 53, 0.8) 0, rgba(255, 107, 53, 0.8) 3px, transparent 3px),
+        radial-gradient(circle at 20% 70%, rgba(255, 107, 53, 0.8) 0, rgba(255, 107, 53, 0.8) 2px, transparent 2px),
+        radial-gradient(circle at 80% 70%, rgba(255, 107, 53, 0.8) 0, rgba(255, 107, 53, 0.8) 2px, transparent 2px);
+    background-size: 25px 25px, 25px 25px, 25px 25px, 25px 25px, 25px 25px;
+    background-position: center, center, center, center, center;
+}
+
+/* Professional Bat with Better Animation */
+.bat-decoration {
+    position: absolute;
+    top: -30px;
+    right: 100px;
+    width: 30px;
+    height: 25px;
+    animation: batFlap 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+.bat-decoration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 10px;
+    background: linear-gradient(180deg, #000 0%, #333 100%);
+    border-radius: 50% 50% 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.bat-decoration::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 30px;
+    height: 15px;
+    background: linear-gradient(180deg, #000 0%, #333 100%);
+    border-radius: 50% 50% 0 0;
+    transform-origin: center top;
+    animation: batWings 2.5s ease-in-out infinite;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Ghost Decoration */
+.ghost-decoration {
+    position: absolute;
+    top: -40px;
+    left: 20px;
+    width: 25px;
+    height: 30px;
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.9) 0%,
+            rgba(240, 240, 240, 0.8) 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 2px 8px rgba(255, 255, 255, 0.4);
+    animation: ghostFloat 5s ease-in-out infinite;
+}
+
+.ghost-decoration::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 15px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 50% 50% 0 0;
+}
+
+.ghost-decoration::after {
+    content: '';
+    position: absolute;
+    top: 17px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+}
+
+/* Enhanced Animations */
+@keyframes stringGlow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 10px rgba(139, 69, 19, 0.6),
+            0 0 20px rgba(210, 105, 30, 0.4),
+            0 0 30px rgba(139, 69, 19, 0.2);
+    }
+
+    50% {
+        box-shadow:
+            0 0 15px rgba(139, 69, 19, 0.8),
+            0 0 25px rgba(210, 105, 30, 0.6),
+            0 0 35px rgba(139, 69, 19, 0.4);
+    }
+}
+
+@keyframes webSway {
+
+    0%,
+    100% {
+        transform: rotate(-15deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(-10deg) scale(1.05);
+    }
+}
+
+@keyframes webPulse {
+
+    0%,
+    100% {
+        opacity: 0.9;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes pumpkinGlow {
+
+    0%,
+    100% {
+        box-shadow:
+            0 4px 12px rgba(0, 0, 0, 0.4),
+            inset 0 2px 8px rgba(255, 255, 255, 0.2),
+            inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    50% {
+        box-shadow:
+            0 6px 18px rgba(0, 0, 0, 0.5),
+            inset 0 3px 12px rgba(255, 255, 255, 0.3),
+            inset 0 -3px 12px rgba(0, 0, 0, 0.4),
+            0 0 20px rgba(255, 107, 53, 0.3);
+    }
+}
+
+@keyframes batFlap {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-5px) rotate(2deg);
+    }
+}
+
+@keyframes batWings {
+
+    0%,
+    100% {
+        transform: scaleY(1) rotate(0deg);
+    }
+
+    50% {
+        transform: scaleY(0.7) rotate(5deg);
+    }
+}
+
+@keyframes ghostFloat {
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-8px) rotate(2deg);
+    }
+}
+
+/* Floating Autumn Leaves */
+.floating-leaf {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg,
+            #FF6B35 0%,
+            #FF8C42 25%,
+            #E55A2B 50%,
+            #8B4513 75%,
+            #A0522D 100%);
+    border-radius: 50% 0 50% 0;
+    opacity: 0.8;
+    animation: leafFloat 8s linear infinite;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.floating-leaf:nth-child(1) {
+    top: -50px;
+    left: 10%;
+    animation-delay: 0s;
+    animation-duration: 10s;
+}
+
+.floating-leaf:nth-child(2) {
+    top: -80px;
+    left: 30%;
+    animation-delay: 2s;
+    animation-duration: 12s;
+}
+
+.floating-leaf:nth-child(3) {
+    top: -60px;
+    left: 70%;
+    animation-delay: 4s;
+    animation-duration: 9s;
+}
+
+.floating-leaf:nth-child(4) {
+    top: -90px;
+    left: 85%;
+    animation-delay: 6s;
+    animation-duration: 11s;
+}
+
+/* Cauldron Decoration */
+.cauldron-decoration {
+    position: absolute;
+    top: -45px;
+    left: 60%;
+    width: 30px;
+    height: 25px;
+    background: linear-gradient(180deg,
+            #2F2F2F 0%,
+            #1A1A1A 50%,
+            #000000 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.6),
+        inset 0 2px 8px rgba(255, 255, 255, 0.1);
+    animation: cauldronBubble 6s ease-in-out infinite;
+}
+
+.cauldron-decoration::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 8px;
+    background: linear-gradient(180deg, #1A1A1A 0%, #2F2F2F 100%);
+    border-radius: 50% 50% 0 0;
+}
+
+.cauldron-decoration::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 25px;
+    height: 20px;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(139, 69, 19, 0.8) 0, rgba(139, 69, 19, 0.8) 4px, transparent 4px),
+        radial-gradient(circle at 70% 30%, rgba(139, 69, 19, 0.8) 0, rgba(139, 69, 19, 0.8) 4px, transparent 4px),
+        radial-gradient(circle at 50% 60%, rgba(139, 69, 19, 0.8) 0, rgba(139, 69, 19, 0.8) 4px, transparent 4px);
+    background-size: 25px 25px, 25px 25px, 25px 25px;
+    background-position: center, center, center;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+}
+
+/* Enhanced String Clips */
 .string-clip {
     position: absolute;
     top: -15px;
@@ -715,11 +1511,19 @@ p {
     transform: translateX(-50%);
     width: 20px;
     height: 20px;
-    background: #C0C0C0;
+    background: linear-gradient(135deg,
+            #C0C0C0 0%,
+            #E5E5E5 25%,
+            #C0C0C0 50%,
+            #A0A0A0 75%,
+            #C0C0C0 100%);
     border-radius: 50%;
     border: 3px solid #8B4513;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.3),
+        inset 0 1px 3px rgba(255, 255, 255, 0.3);
     z-index: 10;
+    animation: clipGlow 4s ease-in-out infinite;
 }
 
 .string-clip::before {
@@ -730,137 +1534,73 @@ p {
     transform: translate(-50%, -50%);
     width: 8px;
     height: 8px;
-    background: #8B4513;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #8B4513 100%);
     border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Halloween CSS Art Elements */
+/* Additional Animations */
+@keyframes leafFloat {
+    0% {
+        transform: translateY(0px) rotate(0deg) scale(1);
+        opacity: 0.8;
+    }
 
-/* Spider Web */
-.spider-web {
-    position: absolute;
-    top: -20px;
-    width: 40px;
-    height: 40px;
-    opacity: 0.8;
+    25% {
+        transform: translateY(-20px) rotate(90deg) scale(0.9);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateY(-40px) rotate(180deg) scale(1.1);
+        opacity: 0.8;
+    }
+
+    75% {
+        transform: translateY(-60px) rotate(270deg) scale(0.9);
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(-80px) rotate(360deg) scale(1);
+        opacity: 0;
+    }
 }
 
-.spider-web.left-web {
-    left: 20px;
+@keyframes cauldronBubble {
+
+    0%,
+    100% {
+        transform: translateY(0px) scale(1);
+        box-shadow:
+            0 4px 12px rgba(0, 0, 0, 0.6),
+            inset 0 2px 8px rgba(255, 255, 255, 0.1);
+    }
+
+    50% {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow:
+            0 6px 18px rgba(0, 0, 0, 0.7),
+            inset 0 3px 12px rgba(255, 255, 255, 0.15),
+            0 0 15px rgba(139, 69, 19, 0.4);
+    }
 }
 
-.spider-web.right-web {
-    right: 20px;
-}
+@keyframes clipGlow {
 
-.spider-web::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: 
-        radial-gradient(circle at 50% 50%, transparent 0, transparent 8px, #fff 8px, #fff 9px, transparent 9px),
-        linear-gradient(45deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%),
-        linear-gradient(-45deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%),
-        linear-gradient(0deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%),
-        linear-gradient(90deg, transparent 45%, #fff 45%, #fff 46%, transparent 46%);
-    background-size: 40px 40px, 40px 40px, 40px 40px, 40px 40px, 40px 40px;
-    background-position: center, center, center, center, center;
-    animation: webSway 4s ease-in-out infinite;
-}
+    0%,
+    100% {
+        box-shadow:
+            0 2px 6px rgba(0, 0, 0, 0.3),
+            inset 0 1px 3px rgba(255, 255, 255, 0.3);
+    }
 
-/* Pumpkin */
-.pumpkin-decoration {
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 35px;
-    background: #FF6B35;
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.pumpkin-decoration::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 12px;
-    height: 8px;
-    background: #228B22;
-    border-radius: 50% 50% 0 0;
-}
-
-.pumpkin-decoration::after {
-    content: '';
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    background: 
-        radial-gradient(circle at 30% 30%, #FF6B35 0, #FF6B35 2px, transparent 2px),
-        radial-gradient(circle at 70% 30%, #FF6B35 0, #FF6B35 2px, transparent 2px),
-        radial-gradient(circle at 50% 60%, #FF6B35 0, #FF6B35 2px, transparent 2px);
-    background-size: 4px 4px, 4px 4px, 4px 4px;
-    background-position: 0 0, 0 0, 0 0;
-}
-
-/* Bat */
-.bat-decoration {
-    position: absolute;
-    top: -25px;
-    right: 80px;
-    width: 25px;
-    height: 20px;
-    animation: batFlap 2s ease-in-out infinite;
-}
-
-.bat-decoration::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 6px;
-    height: 8px;
-    background: #000;
-    border-radius: 50% 50% 0 0;
-}
-
-.bat-decoration::after {
-    content: '';
-    position: absolute;
-    top: 8px;
-    left: 0;
-    width: 25px;
-    height: 12px;
-    background: #000;
-    border-radius: 50% 50% 0 0;
-    transform-origin: center top;
-    animation: batWings 2s ease-in-out infinite;
-}
-
-/* Animations */
-@keyframes webSway {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(2deg); }
-}
-
-@keyframes batFlap {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-3px); }
-}
-
-@keyframes batWings {
-    0%, 100% { transform: scaleY(1); }
-    50% { transform: scaleY(0.8); }
+    50% {
+        box-shadow:
+            0 4px 12px rgba(0, 0, 0, 0.4),
+            inset 0 2px 6px rgba(255, 255, 255, 0.4),
+            0 0 10px rgba(139, 69, 19, 0.3);
+    }
 }
 
 .polaroid-image {
@@ -868,7 +1608,7 @@ p {
     height: 100%;
     background: white;
     padding: 40px 15px 15px 15px;
-    box-shadow: 
+    box-shadow:
         0 4px 15px rgba(0, 0, 0, 0.3),
         0 8px 25px rgba(0, 0, 0, 0.2);
     transform: rotate(-2deg) translateZ(0);
@@ -878,7 +1618,7 @@ p {
 
 .polaroid-image:hover {
     transform: rotate(0deg) translateZ(20px) scale(1.05);
-    box-shadow: 
+    box-shadow:
         0 8px 30px rgba(0, 0, 0, 0.4),
         0 15px 40px rgba(0, 0, 0, 0.3);
 }
@@ -887,12 +1627,8 @@ p {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: 
-        sepia(0.3) 
-        contrast(1.1) 
-        brightness(1.05) 
-        saturate(1.2)
-        hue-rotate(5deg);
+    filter:
+        sepia(0.3) contrast(1.1) brightness(1.05) saturate(1.2) hue-rotate(5deg);
     transition: filter 0.3s ease-in-out;
     /* Performance optimizations for fast rendering */
     will-change: transform, filter;
@@ -903,12 +1639,8 @@ p {
 }
 
 .polaroid-image:hover img {
-    filter: 
-        sepia(0.2) 
-        contrast(1.2) 
-        brightness(1.1) 
-        saturate(1.3)
-        hue-rotate(0deg);
+    filter:
+        sepia(0.2) contrast(1.2) brightness(1.1) saturate(1.3) hue-rotate(0deg);
 }
 
 .polaroid-caption {
@@ -934,9 +1666,12 @@ p {
 }
 
 @keyframes polaroidFloat {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: rotate(-2deg) translateY(0px) translateZ(0);
     }
+
     50% {
         transform: rotate(-1deg) translateY(-15px) translateZ(10px);
     }
@@ -950,7 +1685,7 @@ p {
 
 .polaroid-image.clickable:hover {
     transform: rotate(0deg) translateZ(30px) scale(1.08);
-    box-shadow: 
+    box-shadow:
         0 12px 40px rgba(0, 0, 0, 0.5),
         0 20px 50px rgba(0, 0, 0, 0.4);
 }
@@ -980,15 +1715,16 @@ p {
         margin: 40px auto;
         padding: 0 20px;
     }
-    
+
     .polaroid-row {
         flex-direction: column;
         align-items: center;
         gap: 0;
         position: relative;
-        height: 400px;
+        height: 500px;
+        /* Increased height for better spacing */
     }
-    
+
     .polaroid-container {
         position: absolute;
         width: 250px;
@@ -999,27 +1735,31 @@ p {
         z-index: 1;
         margin-bottom: 0;
     }
-    
-    /* Stack the cards with slight offsets */
+
+    /* Stack the cards with better spacing */
     .polaroid-container:nth-child(1) {
         top: 0;
         z-index: 3;
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
     }
-    
+
     .polaroid-container:nth-child(2) {
-        top: 20px;
+        top: 60px;
+        /* Increased spacing */
         z-index: 2;
         transform: translateX(-50%) scale(0.95);
         opacity: 0.8;
     }
-    
+
     .polaroid-container:nth-child(3) {
-        top: 40px;
+        top: 120px;
+        /* Increased spacing */
         z-index: 1;
         transform: translateX(-50%) scale(0.9);
         opacity: 0.6;
     }
-    
+
     /* Hover effects to reveal cards */
     .polaroid-container:hover {
         z-index: 10;
@@ -1027,16 +1767,16 @@ p {
         opacity: 1;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
-    
-    .polaroid-container:hover ~ .polaroid-container {
+
+    .polaroid-container:hover~.polaroid-container {
         transform: translateX(-50%) scale(0.9);
         opacity: 0.4;
     }
-    
+
     .polaroid-image {
         padding: 40px 12px 12px 12px;
     }
-    
+
     .polaroid-caption {
         font-size: 12px;
         top: 12px;
@@ -1044,23 +1784,23 @@ p {
         right: 12px;
         padding: 6px 10px;
     }
-    
+
     .string-line {
         display: none;
     }
-    
+
     .string-clip {
         display: none;
     }
-    
+
     .spider-web.left-web {
         left: 10px;
     }
-    
+
     .spider-web.right-web {
         right: 10px;
     }
-    
+
     .bat-decoration {
         right: 40px;
     }
@@ -1071,12 +1811,12 @@ p {
     .polaroid-row {
         height: 350px;
     }
-    
+
     .polaroid-container {
         width: 220px;
         height: 300px;
     }
-    
+
     .polaroid-caption {
         font-size: 11px;
         padding: 5px 8px;
@@ -1084,12 +1824,13 @@ p {
 }
 
 @media (min-width: 1200px) {
+
     /* Wide screen - side by side layout */
     .polaroid-row {
         gap: 60px;
         justify-content: center;
     }
-    
+
     .polaroid-container {
         margin: 0;
     }
@@ -1177,17 +1918,18 @@ p {
 
 .track-link {
     display: inline-block;
-    padding: 12px 24px;
-    background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-    color: white;
+    padding: 8px 16px;
+    background: rgba(220, 20, 60, 0.9);
+    color: #000;
     text-decoration: none;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 1.1em;
+    border-radius: 0;
+    font-weight: 500;
+    font-size: 18px;
     transition: all 0.3s ease-in-out;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .track-link::before {
@@ -1207,8 +1949,8 @@ p {
 
 .track-link:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
-    background: linear-gradient(45deg, #ff5252, #d84315);
+    box-shadow: 0 8px 25px rgba(220, 20, 60, 0.6);
+    background: rgba(220, 20, 60, 1);
 }
 
 .track-link.disabled {
@@ -1225,6 +1967,7 @@ p {
 
 /* Responsive Music Layout */
 @media (max-aspect-ratio: 1/1) {
+
     /* Vertical/Mobile Layout */
     .track-item {
         flex-direction: column;
@@ -1232,16 +1975,16 @@ p {
         gap: 20px;
         padding: 25px;
     }
-    
+
     .track-artwork {
         width: 100px;
         height: 100px;
     }
-    
+
     .track-info h3 {
         font-size: 1.8em;
     }
-    
+
     .music-tracks {
         gap: 30px;
         padding: 15px;
@@ -1305,12 +2048,8 @@ p {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: 
-        sepia(0.3) 
-        contrast(1.1) 
-        brightness(1.05) 
-        saturate(1.2)
-        hue-rotate(5deg);
+    filter:
+        sepia(0.3) contrast(1.1) brightness(1.05) saturate(1.2) hue-rotate(5deg);
     transition: filter 0.3s ease-in-out;
     border-radius: 8px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
@@ -1321,16 +2060,13 @@ p {
 }
 
 .polaroid-overlay.clickable:hover img {
-    filter: 
-        sepia(0.2) 
-        contrast(1.2) 
-        brightness(1.1) 
-        saturate(1.3)
-        hue-rotate(0deg);
+    filter:
+        sepia(0.2) contrast(1.2) brightness(1.1) saturate(1.3) hue-rotate(0deg);
     transform: scale(1.05);
 }
 
 @media (min-aspect-ratio: 1/1) {
+
     /* Wide Screen Layout */
     .track-item {
         flex-direction: row;
@@ -1338,16 +2074,16 @@ p {
         gap: 40px;
         padding: 40px;
     }
-    
+
     .track-artwork {
         width: 140px;
         height: 140px;
     }
-    
+
     .track-info h3 {
         font-size: 2.5em;
     }
-    
+
     .music-tracks {
         gap: 50px;
         padding: 30px;
@@ -1355,6 +2091,7 @@ p {
 }
 
 @media (aspect-ratio: 1/1) {
+
     /* Square Screen Layout */
     .track-item {
         flex-direction: column;
@@ -1362,16 +2099,16 @@ p {
         gap: 25px;
         padding: 30px;
     }
-    
+
     .track-artwork {
         width: 110px;
         height: 110px;
     }
-    
+
     .track-info h3 {
         font-size: 2.0em;
     }
-    
+
     .music-tracks {
         gap: 35px;
         padding: 20px;
@@ -1386,8 +2123,121 @@ p {
         gap: 30px;
         max-width: 1200px;
     }
-    
+
     .track-item {
         margin: 0;
+    }
+}
+
+/* Prevent scroll animations from affecting polaroid stack */
+.polaroid-stack,
+.polaroid-stack-container,
+.stack-item {
+    /* Disable any scroll-based animations */
+    scroll-behavior: auto;
+    /* Ensure stable positioning - but don't override the main polaroid-stack rules */
+}
+
+/* Ensure polaroid stack is immune to scroll effects AND widescreen mode */
+.polaroid-stack {
+    /* Lock position and prevent scroll interference */
+    transform: translate(-50%, -50%) !important;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    /* Force center positioning - override ALL other rules */
+    left: 50% !important;
+    top: 50% !important;
+    /* Ensure it's above all page content */
+    z-index: 100 !important;
+    /* Force opacity to prevent transparency issues */
+    opacity: 1 !important;
+}
+
+/* Ensure polaroid stack items maintain their properties */
+.stack-item {
+    /* Override any conflicting rules */
+    opacity: 1 !important;
+    visibility: visible !important;
+    /* Maintain the positioning from the main rules */
+}
+
+.stack-item.active {
+    /* Ensure active state is always visible */
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 10 !important;
+}
+
+/* Override any conflicting page layouts */
+.page:has(.polaroid-stack) .page-content {
+    /* Ensure page content doesn't interfere with polaroid stack */
+    z-index: 1;
+}
+
+/* Force polaroid stack to be centered on all screen sizes */
+@media (max-width: 768px) {
+    .polaroid-stack {
+        width: 350px;
+        height: 350px;
+        /* Maintain center positioning on mobile */
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        /* Force visibility and opacity */
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .stack-item {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .polaroid-stack {
+        width: 400px;
+        height: 400px;
+        /* Maintain center positioning on desktop */
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        /* Force visibility and opacity */
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .stack-item {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
+/* Widescreen mode - ensure polaroid stack is completely immune */
+@media (min-aspect-ratio: 1/1) {
+    .polaroid-stack {
+        /* Override any widescreen effects */
+        opacity: 1 !important;
+        visibility: visible !important;
+        /* Maintain fixed positioning */
+        position: fixed !important;
+        /* Force center positioning */
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        /* Ensure it's above all content */
+        z-index: 100 !important;
+    }
+
+    .stack-item {
+        /* Override any widescreen effects */
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .stack-item.active {
+        opacity: 1 !important;
+        visibility: visible !important;
+        z-index: 10 !important;
     }
 }

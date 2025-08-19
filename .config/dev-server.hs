@@ -44,6 +44,88 @@ logWarning msg = putStrLn $ "[DEV-WARNING] " ++ msg
 logError :: String -> IO ()
 logError msg = putStrLn $ "[DEV-ERROR] " ++ msg
 
+-- Process management functions
+isServerRunning :: IO Bool
+isServerRunning = do
+    (exitCode, _, _) <- readProcessWithExitCode "bash" ["-c", "pgrep -f 'psyop-website-exe' > /dev/null"] ""
+    return $ exitCode == ExitSuccess
+
+startServer :: IO Bool
+startServer = do
+    logInfo "Starting PSYOP development server..."
+    isRunning <- isServerRunning
+    if isRunning then do
+        logWarning "Server already running!"
+        return True
+    else do
+        success <- runCommand "stack run &"
+        if success then do
+            logSuccess "Server started on http://localhost:8080"
+            return True
+        else do
+            logError "Failed to start server"
+            return False
+
+stopServer :: IO Bool
+stopServer = do
+    logInfo "Stopping PSYOP development server..."
+    success <- runCommand "pkill -f 'psyop-website-exe'"
+    if success then do
+        logSuccess "Server stopped"
+        return True
+    else do
+        logWarning "No server process found to stop"
+        return True
+
+restartServer :: IO Bool
+restartServer = do
+    logInfo "Restarting PSYOP development server..."
+    stopSuccess <- stopServer
+    if stopSuccess then do
+        logInfo "Waiting 2 seconds before restart..."
+        threadDelay (2 * 1000000) -- 2 seconds
+        startSuccess <- startServer
+        return startSuccess
+    else do
+        logError "Failed to stop server for restart"
+        return False
+
+cleanupProcesses :: IO Bool
+cleanupProcesses = do
+    logInfo "Cleaning up processes..."
+    stopSuccess <- stopServer
+    cleanSuccess <- runCommand "pkill -f 'stack'"
+    if stopSuccess && cleanSuccess then do
+        logSuccess "Cleanup complete"
+        return True
+    else do
+        logWarning "Some cleanup operations had issues"
+        return True
+
+showServerStatus :: IO ()
+showServerStatus = do
+    logInfo "Checking server status..."
+    isRunning <- isServerRunning
+    
+    putStrLn ""
+    putStrLn "=== Server Status ==="
+    
+    if isRunning then do
+        putStrLn "✅ Server is running"
+        putStrLn ""
+        putStrLn "=== Process Details ==="
+        (_, output, _) <- readProcessWithExitCode "bash" ["-c", "ps aux | grep 'psyop-website-exe' | grep -v grep"] ""
+        putStrLn output
+    else do
+        putStrLn "❌ Server is not running"
+    
+    putStrLn ""
+    putStrLn "=== Quick Actions ==="
+    putStrLn "  start   - Start the development server"
+    putStrLn "  stop    - Stop the development server"
+    putStrLn "  restart - Restart the development server"
+    putStrLn "  clean   - Clean up all related processes"
+
 -- Check if files have changed
 checkForChanges :: [String] -> IO Bool
 checkForChanges dirs = do
@@ -369,13 +451,25 @@ main = do
             runDevServer (runCmd defaultDevConfig)
         ["dev"] -> do
             devMode defaultDevConfig
+        ["start"] -> do
+            success <- startServer
+            exitWith $ if success then ExitSuccess else ExitFailure 1
+        ["stop"] -> do
+            success <- stopServer
+            exitWith $ if success then ExitSuccess else ExitFailure 1
+        ["restart"] -> do
+            success <- restartServer
+            exitWith $ if success then ExitSuccess else ExitFailure 1
+        ["status"] -> showServerStatus
+        ["clean"] -> do
+            success <- cleanupProcesses
+            exitWith $ if success then ExitSuccess else ExitFailure 1
         ["setup"] -> do
             success <- checkAndRegenerateProjectFiles
             unless success $ exitWith (ExitFailure 1)
         ["rebuild"] -> do
             success <- forceRebuildProjectFiles
             unless success $ exitWith (ExitFailure 1)
-        ["status"] -> showStatus
         ["help"] -> showHelp
         ["-h"] -> showHelp
         ["--help"] -> showHelp
@@ -388,6 +482,13 @@ showHelp = do
     putStrLn ""
     putStrLn "Usage: runhaskell config/dev-server.hs [COMMAND]"
     putStrLn ""
+    putStrLn "Server Management Commands:"
+    putStrLn "  start       Start the development server"
+    putStrLn "  stop        Stop the development server"
+    putStrLn "  restart     Restart the development server"
+    putStrLn "  status      Check server status and process details"
+    putStrLn "  clean       Clean up all related processes"
+    putStrLn ""
     putStrLn "Development Commands:"
     putStrLn "  dev         Development mode with auto-reload (recommended)"
     putStrLn "  build       Build the project only"
@@ -396,14 +497,15 @@ showHelp = do
     putStrLn "Setup Commands:"
     putStrLn "  setup       Check and regenerate missing project files"
     putStrLn "  rebuild     Force rebuild all project files"
-    putStrLn "  status      Show project status"
     putStrLn "  help        Show this help message"
     putStrLn ""
     putStrLn "Examples:"
-    putStrLn "  runhaskell config/dev-server.hs dev      # Start development server"
-    putStrLn "  runhaskell config/dev-server.hs setup    # Setup project files"
-    putStrLn "  runhaskell config/dev-server.hs build    # Build project"
-    putStrLn "  runhaskell config/dev-server.hs status   # Check status"
+    putStrLn "  runhaskell config/dev-server.hs start     # Start server"
+    putStrLn "  runhaskell config/dev-server.hs stop      # Stop server"
+    putStrLn "  runhaskell config/dev-server.hs status    # Check status"
+    putStrLn "  runhaskell config/dev-server.hs dev       # Start development mode"
+    putStrLn "  runhaskell config/dev-server.hs setup     # Setup project files"
+    putStrLn "  runhaskell config/dev-server.hs build     # Build project"
     putStrLn ""
     putStrLn "For local development, use: runhaskell config/dev-server.hs dev"
     putStrLn "This tool will automatically regenerate missing project files"

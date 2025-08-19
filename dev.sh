@@ -20,16 +20,16 @@ case "$1" in
         ;;
     restart)
         echo "Restarting PSYOP development server..."
-        ./dev.sh stop
+        ./dev-server.sh stop
         sleep 2
-        ./dev.sh start
+        ./dev-server.sh start
         ;;
     status)
         if pgrep -f "psyop-website-exe" > /dev/null; then
-            echo "✅ Server is running"
+            echo "Server is running"
             ps aux | grep "psyop-website-exe" | grep -v grep
         else
-            echo "❌ Server is not running"
+            echo "Server is not running"
         fi
         ;;
     clean)

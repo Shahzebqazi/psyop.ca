@@ -14,7 +14,7 @@ description: |
   environment with auto-reload, project setup, and comprehensive tooling. Features ./stack-dev 
   script for familiar Stack-like development commands.
   
-  ## 🎵 Key Features
+  ## Key Features
   
   ### Music Website
   - **Dynamic Background System**: Responsive image sequences that adapt to screen orientation
@@ -35,7 +35,7 @@ description: |
   - **Image Management**: Non-repeating image sequence algorithm for dynamic backgrounds
   - **Build System**: Haskell Stack with comprehensive project configuration
   
-  ## 🚀 Quick Start
+  ## Quick Start
   
   ### Prerequisites
   - macOS (automatic dependency installation supported)
@@ -58,7 +58,7 @@ description: |
   # Visit http://localhost:8080
   ```
   
-  ## 🛠️ Development Commands
+  ## Development Commands
   
   ### Stack-like Experience (Recommended)
   ```bash
@@ -120,7 +120,7 @@ description: |
   swift installer.swift gui
   ```
   
-  ## 🏗️ Project Structure
+  ## Project Structure
   
   ```
   psyop.ca/
@@ -144,7 +144,7 @@ description: |
   └── stack.yaml              # Haskell Stack configuration
   ```
   
-  ## 🔧 Development Workflow
+  ## Development Workflow
   
   1. **Start Development**: `./.config/dev/stack-dev dev`
   2. **Make Changes**: Edit your code in any editor
@@ -152,17 +152,17 @@ description: |
   4. **Check Status**: `./.config/dev/stack-dev status` to monitor project health
   5. **Setup Files**: `./.config/dev/stack-dev setup` to regenerate missing files
   
-  ## 🚀 Why `./.config/dev/stack-dev`?
+  ## Why `./.config/dev/stack-dev`?
   
   The `./.config/dev/stack-dev` script provides a **familiar Stack-like experience** while keeping the powerful `dev-server.hs` engine:
   
-  - ✅ **Familiar Commands**: `./.config/dev/stack-dev dev` feels like `stack run dev`
-  - ✅ **Consistent Interface**: All development commands go through one tool
-  - ✅ **Powerful Engine**: Uses the full-featured `dev-server.hs` behind the scenes
-  - ✅ **Auto-detection**: Automatically finds `runhaskell` or falls back to `stack exec`
-  - ✅ **Colored Output**: Professional-looking terminal output with colors
+  - **Familiar Commands**: `./.config/dev/stack-dev dev` feels like `stack run dev`
+  - **Consistent Interface**: All development commands go through one tool
+  - **Powerful Engine**: Uses the full-featured `dev-server.hs` behind the scenes
+  - **Auto-detection**: Automatically finds `runhaskell` or falls back to `stack exec`
+  - **Colored Output**: Professional-looking terminal output with colors
   
-  ## 📊 Code Quality
+  ## Code Quality
   
   **Current Score**: 9.2/10 (Excellent, Production-Ready)
   
@@ -171,7 +171,7 @@ description: |
   - **Final Score**: 9.2/10 (Excellent, production-ready)
   - **Total Improvement**: +5.2 points (130% improvement)
   
-  ## 🤝 Contributing
+  ## Contributing
   
   1. Fork the repository
   2. Create a feature branch: `git checkout -b feature-name`
@@ -181,40 +181,40 @@ description: |
   6. Push: `git push origin feature-name`
   7. Create a Pull Request
   
-  ## 📄 License
+  ## License
   
   BSD-3-Clause - see LICENSE file for details
   
-  ## 🔄 Changelog
+  ## Changelog
   
   ### v0.2.1 (2025-01-24)
   **Project Structure Refactoring**
   
-  - 🔄 **Directory Reorganization**: Moved config/ to .config/ for cleaner structure
-  - 🧹 **File Consolidation**: Merged gui.swift into installer.swift
-  - 📚 **Documentation Merge**: Consolidated README.md into package.yaml
-  - 🏗️ **Development Tools**: Moved stack-dev and test-ui to .config/dev/
+  - **Directory Reorganization**: Moved config/ to .config/ for cleaner structure
+  - **File Consolidation**: Merged gui.swift into installer.swift
+  - **Documentation Merge**: Consolidated README.md into package.yaml
+  - **Development Tools**: Moved stack-dev and test-ui to .config/dev/
   
   ### v0.2.0 (2025-01-24)
   **Major Development Environment Enhancement**
   
-  - 🚀 **Enhanced Development Server**: Merged Setup.hs into .config/dev-server.hs
-  - 🛠️ **Comprehensive Project Setup**: Auto-regeneration of missing project files
-  - 📦 **Smart Installer**: Swift-based installer with automatic dependency management
-  - 🔄 **Auto-healing**: Automatic detection and regeneration of corrupted files
-  - 📊 **Project Status**: Real-time project health monitoring
-  - 🏗️ **Force Rebuild**: Complete project reconstruction capabilities
-  - 🎯 **Stack-like Experience**: New `./.config/dev/stack-dev` script for familiar development commands
+  - **Enhanced Development Server**: Merged Setup.hs into .config/dev-server.hs
+  - **Comprehensive Project Setup**: Auto-regeneration of missing project files
+  - **Smart Installer**: Swift-based installer with automatic dependency management
+  - **Auto-healing**: Automatic detection and regeneration of corrupted files
+  - **Project Status**: Real-time project health monitoring
+  - **Force Rebuild**: Complete project reconstruction capabilities
+  - **Stack-like Experience**: New `./.config/dev/stack-dev` script for familiar development commands
   
   ### v0.1.0 (2025-01-23)
   **Initial Release**
   
-  - 🎵 **Core Website**: Dynamic PSYOP electronic music website
-  - 🖼️ **Image Sequences**: Non-repeating background image system
-  - 👹 **Lovecraftian Effects**: Horror-themed CSS/SVG transition animations
-  - 📱 **Responsive Design**: Mobile and desktop optimized layouts
-  - 🔧 **Build System**: Haskell Stack integration with Servant API
-  - 🎨 **Visual Design**: Cyberpunk aesthetic with electronic music branding
+  - **Core Website**: Dynamic PSYOP electronic music website
+  - **Image Sequences**: Non-repeating background image system
+  - **Lovecraftian Effects**: Horror-themed CSS/SVG transition animations
+  - **Responsive Design**: Mobile and desktop optimized layouts
+  - **Build System**: Haskell Stack integration with Servant API
+  - **Visual Design**: Cyberpunk aesthetic with electronic music branding
 category:            Web, Music, Electronic
 extra-source-files:
 - LICENSE
@@ -274,7 +274,7 @@ executables:
 tests:
   psyop-website-test:
     main:                Spec.hs
-    source-dirs:         test
+    source-dirs:         tests
     dependencies:
     - psyop-website
     - hspec
