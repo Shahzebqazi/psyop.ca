@@ -20,7 +20,7 @@ WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET', 'your-webhook-secret-here')
 WEBHOOK_PORT = int(os.getenv('WEBHOOK_PORT', '9000'))
 DEPLOY_SCRIPT = os.getenv('DEPLOY_SCRIPT', './deploy-digitalocean.sh')
 REPO_PATH = os.getenv('REPO_PATH', '/opt/psyop-website')
-LOG_FILE = '/var/log/psyop-webhook.log'
+LOG_FILE = os.getenv('LOG_FILE', '/var/log/psyop-webhook.log')
 
 # Setup logging
 logging.basicConfig(

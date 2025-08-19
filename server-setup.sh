@@ -91,7 +91,7 @@ configure_nginx() {
     sudo tee /etc/nginx/sites-available/psyop-website > /dev/null << 'EOF'
 server {
     listen 80;
-    server_name psyop.ca www.psyop.ca;
+    server_name ${DOMAIN_NAME:-psyop.ca} ${DOMAIN_WWW:-www.psyop.ca};
     
     location / {
         proxy_pass http://localhost:8080;
@@ -157,7 +157,7 @@ setup_ssl() {
     
     if [ -n "$DOMAIN_NAME" ]; then
         log "Domain name provided: $DOMAIN_NAME"
-        sudo certbot --nginx -d "$DOMAIN_NAME" -d "www.$DOMAIN_NAME" --non-interactive --agree-tos --email admin@psyop.ca
+        sudo certbot --nginx -d "$DOMAIN_NAME" -d "www.$DOMAIN_NAME" --non-interactive --agree-tos --email ${SSL_EMAIL:-admin@psyop.ca}
         success "SSL certificate obtained successfully"
     else
         warn "No domain name provided. SSL setup skipped."
@@ -221,8 +221,8 @@ show_help() {
     echo ""
     echo "Examples:"
     echo "  $0"
-    echo "  DOMAIN_NAME=psyop.ca $0"
-    echo "  $0 -d psyop.ca"
+            echo "  DOMAIN_NAME=your-domain.com $0"
+        echo "  $0 -d your-domain.com"
     echo ""
     echo "Prerequisites:"
     echo "  - Ubuntu/Debian server"

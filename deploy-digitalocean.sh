@@ -103,7 +103,7 @@ EOF
     cat > deploy-package/nginx-psyop << 'EOF'
 server {
     listen 80;
-    server_name psyop.ca www.psyop.ca;
+    server_name ${DOMAIN_NAME:-psyop.ca} ${DOMAIN_WWW:-www.psyop.ca};
     
     location / {
         proxy_pass http://localhost:8080;
@@ -240,7 +240,7 @@ main() {
     
     log "Your website should be available at:"
     log "- http://$SERVER_IP"
-    log "- https://psyop.ca (after DNS configuration)"
+    log "- https://${DOMAIN_NAME:-psyop.ca} (after DNS configuration)"
     
     log "To check service status:"
     log "ssh $SERVER_USER@$SERVER_IP 'sudo systemctl status psyop-website'"

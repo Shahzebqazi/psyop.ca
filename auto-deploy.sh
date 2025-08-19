@@ -6,13 +6,13 @@
 set -e
 
 # Configuration
-APP_NAME="psyop-website"
-APP_PORT="8080"
-WEBHOOK_PORT="9000"
-REPO_URL="https://github.com/Shahzebqazi/psyop.ca.git"
-DEPLOY_USER="psyop"
-APP_DIR="/opt/psyop-website"
-LOG_FILE="/var/log/psyop-deploy.log"
+APP_NAME="${APP_NAME:-psyop-website}"
+APP_PORT="${APP_PORT:-8080}"
+WEBHOOK_PORT="${WEBHOOK_PORT:-9000}"
+REPO_URL="${REPO_URL:-https://github.com/Shahzebqazi/psyop.ca.git}"
+DEPLOY_USER="${DEPLOY_USER:-psyop}"
+APP_DIR="${APP_DIR:-/opt/psyop-website}"
+LOG_FILE="${LOG_FILE:-/var/log/psyop-deploy.log}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -137,7 +137,7 @@ setup_nginx() {
     sudo tee /etc/nginx/sites-available/psyop-website > /dev/null << EOF
 server {
     listen 80;
-    server_name psyop.ca www.psyop.ca;
+    server_name ${DOMAIN_NAME:-psyop.ca} ${DOMAIN_WWW:-www.psyop.ca};
     
     location / {
         proxy_pass http://localhost:$APP_PORT;

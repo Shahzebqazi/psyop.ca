@@ -10,6 +10,8 @@ import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Lazy.Char8 as L8
 import Data.List (isInfixOf)
 import Lib (app)
+import System.Environment (lookupEnv)
+import Data.Maybe (fromMaybe)
 
 -- Helper function to check if a string is contained in lazy bytestring
 bodyContains :: String -> LBS.ByteString -> Bool
@@ -73,7 +75,7 @@ spec = with (return app) $ do
       liftIO $ do
         simpleStatus response `shouldBe` status200
         simpleBody response `shouldSatisfy` 
-          \body -> bodyContains "admin@psyop.ca" body
+          \body -> bodyContains (fromMaybe "admin@psyop.ca" (lookupEnv "ADMIN_EMAIL")) body
 
   describe "GET /links" $ do
     it "responds with 200" $ do

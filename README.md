@@ -7,7 +7,7 @@
 
 Official website for **PSYOP**, an experimental electronic music project exploring the intersection of technology, consciousness, and sound.
 
-🌐 **Live Website:** [https://psyop.ca](https://psyop.ca)
+🌐 **Live Website:** [https://${DOMAIN_NAME:-psyop.ca}](https://${DOMAIN_NAME:-psyop.ca})
 
 ## 🎵 About PSYOP
 
@@ -55,8 +55,8 @@ This website is built with modern, scalable technologies:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Shahzebqazi/psyop.ca.git
-   cd psyop.ca
+   git clone https://github.com/${GITHUB_USERNAME:-Shahzebqazi}/${GITHUB_REPO:-psyop.ca}.git
+cd ${GITHUB_REPO:-psyop.ca}
    ```
 
 2. **Install dependencies:**
@@ -161,7 +161,7 @@ stack test psyop-website:test:psyop-website-test
 ## 📁 Project Structure
 
 ```
-psyop.ca/
+${GITHUB_REPO:-psyop.ca}/
 ├── app/                    # Application entry point
 │   └── Main.hs            # Main executable
 ├── src/                    # Source code
@@ -270,9 +270,9 @@ This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICE
 
 ## 📞 Contact
 
-- **Website:** [https://psyop.ca](https://psyop.ca)
-- **Email:** [admin@psyop.ca](mailto:admin@psyop.ca)
-- **Developer:** [github.com/Shahzebqazi](https://github.com/Shahzebqazi)
+- **Website:** [https://${DOMAIN_NAME:-psyop.ca}](https://${DOMAIN_NAME:-psyop.ca})
+- **Email:** [${ADMIN_EMAIL:-admin@psyop.ca}](mailto:${ADMIN_EMAIL:-admin@psyop.ca})
+- **Developer:** [github.com/${GITHUB_USERNAME:-Shahzebqazi}](https://github.com/${GITHUB_USERNAME:-Shahzebqazi})
 
 ## 🙏 Acknowledgments
 

@@ -10,7 +10,7 @@ description:    Please see the README on GitHub at <https://github.com/githubuse
 homepage:       https://github.com/githubuser/psyop-website#readme
 bug-reports:    https://github.com/githubuser/psyop-website/issues
 author:         PSYOP
-maintainer:     admin@psyop.ca
+maintainer:     ${PACKAGE_MAINTAINER:-admin@psyop.ca}
 copyright:      2025 PSYOP
 license:        BSD-3-Clause
 license-file:   LICENSE

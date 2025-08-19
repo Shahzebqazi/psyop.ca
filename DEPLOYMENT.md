@@ -27,14 +27,14 @@ The system consists of several components that work together to provide real-tim
 ssh root@your-server-ip
 
 # Run the server setup script
-curl -sSL https://raw.githubusercontent.com/Shahzebqazi/psyop.ca/main/server-setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/${GITHUB_USERNAME:-Shahzebqazi}/${GITHUB_REPO:-psyop.ca}/main/server-setup.sh | bash
 ```
 
 ### 2. Clone and Setup Repository
 
 ```bash
 # Clone your repository
-git clone https://github.com/Shahzebqazi/psyop.ca.git /opt/psyop-website
+git clone https://github.com/${GITHUB_USERNAME:-Shahzebqazi}/${GITHUB_REPO:-psyop.ca}.git /opt/psyop-website
 cd /opt/psyop-website
 
 # Make scripts executable
