@@ -1,205 +1,39 @@
-name:                psyop-website
-version:             0.1.0.0
-github:              "${GITHUB_USERNAME:-Shahzebqazi}/${GITHUB_REPO:-psyop.ca}"
-license:             BSD-3-Clause
-author:              "${PACKAGE_AUTHOR:-PSYOP}"
-maintainer:          "${PACKAGE_MAINTAINER:-admin@psyop.ca}"
-copyright:           "${PACKAGE_COPYRIGHT:-2025 PSYOP}"
-homepage:            "https://${DOMAIN_NAME:-psyop.ca}"
-bug-reports:         "https://github.com/${GITHUB_USERNAME:-Shahzebqazi}/${GITHUB_REPO:-psyop.ca}/issues"
+name:                hello-world
+version:             1.0.0.0
+license:             MIT
+author:              PSYOP
+maintainer:          admin@psyop.ca
+copyright:           2025 PSYOP
+homepage:            https://psyop.ca
 
-extra-source-files:
-- LICENSE
-- env.template
-- static/*
-- config/*
-- scripts/*
+synopsis:            A simple hello world application
+category:            Hello World, Example
 
-# Project metadata
-synopsis:            Official website for PSYOP electronic music project
-category:            Web, Music, Electronic, Haskell
-
-# Complete project description and documentation
 description: |
-  🎵 PSYOP Official Website
+  A minimal hello world application.
   
-  An experimental electronic music project exploring the intersection of technology, 
-  consciousness, and sound. This website serves as the official online presence 
-  featuring music releases, tour dates, and artist information.
-  
-  🏗️ ARCHITECTURE
-  Built with modern, scalable technologies:
-  - Backend: Haskell with Servant web framework
-  - Frontend: Server-side rendered HTML with Blaze templating  
-  - Infrastructure: DigitalOcean deployment with automated CI/CD
-  - Reverse Proxy: Nginx with SSL/TLS termination
-  
-  🛠️ TECH STACK
-  Core Technologies:
-  - Haskell - Type-safe functional programming
-  - Servant - Type-safe web API framework
-  - Warp - High-performance HTTP server
-  - Blaze HTML - HTML templating library
-  
-  🚀 QUICK START
-  Prerequisites: Stack (Haskell build tool)
-  
-  1. Clone: git clone https://github.com/${GITHUB_USERNAME:-Shahzebqazi}/${GITHUB_REPO:-psyop.ca}.git
-  2. Install: stack setup && stack build --dependencies-only  
-  3. Build: stack build
-  4. Run: stack run
-  5. Visit: http://localhost:8080
-  
-  📄 AVAILABLE ROUTES
-  - / - Homepage with latest releases
-  - /about - About PSYOP and the project
-  - /contact - Contact information and social links
-  - /links - Music platforms and streaming services
-  - /admin - Admin panel (future feature)
-  - /static/* - Static assets (CSS, images, etc.)
-  
-  🧪 TESTING
-  Run tests: stack test
-  Run with coverage: stack test --coverage
-  Test specific module: stack test psyop-website:test:psyop-website-test
-  
-  🎨 DESIGN FEATURES
-  Current Features:
-  - Dark cyberpunk theme with gold accents
-  - Responsive design (mobile-first approach)
-  - Modern typography (Orbitron + Rajdhani fonts)
-  - Performance optimized Haskell backend
-  - SEO ready with server-side rendering
-  - Security headers and HTTPS configuration
-  - Health monitoring with built-in checks
-  
-  Upcoming Features:
-  - Music Integration: Spotify/Bandcamp API integration
-  - Tour Dates: Dynamic event listing
-  - Newsletter: Mailchimp integration
-  - Social Media: Dynamic social feed integration
-  - Admin Panel: Content management system
-  
-  📋 DEVELOPMENT WORKFLOW
-  Branch Structure:
-  - main → Production branch (auto-deploys to website)
-  - dev → Development branch (development workspace)
-  - docker_k8s → Docker/Kubernetes configurations
-  - test-build-1 → Legacy site implementations
-  - test-local → Local testing branch
-  
-  Development Process:
-  1. Work on dev branch: git checkout dev
-  2. Make changes and commit: git add . && git commit -m "message"
-  3. Push to dev: git push origin dev
-  4. When ready: git checkout main && git merge dev && git push origin main
-  5. Auto-deployment triggers within 30-60 seconds
-  
-  🔧 DEVELOPMENT COMMANDS
-  Build: stack build
-  Test: stack test  
-  Run: stack exec psyop-website-exe
-  Local server: http://localhost:8080
-  Scripts: ./scripts/[script-name].sh
-  
-  🌐 DEPLOYMENT
-  The project includes automated deployment to DigitalOcean:
-  - Real-time deployment via GitHub webhooks
-  - Automated server setup scripts
-  - SSL certificate automation via Let's Encrypt
-  - Nginx reverse proxy configuration
-  - Systemd service management
-  
-  📁 PROJECT STRUCTURE
-  - src/ - Source code (Main.hs entry point, Lib.hs core logic)
-  - test/ - Test suites (Spec.hs)
-  - static/ - Static assets (CSS, images)
-  - config/ - Configuration files
-  - scripts/ - Deployment and utility scripts
-    - auto-deploy.sh - Main deployment script
-    - webhook-server.py - GitHub webhook receiver
-    - server-setup.sh - Server preparation
-    - deploy-digitalocean.sh - DigitalOcean deployment
-    - git_rollback.sh - Git rollback utility
-    - load-env.sh - Environment variable loader
-  
-  🚨 MONITORING & HEALTH CHECKS
-  - Application: curl http://localhost:8080/
-  - Container logs: docker logs psyop-website
-  - Health checks: Built-in Docker and Kubernetes probes
-  
-  🤝 CONTRIBUTING
-  1. Fork repository
-  2. Create feature branch: git checkout -b feature/amazing-feature
-  3. Commit changes: git commit -m 'Add amazing feature'
-  4. Push branch: git push origin feature/amazing-feature
-  5. Open Pull Request
-  
-  📞 CONTACT
-  - Website: https://${DOMAIN_NAME:-psyop.ca}
-  - Email: ${ADMIN_EMAIL:-admin@psyop.ca}
-  - Developer: github.com/${GITHUB_USERNAME:-Shahzebqazi}
-  
-  🙏 ACKNOWLEDGMENTS
-  Built with Haskell and Servant, deployed on DigitalOcean,
-  SSL by Let's Encrypt, containerized with Docker.
-  
-  PSYOP - Pushing the boundaries of electronic music
+  This is a clean, simple package that demonstrates basic functionality.
 
 dependencies:
 - base >= 4.7 && < 5
-- servant
-- servant-server
-- servant-blaze
-- wai
-- warp
-- blaze-html
-- blaze-markup
-- text
-- bytestring
-- containers
-- mtl
-- transformers
-
 
 ghc-options:
 - -Wall
-- -Wcompat
-- -Widentities
-- -Wincomplete-record-updates
-- -Wincomplete-uni-patterns
-- -Wmissing-export-lists
-- -Wmissing-home-modules
-- -Wpartial-fields
-- -Wredundant-constraints
+
+executables:
+  hello-world:
+    main:                Main.hs
+    source-dirs:         src
+    dependencies:
+    - hello-world
 
 library:
   source-dirs: src
 
-executables:
-  psyop-website-exe:
-    main:                Main.hs
-    source-dirs:         src
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - psyop-website
-
-
-
 tests:
-  psyop-website-test:
+  hello-world-test:
     main:                Spec.hs
     source-dirs:         test
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
     dependencies:
-    - psyop-website
+    - hello-world
     - hspec
-    - hspec-wai
-    - wai-extra
-    - http-types
