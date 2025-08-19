@@ -1,0 +1,205 @@
+#!/bin/bash
+
+# PSYOP Website UI/UX Test Runner
+# Opens 4 responsive windows to test the website across different screen sizes
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to show help
+show_help() {
+    echo "PSYOP Website UI/UX Test Runner"
+    echo ""
+    echo "Usage: ./test-ui [OPTION]"
+    echo ""
+    echo "Options:"
+    echo "  start       Start the PSYOP development server and launch GUI test"
+    echo "  gui-only    Launch GUI test only (assumes server is running)"
+    echo "  server-only Start development server only"
+    echo "  help        Show this help message"
+    echo ""
+    echo "This tool opens 4 responsive windows to test the PSYOP website:"
+    echo "• 600×400   - Small landscape window"
+    echo "• 1280×720  - Standard HD window"
+    echo "• 800×1600  - Tall portrait window"
+    echo "• 1920×1080 - Full HD window"
+    echo ""
+    echo "Each window remembers its size and position, supports responsive"
+    echo "resizing, and tests scrolling and animations."
+}
+
+# Function to check if dev-server.hs exists
+check_dev_server() {
+    if [ ! -f "config/dev-server.hs" ]; then
+        print_error "config/dev-server.hs not found!"
+        print_error "Please ensure you're running this script from the project root"
+        exit 1
+    fi
+}
+
+# Function to check if gui.swift exists
+check_gui() {
+    if [ ! -f "gui.swift" ]; then
+        print_error "gui.swift not found!"
+        print_error "Please ensure you're running this script from the project root"
+        exit 1
+    fi
+}
+
+# Function to start development server
+start_server() {
+    print_info "Starting PSYOP development server..."
+    
+    if command -v runhaskell >/dev/null 2>&1; then
+        runhaskell config/dev-server.hs dev &
+    elif command -v stack >/dev/null 2>&1; then
+        print_info "runhaskell not found, using stack exec runhaskell"
+        stack exec runhaskell config/dev-server.hs dev &
+    else
+        print_error "Neither runhaskell nor stack found!"
+        print_error "Please install Haskell Stack: https://docs.haskellstack.org/"
+        exit 1
+    fi
+    
+    SERVER_PID=$!
+    print_success "Development server started with PID: $SERVER_PID"
+    
+    # Wait for server to be ready
+    print_info "Waiting for server to be ready..."
+    sleep 3
+    
+    # Check if server is responding
+    if curl -s http://localhost:8080 >/dev/null 2>&1; then
+        print_success "Server is responding at http://localhost:8080"
+    else
+        print_warning "Server may not be ready yet, continuing anyway..."
+    fi
+}
+
+# Function to launch GUI test
+launch_gui() {
+    print_info "Launching PSYOP Website UI/UX Test..."
+    
+    if command -v swift >/dev/null 2>&1; then
+        swift gui.swift &
+        GUI_PID=$!
+        print_success "GUI test launched with PID: $GUI_PID"
+        print_info "4 test windows should now be visible"
+    else
+        print_error "Swift not found!"
+        print_error "Please install Xcode Command Line Tools: xcode-select --install"
+        exit 1
+    fi
+}
+
+# Function to stop server
+stop_server() {
+    if [ ! -z "$SERVER_PID" ]; then
+        print_info "Stopping development server (PID: $SERVER_PID)..."
+        kill $SERVER_PID 2>/dev/null || true
+        print_success "Development server stopped"
+    fi
+}
+
+# Function to stop GUI
+stop_gui() {
+    if [ ! -z "$GUI_PID" ]; then
+        print_info "Stopping GUI test (PID: $GUI_PID)..."
+        kill $GUI_PID 2>/dev/null || true
+        print_success "GUI test stopped"
+    fi
+}
+
+# Function to cleanup on exit
+cleanup() {
+    print_info "Cleaning up..."
+    stop_server
+    stop_gui
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup SIGINT SIGTERM
+
+# Main script logic
+main() {
+    local command="${1:-start}"
+    
+    case "$command" in
+        "start")
+            check_dev_server
+            check_gui
+            start_server
+            launch_gui
+            
+            print_success "🎉 PSYOP Website UI/UX Test is running!"
+            print_info "• Development server: http://localhost:8080"
+            print_info "• 4 test windows should be visible"
+            print_info "• Press Ctrl+C to stop everything"
+            
+            # Wait for user to stop
+            wait
+            ;;
+            
+        "gui-only")
+            check_gui
+            launch_gui
+            
+            print_success "🎉 PSYOP Website UI/UX Test launched!"
+            print_info "• 4 test windows should be visible"
+            print_info "• Press Ctrl+C to stop GUI"
+            
+            # Wait for user to stop
+            wait
+            ;;
+            
+        "server-only")
+            check_dev_server
+            start_server
+            
+            print_success "🎉 PSYOP Development Server is running!"
+            print_info "• Server: http://localhost:8080"
+            print_info "• Press Ctrl+C to stop server"
+            
+            # Wait for user to stop
+            wait
+            ;;
+            
+        "help"|"-h"|"--help")
+            show_help
+            ;;
+            
+        *)
+            print_error "Unknown command: $command"
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+# Run the main function with all arguments
+main "$@"
