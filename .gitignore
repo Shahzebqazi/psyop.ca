@@ -110,3 +110,6 @@ dist/
 # Cache files
 .cache/
 .parcel-cache/
+# macOS
+.DS_Store
+.DS_Store?

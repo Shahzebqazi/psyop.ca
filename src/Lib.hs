@@ -8,7 +8,10 @@
 module Lib
     ( startApp
     , app
+    , module ImageUtils
     ) where
+
+import ImageUtils
 
 import Network.Wai
 import Network.Wai.Handler.Warp

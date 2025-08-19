@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      ImageUtils
       Lib
   other-modules:
       Paths_psyop_website
@@ -34,12 +35,46 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      JuicyPixels
+    , JuicyPixels-extra
+    , base >=4.7 && <5
     , blaze-html
     , blaze-markup
     , bytestring
     , containers
+    , directory
+    , filepath
     , mtl
+    , servant
+    , servant-blaze
+    , servant-server
+    , text
+    , transformers
+    , wai
+    , warp
+  default-language: Haskell2010
+
+executable image-optimizer
+  main-is: ImageOptimizer.hs
+  other-modules:
+      Paths_psyop_website
+  autogen-modules:
+      Paths_psyop_website
+  hs-source-dirs:
+      tools
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      JuicyPixels
+    , JuicyPixels-extra
+    , base >=4.7 && <5
+    , blaze-html
+    , blaze-markup
+    , bytestring
+    , containers
+    , directory
+    , filepath
+    , mtl
+    , psyop-website
     , servant
     , servant-blaze
     , servant-server
@@ -52,6 +87,7 @@ library
 executable psyop-website-exe
   main-is: Main.hs
   other-modules:
+      ImageOptimizer
       Paths_psyop_website
   autogen-modules:
       Paths_psyop_website
@@ -59,11 +95,15 @@ executable psyop-website-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      JuicyPixels
+    , JuicyPixels-extra
+    , base >=4.7 && <5
     , blaze-html
     , blaze-markup
     , bytestring
     , containers
+    , directory
+    , filepath
     , mtl
     , psyop-website
     , servant
@@ -86,11 +126,15 @@ test-suite psyop-website-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      JuicyPixels
+    , JuicyPixels-extra
+    , base >=4.7 && <5
     , blaze-html
     , blaze-markup
     , bytestring
     , containers
+    , directory
+    , filepath
     , hspec
     , hspec-wai
     , http-types
