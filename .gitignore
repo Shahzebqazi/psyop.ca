@@ -112,6 +112,13 @@ app/Main
 # Cache files
 .cache/
 .parcel-cache/
+
+# Build logs and development files
+Build Log.md
+
+# Documentation (private development docs)
+docs/
+
 # macOS
 .DS_Store
 .DS_Store?

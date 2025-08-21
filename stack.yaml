@@ -19,8 +19,8 @@
 # snapshot: https://example.com/snapshots/2024-01-01.yaml
 snapshot: lts-22.28
 
-# Configure stack to use .config/.stack-work instead of .stack-work
-work-dir: .config/.stack-work
+# Configure stack to use standard .stack-work directory
+work-dir: .stack-work
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
