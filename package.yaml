@@ -39,11 +39,16 @@ library:
     - Models
     - App
     - Views
+    - Components.MenuBar
+    - Components.Footer
 
 executables:
   psyop-website-exe:
     main:                Main.hs
     source-dirs:         src
+    other-modules:
+      - Components.MenuBar
+      - Components.Footer
     ghc-options:
     - -threaded
     - -rtsopts
