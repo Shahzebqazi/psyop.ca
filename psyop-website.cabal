@@ -30,6 +30,8 @@ library
       Models
       App
       Views
+      Components.MenuBar
+      Components.Footer
   other-modules:
       Main
       Paths_psyop_website
@@ -60,6 +62,8 @@ executable psyop-website-exe
       Lib
       Models
       Views
+      Components.MenuBar
+      Components.Footer
       Paths_psyop_website
   autogen-modules:
       Paths_psyop_website
