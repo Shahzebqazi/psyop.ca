@@ -13,8 +13,10 @@ category:            Web, Music, Electronic, WebGL
 extra-source-files:
 - LICENSE
 - assets/*
-- assets/white/*
-- assets/red_white/*
+- assets/graphics/*
+- assets/graphics/white/*
+- assets/graphics/red_white/*
+- assets/webdev/icons/streaming/*
 
 dependencies:
 - base >= 4.7 && < 5

@@ -1,6 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Views where
+module Views
+    ( renderAsciiWallpaper
+    , renderFallbackBackground
+    , renderHomePage
+    ) where
 
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A

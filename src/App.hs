@@ -2,9 +2,8 @@
 
 module App (app) where
 
-import Network.Wai (Application, Response, responseLBS, pathInfo, requestHeaders)
+import Network.Wai (Application, Response, responseLBS, pathInfo)
 import Network.HTTP.Types (status200, status404)
-import Network.HTTP.Types.URI (parseQuery)
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.String (renderHtml)
@@ -88,6 +87,11 @@ app request respond = do
         
         ["assets", "graphics", filename] -> do
             let filePath = "assets/graphics/" ++ T.unpack filename
+            response <- serveStaticFile filePath
+            respond response
+
+        ["assets", "icons", "streaming", filename] -> do
+            let filePath = "assets/webdev/icons/streaming/" ++ T.unpack filename
             response <- serveStaticFile filePath
             respond response
         
