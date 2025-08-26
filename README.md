@@ -3,11 +3,11 @@
 llm_review:
   goal: "Take over development on the fallback branch via SSH; read private/docs and continue tests/deploy"
   scope:
-    - path: "private/docs/TRD.yaml"
-    - path: "private/docs/fallback-server-implementation.yaml"
-    - path: "private/docs/WORKLOG.log"
-    - path: "private/docs/CHANGELOG.log"
-    - path: "private/docs/environment.md"
+    - path: "Private/docs/TRD.yaml"
+    - path: "Private/docs/fallback-server-implementation.yaml"
+    - path: "Private/docs/WORKLOG.log"
+    - path: "Private/docs/CHANGELOG.log"
+    - path: "Private/docs/environment.md"
   checks:
     - "Spec completeness and contradictions"
     - "Routes and endpoints match implementation"
@@ -21,7 +21,7 @@ llm_review:
     notes:
       - "Use Host header with 127.0.0.1 for local HTTPS curls"
       - "After stack build, run setcap on /opt/psyop/bin/psyop-website-exe"
-      - "Read docs under private/docs before changes"
+      - "Read docs under Private/docs before changes"
   update_readme_logs:
     worklog:
       enabled: true
@@ -46,8 +46,8 @@ llm_review:
 A modern, responsive website for the metal band PSYOP, built with Haskell featuring a component-based architecture and tomato red accent styling. **✅ All critical functionality has been restored and the website is now fully operational.**
 
 ## 📚 Documentation
-See `private/docs/overview.md` for detailed documentation moved from this README.
-See `private/docs/environment.md` for environment variable guidance.
+See `Private/docs/overview.md` for detailed documentation moved from this README.
+See `Private/docs/environment.md` for environment variable guidance.
 
 ## 🔧 Environment files
 
@@ -81,7 +81,7 @@ stack run
 stack build
 
 # Run with hot-reload development server
-./private/dev/hot-reload.sh
+./Private/dev/hot-reload.sh
 
 # Start server manually
 stack run
@@ -92,11 +92,11 @@ stack clean
 
 ## 📦 Changelog
 
-See `private/docs/CHANGELOG.log` for the full, timestamped changelog.
+See `Private/docs/CHANGELOG.log` for the full, timestamped changelog.
 
 ## 🧰 Worklog
 
-See `private/docs/WORKLOG.log` for the full, timestamped worklog.
+See `Private/docs/WORKLOG.log` for the full, timestamped worklog.
 
 ## 📄 License
 
