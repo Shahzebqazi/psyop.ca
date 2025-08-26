@@ -28,6 +28,12 @@ cabal.project.local~
 .HTF/
 .ghc.environment.*
 
+# Binary files (including Main executable)
+Main
+Private/Src/Main
+**/Main
+*.bin
+
 # Node.js dependencies
 node_modules/
 npm-debug.log*
