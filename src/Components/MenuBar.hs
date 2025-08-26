@@ -8,15 +8,15 @@ module Components.MenuBar
 
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
-import Lib (SiteSection(..))
+-- Fallback-only: no SiteSection required
 
 -- Minimal menubar model for fallback site
 data MenuBar = MenuBar
-    { activeSection :: SiteSection
+    { activeSection :: String
     } deriving (Show, Eq)
 
 -- Smart constructor
-mkMenuBar :: SiteSection -> MenuBar
+mkMenuBar :: String -> MenuBar
 mkMenuBar section = MenuBar { activeSection = section }
 
 -- Render a simple, accessible header/nav compatible with existing CSS/JS

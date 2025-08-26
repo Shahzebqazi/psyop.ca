@@ -10,7 +10,5 @@ site:
     - { label: "Instagram", url: "https://instagram.com/psyopband" }
     - { label: "TikTok", url: "https://tiktok.com/@psyopsucks" }
     - { label: "Spotify", url: "https://open.spotify.com/artist/2bRWBW2Km3N9MSXY90QKb7?si=oVutT8ZFTxylihcAk-_sHg" }
-    - { label: "YouTube", url: "https://www.youtube.com/@psyopsucks" }
-    - { label: "Bandcamp", url: "https://psyop.bandcamp.com" }
   random_definitions_file: "psyop.txt"
 
