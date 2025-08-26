@@ -4,7 +4,7 @@
 
 module App (app, FallbackEnv(..), loadFallbackEnv) where
 
-import Network.Wai (Application, Response, Request, responseLBS, pathInfo, requestHeaders, isSecure, rawPathInfo, rawQueryString, queryString)
+import Network.Wai (Application, Response, responseLBS, pathInfo, requestHeaders, isSecure, rawPathInfo, rawQueryString)
 import Network.HTTP.Types (RequestHeaders)
 import qualified Data.CaseInsensitive as CI
 import Network.HTTP.Types (status200, status404, status308)
@@ -27,11 +27,7 @@ import qualified Data.Yaml as Y
 import Data.Aeson (FromJSON(..), withObject, (.:))
 
 -- Helper function to parse query string
-parseQueryString :: String -> [(String, String)]
-parseQueryString query = 
-    case break (== '=') query of
-        (key, '=':value) -> [(key, value)]
-        _ -> []
+-- (fallback-only) parseQueryString removed
 
 -- Fallback background functions moved to Models.hs for better organization
 
@@ -337,16 +333,7 @@ serveTextFile filePath contentType = do
         else return $ responseLBS status404 [("Content-Type", "text/plain")] "Not Found"
 
 -- Fallback decision logic
-shouldServeFallback :: Request -> IO Bool
-shouldServeFallback req = do
-    envSwitch <- lookupEnv "FALLBACK_MODE"
-    let headerSwitch = lookup (CI.mk (B8.pack "X-Fallback-Mode")) (requestHeaders req)
-        querySwitch  = queryParamTrue' "fallback" req
-        bot          = isBotUserAgent req
-        oldMobile    = isOldMobile req
-        envTrue      = maybe False truthy envSwitch
-        headerTrue   = maybe False (\v -> B8.map toLowerChar v == "1") headerSwitch
-    pure (envTrue || headerTrue || querySwitch || bot || oldMobile)
+-- (fallback-only) shouldServeFallback removed
 
 truthy :: String -> Bool
 truthy s = let ls = Prelude.map toLower s in ls == "1" || ls == "true" || ls == "yes"
@@ -354,25 +341,13 @@ truthy s = let ls = Prelude.map toLower s in ls == "1" || ls == "true" || ls == 
 toLowerStr :: String -> String
 toLowerStr = Prelude.map toLower
 
-toLowerChar :: Char -> Char
-toLowerChar = toLower
+-- (fallback-only) toLowerChar removed
 
-queryParamTrue' :: BS.ByteString -> Request -> Bool
-queryParamTrue' key req =
-    let qs = Network.Wai.queryString req
-    in any (\(k,v) -> k == key && maybe False (\x -> let t = B8.map toLowerChar x in t == "1" || t == "true") v) qs
+-- (fallback-only) queryParamTrue' removed
 
-isBotUserAgent :: Request -> Bool
-isBotUserAgent req =
-    let ua = fmap (B8.map toLowerChar) (lookup (CI.mk (B8.pack "User-Agent")) (requestHeaders req))
-        bots = ["googlebot","bingbot","duckduckbot","yandexbot","baiduspider","ahrefsbot","semrushbot","petalbot"]
-    in maybe False (\u -> any (`B8.isInfixOf` u) bots) ua
+-- (fallback-only) isBotUserAgent removed
 
-isOldMobile :: Request -> Bool
-isOldMobile req =
-    let ua = fmap (B8.map toLowerChar) (lookup (CI.mk (B8.pack "User-Agent")) (requestHeaders req))
-        needles = ["nokia","blackberry","msie 6","msie 7","android 4."]
-    in maybe False (\u -> any (`B8.isInfixOf` u) needles) ua
+-- (fallback-only) isOldMobile removed
 
 shortDescription :: T.Text -> T.Text
 shortDescription t =
@@ -420,9 +395,7 @@ serveStaticFile filePath = do
         else
             return $ responseLBS status404 [("Content-Type", "text/plain")] $ LBS.fromStrict $ encodeUtf8 $ T.pack $ "File not found: " ++ filePath
 
--- Serve main CSS with enhanced styling
--- (Removed enhanced CSS in fallback-only build)
-{-
+{- Removed CSS blocks in fallback-only build
     "/* Main CSS for PSYOP Website */"
     , "body {"
     , "    margin: 0;"
@@ -1147,9 +1120,7 @@ serveStaticFile filePath = do
     ]
 -}
 
--- Serve components CSS
--- (Removed components CSS in fallback-only build)
-{-
+{- Removed components CSS in fallback-only build
     "/* Components CSS */"
     , ""
     , "/* MenuBar Styles */"
@@ -1467,9 +1438,7 @@ serveStaticFile filePath = do
     ]
 -}
 
--- Serve responsive CSS
--- (Removed responsive CSS in fallback-only build)
-{-
+{- Removed responsive CSS in fallback-only build
     "/* Responsive CSS */"
     , ""
     , "/* Mobile MenuBar Styles */"
