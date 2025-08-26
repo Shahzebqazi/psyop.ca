@@ -22,6 +22,9 @@ dependencies:
 - base >= 4.7 && < 5
 - wai
 - warp
+- warp-tls
+- yaml
+- aeson
 - blaze-html
 - text
 - bytestring

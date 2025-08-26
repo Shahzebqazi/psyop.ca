@@ -72,7 +72,8 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
     , blaze-html
     , bytestring
     , containers
@@ -84,6 +85,8 @@ library
     , time
     , wai
     , warp
+    , warp-tls
+    , yaml
   default-language: Haskell2010
 
 executable psyop-website-exe
@@ -95,7 +98,8 @@ executable psyop-website-exe
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
     , blaze-html
     , bytestring
     , containers
@@ -108,6 +112,8 @@ executable psyop-website-exe
     , time
     , wai
     , warp
+    , warp-tls
+    , yaml
   default-language: Haskell2010
 
 test-suite psyop-website-test
@@ -121,7 +127,8 @@ test-suite psyop-website-test
       src/tests
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base
+      aeson
+    , base
     , blaze-html
     , bytestring
     , containers
@@ -135,4 +142,6 @@ test-suite psyop-website-test
     , time
     , wai
     , warp
+    , warp-tls
+    , yaml
   default-language: Haskell2010

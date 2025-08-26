@@ -2,7 +2,11 @@
 
 module Main (main) where
 
-import Network.Wai.Handler.Warp
+import Network.Wai.Handler.Warp (run, defaultSettings, setPort)
+import Network.Wai.Handler.WarpTLS (runTLS, tlsSettings)
+import System.Environment (lookupEnv)
+import Data.Char (toLower)
+import Text.Read (readMaybe)
 import Models (defaultConfig, getServerPort)
 import App (app, loadFallbackEnv, FallbackEnv)
 
@@ -17,9 +21,29 @@ main = do
 -- Start the server
 startServer :: FallbackEnv -> IO ()
 startServer env = do
-    let port = getServerPort defaultConfig
-    putStrLn $ "🌐 Server running at http://localhost:" ++ show port
-    putStrLn $ "🧭 Visit http://localhost:" ++ show port ++ "/index.html for fallback"
-    run port (app env)
+    mPortEnv <- lookupEnv "PORT"
+    let port = case mPortEnv >>= readMaybe of
+            Just p  -> p
+            Nothing -> getServerPort defaultConfig
+    httpsEnable <- lookupEnv "HTTPS_ENABLE"
+    certFile    <- lookupEnv "CERT_FILE"
+    keyFile     <- lookupEnv "KEY_FILE"
+    case fmap (map toLower) httpsEnable of
+        Just "true" -> case (certFile, keyFile) of
+            (Just cert, Just key) -> do
+                putStrLn $ "🔐 Starting HTTPS server on port " ++ show port
+                putStrLn $ "    cert: " ++ cert
+                putStrLn $ "    key : " ++ key
+                putStrLn $ "🧭 Visit https://localhost:" ++ show port ++ "/index.html for fallback"
+                runTLS (tlsSettings cert key) (setPort port defaultSettings) (app env)
+            _ -> do
+                putStrLn "⚠️ HTTPS_ENABLE=true but CERT_FILE or KEY_FILE not set; starting HTTP instead"
+                putStrLn $ "🌐 Server running at http://localhost:" ++ show port
+                putStrLn $ "🧭 Visit http://localhost:" ++ show port ++ "/index.html for fallback"
+                run port (app env)
+        _ -> do
+            putStrLn $ "🌐 Server running at http://localhost:" ++ show port
+            putStrLn $ "🧭 Visit http://localhost:" ++ show port ++ "/index.html for fallback"
+            run port (app env)
 
 

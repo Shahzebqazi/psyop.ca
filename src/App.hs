@@ -1,9 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module App (app, FallbackEnv(..), loadFallbackEnv) where
 
-import Network.Wai (Application, Response, responseLBS, pathInfo)
-import Network.HTTP.Types (status200, status404)
+import Network.Wai (Application, Response, responseLBS, pathInfo, requestHeaders, isSecure, rawPathInfo, rawQueryString, queryString)
+import qualified Network.Wai as Wai
+import Network.HTTP.Types (status200, status404, status308)
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.String (renderHtml)
@@ -12,8 +15,11 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString as BS
+import qualified Data.ByteString.Char8 as B8
 import Data.List (isSuffixOf)
 import System.Directory (doesFileExist)
+import System.Environment (lookupEnv)
+import Data.Char (toLower)
 import Components.MenuBar (MenuBar(..), mkMenuBar, renderMenuBar)
 import Components.Footer (Footer(..), mkFooter, renderFooter)
 import Views (renderHomePage)
@@ -21,6 +27,9 @@ import Models (generateOptimizedWallpaper, createBackgroundSystem, getBackground
 import Lib (SiteSection(..))
 import Data.IORef (IORef, newIORef, atomicModifyIORef')
 import Control.Monad (when)
+import GHC.Generics (Generic)
+import qualified Data.Yaml as Y
+import Data.Aeson (FromJSON(..), withObject, (.:))
 
 -- Helper function to parse query string
 parseQueryString :: String -> [(String, String)]
@@ -32,25 +41,98 @@ parseQueryString query =
 -- Fallback background functions moved to Models.hs for better organization
 
 -- Simple environment for fallback content, cached at startup
+data SocialLink = SocialLink
+    { linkLabel :: T.Text
+    , linkUrl   :: T.Text
+    } deriving (Show, Eq, Generic)
+
+instance FromJSON SocialLink where
+    parseJSON = withObject "SocialLink" $ \o -> do
+        linkLabel <- o .: "label"
+        linkUrl   <- o .: "url"
+        pure SocialLink {.. }
+
+data Site = Site
+    { siteName                 :: T.Text
+    , siteSubtitle             :: T.Text
+    , siteHeroImage            :: T.Text
+    , siteBio                  :: T.Text
+    , siteSocialLinks          :: [SocialLink]
+    , siteDefinitionsFile      :: T.Text
+    } deriving (Show, Eq, Generic)
+
+instance FromJSON Site where
+    parseJSON = withObject "Site" $ \o -> do
+        siteName            <- o .: "name"
+        siteSubtitle        <- o .: "subtitle"
+        siteHeroImage       <- o .: "hero_image"
+        siteBio             <- o .: "bio"
+        siteSocialLinks     <- o .: "social_links"
+        siteDefinitionsFile <- o .: "random_definitions_file"
+        pure Site {..}
+
+newtype SiteConfig = SiteConfig { site :: Site } deriving (Show, Eq)
+
+instance FromJSON SiteConfig where
+    parseJSON = withObject "SiteConfig" $ \o -> do
+        s <- o .: "site"
+        pure (SiteConfig s)
+
 data FallbackEnv = FallbackEnv
     { fallbackDefinitions :: [T.Text]
-    , rrIndexRef :: IORef Int
+    , rrIndexRef          :: IORef Int
+    , siteConfig          :: Site
     }
 
 -- Load definitions from psyop.txt once at startup
 loadFallbackEnv :: IO FallbackEnv
 loadFallbackEnv = do
-    fileExists <- doesFileExist "psyop.txt"
-    defs <- if fileExists
+    site <- loadSite
+    defs <- loadDefinitions (T.unpack (siteDefinitionsFile site))
+    idxRef <- newIORef 0
+    pure FallbackEnv { fallbackDefinitions = defs, rrIndexRef = idxRef, siteConfig = site }
+
+loadSite :: IO Site
+loadSite = do
+    let path = "private/content/site.yaml"
+    exists <- doesFileExist path
+    if not exists
+        then pure defaultSite
+        else do
+            parsed <- Y.decodeFileEither path :: IO (Either Y.ParseException SiteConfig)
+            case parsed of
+                Right (SiteConfig s) -> pure s
+                Left _err            -> pure defaultSite
+
+loadDefinitions :: FilePath -> IO [T.Text]
+loadDefinitions path = do
+    fileExists <- doesFileExist path
+    if fileExists
         then do
-            content <- TIO.readFile "psyop.txt"
+            content <- TIO.readFile path
             let rawLines = T.lines content
                 cleaned  = Prelude.map extractDefinitionT rawLines
                 nonEmpty = Prelude.filter (not . T.null . T.strip) cleaned
             pure (if null nonEmpty then [defaultDefinition] else nonEmpty)
         else pure [defaultDefinition]
-    idxRef <- newIORef 0
-    pure FallbackEnv { fallbackDefinitions = defs, rrIndexRef = idxRef }
+
+defaultSite :: Site
+defaultSite = Site
+    { siteName = "Psyop"
+    , siteSubtitle = "lite edition"
+    , siteHeroImage = "assets/graphics/white/promo_1.jpg"
+    , siteBio = T.unlines
+        [ "Psyop (ˈsaɪ.ɑp) is a 4 piece Metal Machine from Toronto, Canada."
+        , "Rooted in nu-metal foundations with addictive hooks and ruthless breakdowns."
+        , "Psyop is James, Max, Miles and Willy."
+        ]
+    , siteSocialLinks =
+        [ SocialLink { linkLabel = "Instagram", linkUrl = "https://instagram.com/psyopband" }
+        , SocialLink { linkLabel = "TikTok",     linkUrl = "https://tiktok.com/@psyopsucks" }
+        , SocialLink { linkLabel = "Spotify",    linkUrl = "https://open.spotify.com/artist/2bRWBW2Km3N9MSXY90QKb7?si=oVutT8ZFTxylihcAk-_sHg" }
+        ]
+    , siteDefinitionsFile = "psyop.txt"
+    }
 
 -- Get next definition via round-robin
 nextDefinition :: FallbackEnv -> IO T.Text
@@ -77,10 +159,47 @@ defaultDefinition = "Psychological Operation - Military operation designed to in
 -- WAI application serving enhanced MenuBar with mobile support
 app :: FallbackEnv -> Application
 app env request respond = do
-    let path = pathInfo request
+    -- Canonical redirects: http->https and non-www->www (controlled by env vars)
+    redirectConfigured <- lookupEnv "REDIRECT_HTTPS"
+    canonicalConfigured <- lookupEnv "WWW_CANONICAL"
+    let httpsRedirectEnabled = maybe False truthy redirectConfigured
+        wwwCanonicalEnabled  = maybe False truthy canonicalConfigured
+        secure               = isSecure request
+        hostHeader           = lookup "Host" (requestHeaders request)
+        pathBs               = rawPathInfo request
+        queryBs              = rawQueryString request
+        pathAndQuery         = B8.unpack pathBs ++ B8.unpack queryBs
+        needsWww h           = toLowerStr h /= "www.psyop.ca"
+        maybeRedirect = case (hostHeader, httpsRedirectEnabled, wwwCanonicalEnabled) of
+            (Just h, _, True) | needsWww (B8.unpack h) -> Just (B8.pack ("https://www.psyop.ca" ++ pathAndQuery))
+            (Just h, True, _) | not secure ->
+                let targetHost = if wwwCanonicalEnabled then "www.psyop.ca" else B8.unpack h
+                in Just (B8.pack ("https://" ++ targetHost ++ pathAndQuery))
+            _ -> Nothing
+    case maybeRedirect of
+        Just loc -> respond $ responseLBS status308 [("Location", loc)] ""
+        Nothing -> do
+            let path = pathInfo request
     case path of
-        -- Main route - serve enhanced MenuBar
-        [] -> respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
+        -- Main route - dynamic decision
+        [] -> do
+            useFallback <- shouldServeFallback request
+            if useFallback
+                then do
+                    html <- renderFallbackPage env
+                    respond $ waiResponse (htmlResponse html)
+                else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
+
+        ["index"] -> do
+            useFallback <- shouldServeFallback request
+            if useFallback
+                then do
+                    html <- renderFallbackPage env
+                    respond $ waiResponse (htmlResponse html)
+                else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
+
+        -- Access to the enhanced site (optional)
+        ["production"] -> respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
 
         -- Fallback minimal routes (unconditional)
         ["index.html"] -> do
@@ -110,6 +229,13 @@ app env request respond = do
         ["css", "style.css"] -> respond $ cssResponse serveMainCSS
         ["css", "responsive.css"] -> respond $ cssResponse serveResponsiveCSS
         ["css", "components.css"] -> respond $ cssResponse serveComponentsCSS
+        -- SEO files
+        ["robots.txt"] -> do
+            response <- serveTextFile "public/robots.txt" "text/plain"
+            respond response
+        ["sitemap.xml"] -> do
+            response <- serveTextFile "public/sitemap.xml" "application/xml"
+            respond response
         
         -- Static asset routes
         ["assets", "album-covers", filename] -> do
@@ -145,40 +271,116 @@ app env request respond = do
 renderFallbackPage :: FallbackEnv -> IO Html
 renderFallbackPage env = do
     defn <- nextDefinition env
+    let s = siteConfig env
     pure $ H.docTypeHtml $ do
         H.head $ do
             H.meta ! A.charset "UTF-8"
             H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1.0"
-            H.title "PSYOP - Lite"
+            H.title $ toHtml (siteName s <> " - Lite")
+            -- SEO Meta
+            H.meta ! A.name "description" ! A.content (toValue (shortDescription (siteBio s)))
+            H.link ! A.rel "canonical" ! A.href "https://www.psyop.ca/"
+            H.meta ! A.customAttribute "property" "og:title" ! A.content (toValue (siteName s))
+            H.meta ! A.customAttribute "property" "og:description" ! A.content (toValue (shortDescription (siteBio s)))
+            H.meta ! A.customAttribute "property" "og:image" ! A.content (toValue (absoluteImageURL (siteHeroImage s)))
             -- Minimal inline CSS for black background and centered column
             H.style ! A.type_ "text/css" $ H.toHtml (T.unlines
                 [ "html, body { margin:0; padding:0; background:#000; color:#f5f5dc; font-family: Arial, sans-serif; }"
-                , ".container { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; padding:2rem; text-align:center; }"
-                , ".logo { max-width: 300px; width: 80%; height: auto; border: 2px solid #f5f5dc; box-shadow: 0 8px 32px rgba(245,245,220,0.2); }"
+                , ".container { min-height:100vh; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start; gap:1rem; padding:2rem; text-align:left; }"
+                , ".page-title { font-weight: 700; font-style: italic; font-size: 2rem; margin: 0; }"
+                , ".title-row { display: flex; align-items: baseline; gap: 0.5rem; }"
                 , ".subtitle { font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }"
-                , ".links { display:flex; flex-direction:column; gap:0.5rem; }"
+                , ".links { display:flex; flex-direction:row; gap:0.25rem; flex-wrap:wrap; align-items:center; }"
                 , ".links a { color:#f5f5dc; text-decoration:none; border-bottom:1px solid rgba(245,245,220,0.3); padding-bottom:2px; }"
                 , ".links a:hover { color:#ff6347; border-bottom-color:#ff6347; }"
                 , ".bio { max-width: 600px; }"
                 , ".definition { max-width: 600px; font-style: italic; color:#e6e6cc; }"
+                , ".hero-image-sq { width: 300px; height: 300px; object-fit: cover; border: 2px solid #f5f5dc; box-shadow: 0 8px 32px rgba(245,245,220,0.2); background:#1a1a1a; }"
                 ])
         H.body $ do
             H.div ! A.class_ "container" $ do
-                H.img ! A.class_ "logo" ! A.src "/assets/graphics/white/promo_1.jpg" ! A.alt "PSYOP"
-                H.div ! A.class_ "subtitle" $ "lite edition"
+                H.div ! A.class_ "title-row" $ do
+                    H.h1 ! A.class_ "page-title" $ toHtml (siteName s)
+                    H.span ! A.class_ "subtitle" $ toHtml (siteSubtitle s)
+                -- Inline menu items separated by ~ and left-aligned
                 H.div ! A.class_ "links" $ do
-                    H.a ! A.href "https://instagram.com/psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Instagram"
-                    H.a ! A.href "https://tiktok.com/@psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "TikTok"
-                    H.a ! A.href "https://open.spotify.com/artist/psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Spotify"
-                    H.a ! A.href "https://youtube.com/@psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "YouTube"
-                    H.a ! A.href "https://distrokid.com/hyperfollow/psyop-moonlight-paradox" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Music Link"
+                    renderLinks (siteSocialLinks s)
                 H.div ! A.class_ "bio" $ do
-                    H.p $ do
-                        H.em "Psyop"
-                        " (ˈsaɪ.ɑp) is a 4 piece Metal Machine from Toronto, Canada."
-                    H.p "Rooted in nu-metal foundations with addictive hooks and ruthless breakdowns."
-                    H.p "Psyop is James, Max, Miles and Willy."
+                    mapM_ (\line -> H.p (toHtml line)) (T.lines (siteBio s))
+                -- Hero image placed between bio and definition
+                H.img ! A.class_ "hero-image-sq" ! A.src (toValue (siteHeroImage s)) ! A.alt "Psyop hero"
                 H.div ! A.class_ "definition" $ H.toHtml defn
+
+-- Render social links with ~ separators
+renderLinks :: [SocialLink] -> Html
+renderLinks [] = mempty
+renderLinks (x:xs) = do
+    renderLink x
+    mapM_ (\l -> H.span " ~ " >> renderLink l) xs
+
+renderLink :: SocialLink -> Html
+renderLink (SocialLink lbl href) =
+    H.a ! A.href (toValue href) ! A.target "_blank" ! A.rel "noopener noreferrer" $ toHtml lbl
+
+-- Serve text-like files with a specified content type
+serveTextFile :: FilePath -> BS.ByteString -> IO Response
+serveTextFile filePath contentType = do
+    exists <- doesFileExist filePath
+    if exists
+        then do
+            fileContent <- BS.readFile filePath
+            return $ responseLBS status200 [("Content-Type", contentType)] (LBS.fromStrict fileContent)
+        else return $ responseLBS status404 [("Content-Type", "text/plain")] "Not Found"
+
+-- Fallback decision logic
+shouldServeFallback :: Network.Wai.Request -> IO Bool
+shouldServeFallback req = do
+    envSwitch <- lookupEnv "FALLBACK_MODE"
+    let headerSwitch = lookup "X-Fallback-Mode" (requestHeaders req)
+        querySwitch  = queryParamTrue' "fallback" req
+        bot          = isBotUserAgent req
+        oldMobile    = isOldMobile req
+        envTrue      = maybe False truthy envSwitch
+        headerTrue   = maybe False (\v -> B8.map toLowerChar v == "1") headerSwitch
+    pure (envTrue || headerTrue || querySwitch || bot || oldMobile)
+
+truthy :: String -> Bool
+truthy s = let ls = map toLower s in ls == "1" || ls == "true" || ls == "yes"
+
+toLowerStr :: String -> String
+toLowerStr = map toLower
+
+toLowerChar :: Char -> Char
+toLowerChar = toLower
+
+queryParamTrue' :: BS.ByteString -> Network.Wai.Request -> Bool
+queryParamTrue' key req =
+    let qs = Network.Wai.queryString req
+    in any (\(k,v) -> k == key && maybe False (\x -> let t = B8.map toLowerChar x in t == "1" || t == "true") v) qs
+
+isBotUserAgent :: Network.Wai.Request -> Bool
+isBotUserAgent req =
+    let ua = fmap (B8.map toLowerChar) (lookup "User-Agent" (requestHeaders req))
+        bots = ["googlebot","bingbot","duckduckbot","yandexbot","baiduspider","ahrefsbot","semrushbot","petalbot"]
+    in maybe False (\u -> any (`B8.isInfixOf` u) bots) ua
+
+isOldMobile :: Network.Wai.Request -> Bool
+isOldMobile req =
+    let ua = fmap (B8.map toLowerChar) (lookup "User-Agent" (requestHeaders req))
+        needles = ["nokia","blackberry","msie 6","msie 7","android 4."]
+    in maybe False (\u -> any (`B8.isInfixOf` u) needles) ua
+
+shortDescription :: T.Text -> T.Text
+shortDescription t =
+    let firstLine = take 160 (T.unpack (T.strip (headDef "" (T.lines t))))
+    in T.pack firstLine
+
+headDef :: a -> [a] -> a
+headDef d [] = d
+headDef _ (x:_) = x
+
+absoluteImageURL :: T.Text -> T.Text
+absoluteImageURL rel = if "/" `T.isPrefixOf` rel then T.concat ["https://www.psyop.ca", rel] else T.concat ["https://www.psyop.ca/", rel]
 
 -- Render enhanced MenuBar with proper HTML structure
 renderEnhancedMenuBar :: MenuBar -> Html
