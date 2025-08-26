@@ -1,7 +1,7 @@
 ### LLM Review Instructions
 ```yaml
 llm_review:
-  goal: "Validate private/docs against project state and keep README logs updated"
+  goal: "Take over development on the fallback branch via SSH; read private/docs and continue tests/deploy"
   scope:
     - path: "private/docs/TRD.yaml"
     - path: "private/docs/fallback-server-implementation.yaml"
@@ -13,6 +13,15 @@ llm_review:
     - "Routes and endpoints match implementation"
     - "Security: TLS, redirects, robots, sitemap"
     - "Terminology and file paths align with repo"
+  context:
+    ssh: true
+    server: "psyop.ca host (Ubuntu, systemd)"
+    cwd: "/opt/psyop/psyop.ca"
+    branch: "shahzebqazi/fallback"
+    notes:
+      - "Use Host header with 127.0.0.1 for local HTTPS curls"
+      - "After stack build, run setcap on /opt/psyop/bin/psyop-website-exe"
+      - "Read docs under private/docs before changes"
   update_readme_logs:
     worklog:
       enabled: true
