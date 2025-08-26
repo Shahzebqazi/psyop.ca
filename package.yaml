@@ -57,7 +57,7 @@ executables:
 tests:
   psyop-website-test:
     main:                Spec.hs
-    source-dirs:         Tests
+    source-dirs:         src
     ghc-options:
     - -threaded
     - -rtsopts
