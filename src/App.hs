@@ -18,7 +18,7 @@ import qualified Data.Text.IO as TIO
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as B8
-import Data.List (isSuffixOf)
+import Data.List (isSuffixOf, isPrefixOf)
 import System.Directory (doesFileExist)
 import System.Environment (lookupEnv)
 import Data.Char (toLower)
