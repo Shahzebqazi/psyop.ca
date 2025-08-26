@@ -37,13 +37,21 @@ main = hspec $ beforeAll mkApp $ do
       simpleStatus res `shouldBe` status200) a
 
   describe "Lite routes without CSS" $ do
-    it "/lite.html returns 200" $ \a -> runSession (do
+    it "/lite.html returns 200 and contains no <style> tag" $ \a -> runSession (do
       res <- srequest (SRequest defaultRequest{ Network.Wai.requestMethod = methodGet, Network.Wai.rawPathInfo = "/lite.html" } "") a
-      simpleStatus res `shouldBe` status200) a
+      simpleStatus res `shouldBe` status200
+      let body = simpleBody res
+      LBS.unpack body `shouldNotContain` "<style"
+      LBS.unpack body `shouldContain` "<title"
+      LBS.unpack body `shouldContain` "rel=\"canonical\""
+      LBS.unpack body `shouldContain` "og:title"
+      LBS.unpack body `shouldContain` "og:description"
+      LBS.unpack body `shouldContain` "og:image") a
 
-    it "/lite returns 200" $ \a -> runSession (do
+    it "/lite returns 200 and contains no <style> tag" $ \a -> runSession (do
       res <- srequest (SRequest defaultRequest{ Network.Wai.requestMethod = methodGet, Network.Wai.rawPathInfo = "/lite" } "") a
-      simpleStatus res `shouldBe` status200) a
+      simpleStatus res `shouldBe` status200
+      LBS.unpack (simpleBody res) `shouldNotContain` "<style") a
 
   describe "Production route is 404" $ do
     it "/production returns 404" $ \a -> runSession (do

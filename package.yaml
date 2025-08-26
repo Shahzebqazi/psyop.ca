@@ -39,9 +39,8 @@ dependencies:
 library:
   source-dirs:         src
   exposed-modules:
-    - 
-    - Models
     - App
+    - Models
 
 executables:
   psyop-website-exe:

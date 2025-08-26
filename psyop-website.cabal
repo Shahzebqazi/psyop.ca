@@ -57,9 +57,8 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
-      Models
       App
+      Models
   other-modules:
       Main
       Paths_psyop_website
@@ -120,7 +119,7 @@ test-suite psyop-website-test
   autogen-modules:
       Paths_psyop_website
   hs-source-dirs:
-      src/tests
+      Tests
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
