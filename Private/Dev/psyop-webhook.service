@@ -1,0 +1,31 @@
+[Unit]
+Description=PSYOP Webhook Server - Instant Deployment
+After=network.target psyop-website.service
+Wants=psyop-website.service
+
+[Service]
+Type=simple
+User=psyop
+Group=psyop
+WorkingDirectory=/opt/psyop/psyop.ca
+Environment=WEBHOOK_PORT=9000
+Environment=WEBHOOK_SECRET=
+Environment=BRANCH=main
+Environment=GIT_REMOTE=origin
+Environment=APP_DIR=/opt/psyop
+Environment=SERVICE_NAME=psyop-website
+ExecStart=/opt/psyop/psyop.ca/Private/Dev/webhook-deploy.sh
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/psyop/webhook.log
+StandardError=append:/var/log/psyop/webhook.log
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/psyop /var/log/psyop
+
+[Install]
+WantedBy=multi-user.target

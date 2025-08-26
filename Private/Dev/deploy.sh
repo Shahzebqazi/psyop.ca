@@ -1,21 +1,164 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# PSYOP deployment helper: run this locally to bootstrap and deploy to a remote host
+echo "🚀 PSYOP Deployment Helper"
+echo "=========================="
 
+# Configuration
 REMOTE_HOST=${REMOTE_HOST:-}
 REMOTE_USER=${REMOTE_USER:-root}
 APP_USER=${APP_USER:-psyop}
 APP_DIR=${APP_DIR:-/opt/psyop}
 SERVICE_NAME=${SERVICE_NAME:-psyop-website}
 BRANCH=${BRANCH:-main}
+DEPLOYMENT_MODE=${DEPLOYMENT_MODE:-manual}
 
-if [[ -z "${REMOTE_HOST}" ]]; then
-  echo "REMOTE_HOST is required (e.g. REMOTE_HOST=147.182.144.112)" >&2
-  exit 1
-fi
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} bash -s <<'REMOTE_BOOTSTRAP'
+# Function to print colored output
+print_status() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Function to show usage
+show_usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo
+    echo "Options:"
+    echo "  -m, --mode MODE         Deployment mode: manual, auto, realtime (default: manual)"
+    echo "  -h, --host HOST         Remote host IP/domain"
+    echo "  -u, --user USER         SSH username (default: root)"
+    echo "  -b, --branch BRANCH     Branch to deploy (default: main)"
+    echo "  --help                  Show this help message"
+    echo
+    echo "Deployment Modes:"
+    echo "  manual     - Traditional deployment (default)"
+    echo "  auto       - Automated deployment with git push"
+    echo "  realtime   - Set up real-time deployment services"
+    echo
+    echo "Environment Variables:"
+    echo "  REMOTE_HOST             Remote server IP/domain"
+    echo "  REMOTE_USER             SSH username"
+    echo "  DEPLOYMENT_MODE         Deployment mode"
+    echo "  BRANCH                  Branch to deploy"
+    echo
+    echo "Examples:"
+    echo "  $0                      # Manual deployment"
+    echo "  $0 -m auto             # Automated deployment"
+    echo "  $0 -m realtime         # Set up real-time deployment"
+    echo "  $0 -h 192.168.1.100    # Deploy to specific host"
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -m|--mode)
+            DEPLOYMENT_MODE="$2"
+            shift 2
+            ;;
+        -h|--host)
+            REMOTE_HOST="$2"
+            shift 2
+            ;;
+        -u|--user)
+            REMOTE_USER="$2"
+            shift 2
+            ;;
+        -b|--branch)
+            BRANCH="$2"
+            shift 2
+            ;;
+        --help)
+            show_usage
+            exit 0
+            ;;
+        *)
+            print_error "Unknown option: $1"
+            show_usage
+            exit 1
+            ;;
+    esac
+done
+
+# Function to check prerequisites
+check_prerequisites() {
+    print_status "Checking prerequisites..."
+    
+    if [[ "$DEPLOYMENT_MODE" == "realtime" ]]; then
+        # For realtime mode, we need to be on the server
+        if [ ! -d "/opt/psyop" ]; then
+            print_error "Realtime mode must be run on the production server"
+            print_error "Please run it from /opt/psyop/psyop.ca on your server"
+            exit 1
+        fi
+        return 0
+    fi
+    
+    # For other modes, we need REMOTE_HOST
+    if [[ -z "${REMOTE_HOST}" ]]; then
+        print_error "REMOTE_HOST is required for manual and auto modes"
+        echo "   Usage: REMOTE_HOST=your-server.com $0"
+        echo "   Or use: $0 -h your-server.com"
+        exit 1
+    fi
+    
+    # Check SSH connection
+    print_status "Testing SSH connection to ${REMOTE_USER}@${REMOTE_HOST}..."
+    if ! ssh -o ConnectTimeout=5 -o BatchMode=yes ${REMOTE_USER}@${REMOTE_HOST} exit 2>/dev/null; then
+        print_error "Cannot connect to ${REMOTE_USER}@${REMOTE_HOST}"
+        print_error "Please check your SSH configuration and try again"
+        exit 1
+    fi
+    print_success "SSH connection successful"
+}
+
+# Function to run realtime setup
+setup_realtime_deployment() {
+    print_status "Setting up real-time deployment..."
+    
+    if [ -f "Private/Dev/setup-realtime.sh" ]; then
+        bash Private/Dev/setup-realtime.sh
+    else
+        print_error "Real-time setup script not found"
+        exit 1
+    fi
+}
+
+# Function to run automated deployment
+run_automated_deployment() {
+    print_status "Running automated deployment..."
+    
+    if [ -f "Private/Dev/deploy-auto.sh" ]; then
+        REMOTE_HOST="$REMOTE_HOST" bash Private/Dev/deploy-auto.sh
+    else
+        print_error "Automated deployment script not found"
+        exit 1
+    fi
+}
+
+# Function to run manual deployment
+run_manual_deployment() {
+    print_status "Running manual deployment..."
+    
+    # Original deployment logic
+    ssh -o StrictHostKeyChecking=no ${REMOTE_USER}@${REMOTE_HOST} bash -s <<'REMOTE_BOOTSTRAP'
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
@@ -70,7 +213,7 @@ if [[ -f Private/Content/Site.yaml ]]; then
       install -D "$SRC" "$DST"
       command -v jpegoptim >/dev/null && [[ "$DST" =~ \.jpe?g$ ]] && jpegoptim --strip-all --max=85 "$DST" || true
       command -v optipng   >/dev/null && [[ "$DST" =~ \.png$   ]] && optipng -o2 "$DST" || true
-      command -v svgcleaner>/dev/null && [[ "$DST" =~ \.svg$   ]] && svgcleaner "$DST" "$DST" || true
+      command -v svgcleaner>//dev/null && [[ "$DST" =~ \.svg$   ]] && svgcleaner "$DST" "$DST" || true
     fi
   fi
 fi
@@ -171,7 +314,41 @@ REDIRECT_UNIT
 fi
 
 echo "Running remote smoke tests"
-HOST=http://${REMOTE_HOST}:8080 bash -c '"$(dirname "$0")"/Private/Dev/smoke-tests.sh'
+HOST=https://${REMOTE_HOST} bash -c '"$(dirname "$0")"/smoke-tests.sh'
 
-echo "Deployment finished. Visit http://${REMOTE_HOST}:8080"
+echo "Deployment finished. Visit https://${REMOTE_HOST}"
+}
+
+# Main execution
+main() {
+    echo "🚀 Starting PSYOP deployment..."
+    echo "   Mode: ${DEPLOYMENT_MODE}"
+    echo "   Branch: ${BRANCH}"
+    if [ -n "$REMOTE_HOST" ]; then
+        echo "   Target: ${REMOTE_USER}@${REMOTE_HOST}"
+    fi
+    echo
+    
+    check_prerequisites
+    
+    case "$DEPLOYMENT_MODE" in
+        realtime)
+            setup_realtime_deployment
+            ;;
+        auto)
+            run_automated_deployment
+            ;;
+        manual)
+            run_manual_deployment
+            ;;
+        *)
+            print_error "Unknown deployment mode: $DEPLOYMENT_MODE"
+            show_usage
+            exit 1
+            ;;
+    esac
+}
+
+# Run main function
+main "$@"
 
