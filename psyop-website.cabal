@@ -60,7 +60,16 @@ library
       App
       Models
   other-modules:
+      Components.Layout
+      Components.Pages.Contact
+      Components.Pages.Home
+      Components.Pages.Legal
+      Components.Pages.Music
+      Components.Pages.Tour
+      Components.UI.Buttons
+      Components.UI.Cards
       Main
+      Views
       Paths_psyop_website
   autogen-modules:
       Paths_psyop_website

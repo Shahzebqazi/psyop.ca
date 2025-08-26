@@ -28,6 +28,7 @@ import Data.IORef (IORef, newIORef, atomicModifyIORef')
 import GHC.Generics (Generic)
 import qualified Data.Yaml as Y
 import Data.Aeson (FromJSON(..), withObject, (.:), eitherDecode)
+import Views (renderMusicPage, renderTourPage, renderContactPage, renderPrivacyPage, renderTermsPage)
 
 -- Helper function to parse query string
 -- (fallback-only) parseQueryString removed
@@ -269,6 +270,23 @@ app env request respond = do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
 
+                -- New component-based routes
+                "/music" -> do
+                    let html = renderMusicPage
+                    respond $ waiResponse (stringResponse html)
+                "/tour" -> do
+                    let html = renderTourPage
+                    respond $ waiResponse (stringResponse html)
+                "/contact" -> do
+                    let html = renderContactPage
+                    respond $ waiResponse (stringResponse html)
+                "/privacy" -> do
+                    let html = renderPrivacyPage
+                    respond $ waiResponse (stringResponse html)
+                "/terms" -> do
+                    let html = renderTermsPage
+                    respond $ waiResponse (stringResponse html)
+
                 -- SEO files
                 "/robots.txt" -> do
                     response <- serveTextFile "Public/robots.txt" "text/plain"
@@ -464,6 +482,10 @@ getHostHeader hdrs = case lookup (CI.mk (B8.pack "Host")) hdrs of
 -- Helper function to create HTML response
 htmlResponse :: Html -> LBS.ByteString
 htmlResponse html = LBS.fromStrict $ encodeUtf8 $ T.pack $ renderHtml html
+
+-- Helper function to create String response (for pre-rendered HTML)
+stringResponse :: String -> LBS.ByteString
+stringResponse str = LBS.fromStrict $ encodeUtf8 $ T.pack str
 
 -- Helper function to create WAI response
 waiResponse :: LBS.ByteString -> Response
