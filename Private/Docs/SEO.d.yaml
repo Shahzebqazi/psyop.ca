@@ -1,0 +1,136 @@
+title: "PSYOP Website SEO Audit"
+branch: "shahzebqazi/fallback"
+generated_at_utc: "26-08-2025 17:38:18"
+target_domain: "https://www.psyop.ca/"
+
+score:
+  total: 63
+  out_of: 100
+  rationale:
+    - "HTTPS enforced and canonical redirects in place"
+    - "Core meta present: title, description, canonical, OpenGraph"
+    - "Robots.txt and sitemap.xml are present and valid"
+    - "Fallback page lacks rich band/EP content and structured data"
+    - "Twitter card tags and JSON-LD are missing"
+
+signals_detected:
+  http_to_https_redirect: true
+  non_www_to_www_redirect: true
+  head:
+    title: "PSYOP - Lite"
+    meta_description: "PSYOP (ˈsaɪ.ɑp) is a 4‑piece Metal Machine from Toronto, Canada."
+    canonical: "https://www.psyop.ca/"
+    open_graph:
+      og_title: "PSYOP"
+      og_description: "PSYOP (ˈsaɪ.ɑp) is a 4‑piece Metal Machine from Toronto, Canada."
+      og_image: "https://www.psyop.ca/assets/graphics/white/promo_1.jpg"
+    twitter_card:
+      present: false
+  robots_txt:
+    allow_all: true
+    sitemap: "https://www.psyop.ca/sitemap.xml"
+  sitemap_xml:
+    urls:
+      - "/"
+      - "/index.html"
+      - "/lite"
+      - "/lite.html"
+      - "/production"
+
+content_opportunities:
+  brand_and_entities:
+    band_name: "PSYOP"
+    band_members:
+      - "James"
+      - "Max"
+      - "Miles"
+      - "Willy"
+    contact_email: "info@psyop.ca"
+    social_profiles:
+      - "https://instagram.com/psyopband"
+      - "https://tiktok.com/@psyopsucks"
+      - "https://open.spotify.com/artist/2bRWBW2Km3N9MSXY90QKb7?si=oVutT8ZFTxylihcAk-_sHg"
+  releases:
+    ep:
+      name: "<EP Name Here>"
+      release_date: "<YYYY-MM-DD>"
+      tracks:
+        - title: "<Song 1>"
+        - title: "<Song 2>"
+        - title: "<Song 3>"
+
+recommendations:
+  meta:
+    - "Update <title> to include EP name, e.g., 'PSYOP — <EP Name> | Official'"
+    - "Expand meta description to mention EP and key tracks (140–160 chars)"
+    - name: "Add Twitter Card tags"
+      tags:
+        - { name: "twitter:card", content: "summary_large_image" }
+        - { name: "twitter:site", content: "@psyopsucks" }
+        - { name: "twitter:title", content: "PSYOP — <EP Name>" }
+        - { name: "twitter:description", content: "<Short EP description>" }
+        - { name: "twitter:image", content: "https://www.psyop.ca/assets/graphics/white/promo_1.jpg" }
+  content:
+    - "Add an EP section to the fallback page listing the EP name and tracks"
+    - "Include band member names in the visible content (already present in bio)"
+    - "Add a visible 'Contact' line with info@psyop.ca"
+  structured_data:
+    - type: "Organization"
+      schema: |
+        {
+          "@context": "https://schema.org",
+          "@type": "MusicGroup",
+          "name": "PSYOP",
+          "url": "https://www.psyop.ca/",
+          "email": "info@psyop.ca",
+          "sameAs": [
+            "https://instagram.com/psyopband",
+            "https://tiktok.com/@psyopsucks",
+            "https://open.spotify.com/artist/2bRWBW2Km3N9MSXY90QKb7?si=oVutT8ZFTxylihcAk-_sHg"
+          ],
+          "member": [
+            { "@type": "Person", "name": "James" },
+            { "@type": "Person", "name": "Max" },
+            { "@type": "Person", "name": "Miles" },
+            { "@type": "Person", "name": "Willy" }
+          ]
+        }
+    - type: "MusicAlbum"
+      schema_template: |
+        {
+          "@context": "https://schema.org",
+          "@type": "MusicAlbum",
+          "name": "<EP Name Here>",
+          "byArtist": { "@type": "MusicGroup", "name": "PSYOP" },
+          "track": [
+            { "@type": "MusicRecording", "name": "<Song 1>" },
+            { "@type": "MusicRecording", "name": "<Song 2>" },
+            { "@type": "MusicRecording", "name": "<Song 3>" }
+          ]
+        }
+
+scoring_breakdown:
+  - { item: "HTTPS/canonicalization", points: 8, max: 8 }
+  - { item: "WWW canonical redirect", points: 4, max: 4 }
+  - { item: "Title quality", points: 6, max: 8 }
+  - { item: "Meta description quality", points: 7, max: 8 }
+  - { item: "Canonical tag", points: 6, max: 6 }
+  - { item: "OpenGraph tags", points: 8, max: 8 }
+  - { item: "Twitter card tags", points: 0, max: 6 }
+  - { item: "robots.txt", points: 4, max: 4 }
+  - { item: "sitemap.xml", points: 4, max: 4 }
+  - { item: "H1 present", points: 4, max: 4 }
+  - { item: "Content richness (EP/tracks/members/email)", points: 4, max: 16 }
+  - { item: "Structured data (JSON-LD)", points: 0, max: 12 }
+  - { item: "Image alt", points: 2, max: 2 }
+  - { item: "Mobile viewport", points: 4, max: 4 }
+  - { item: "Internal links/navigation", points: 2, max: 4 }
+
+next_steps:
+  - "Confirm EP name and tracklist; update content and JSON-LD templates"
+  - "Add Twitter Card meta tags to <head>"
+  - "Inject JSON-LD Organization and MusicAlbum to fallback head"
+  - "Add visible Contact info and enrich bio with member roles"
+  - "Optionally add a minimal 'Releases' section to fallback page"
+
+

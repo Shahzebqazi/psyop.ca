@@ -46,15 +46,69 @@ llm_review:
 A modern, responsive website for the metal band PSYOP, built with Haskell featuring a component-based architecture and tomato red accent styling. **✅ All critical functionality has been restored and the website is now fully operational.**
 
 ## 📚 Documentation
-See `Private/docs/overview.md` for detailed documentation moved from this README.
-See `Private/docs/environment.md` for environment variable guidance.
+See `Docs/overview.md` for detailed documentation moved from this README.
+Environment variables are documented in the [Environment Variables](#-environment-variables) section below.
 
-## 🔧 Environment files
+## 🔧 Environment Variables
 
-- `env.example`: Example values and structure for local development.
-- `env.template`: Blank template to copy to `.env` and fill in.
+The following environment variables can be configured for the Psyop website. Copy the ones you need to a `.env` file in the project root:
 
-Full details: `private/docs/environment.md`.
+### Server Configuration
+```bash
+# Environment
+ENVIRONMENT=development
+
+# Server settings
+PORT=8080
+HTTPS_ENABLE=false
+WWW_CANONICAL=true
+REDIRECT_HTTPS=false
+CERT_FILE=
+KEY_FILE=
+SERVER_HOST=localhost
+```
+
+### Security & Admin
+```bash
+# Admin configuration
+ADMIN_EMAIL=admin@psyop.ca
+ADMIN_USERNAME=admin
+
+# Security
+SESSION_SECRET=your_session_secret_here
+CORS_ORIGINS=http://localhost:8080,https://psyop.ca
+```
+
+### Development & Logging
+```bash
+# Development
+HOT_RELOAD_ENABLED=true
+DEBUG_MODE=true
+
+# Logging
+LOG_LEVEL=debug
+LOG_FILE=./logs/psyop.log
+```
+
+### Asset Configuration
+```bash
+# Assets
+ASSET_CDN_URL=
+ASSET_LOCAL_PATH=./assets
+```
+
+### Future Extensions (commented out)
+```bash
+# Database (if needed in future)
+# DATABASE_URL=postgresql://user:password@localhost:5432/psyop_db
+
+# External API Keys (if needed in future)
+# SPOTIFY_CLIENT_ID=your_spotify_client_id
+# SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+# APPLE_MUSIC_KEY=your_apple_music_key
+```
+
+**Note**: Create a `.env` file in the project root and add the variables you need. Never commit `.env` files to version control.
 
 ## 🚀 Getting Started
 
@@ -92,11 +146,11 @@ stack clean
 
 ## 📦 Changelog
 
-See `Private/docs/CHANGELOG.log` for the full, timestamped changelog.
+See `Docs/CHANGELOG.log` for the full, timestamped changelog.
 
 ## 🧰 Worklog
 
-See `Private/docs/WORKLOG.log` for the full, timestamped worklog.
+See `Docs/WORKLOG.log` for the full, timestamped worklog.
 
 ## 📄 License
 
@@ -109,9 +163,9 @@ For support and questions:
 - **Issues**: [GitHub Issues](https://github.com/Shahzebqazi/psyop.ca/issues)
 - **Documentation**: This README and inline code comments
 
-## 🎵 About PSYOP
+## 🎵 About Psyop
 
-PSYOP is a metal band focused on creating powerful, atmospheric music. The website reflects the band's aesthetic with its dark, technical background system and modern web design.
+Psyop is a metal band focused on creating powerful, atmospheric music. The website reflects the band's aesthetic with its dark, technical background system and modern web design.
 
 ---
 

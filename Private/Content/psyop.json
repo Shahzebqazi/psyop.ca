@@ -1,40 +1,192 @@
 [
-  "ENGLISH: Psychological Operation - A military operation designed to influence the emotions, attitudes, and behavior of target audiences to support national objectives.",
-  "SPANISH: Operación Psicológica - Una operación militar diseñada para influir en las emociones, actitudes y comportamiento de audiencias objetivo para apoyar objetivos nacionales.",
-  "FRENCH: Opération Psychologique - Une opération militaire conçue pour influencer les émotions, les attitudes et le comportement des publics cibles afin de soutenir les objectifs nationaux.",
-  "GERMAN: Psychologische Operation - Eine militärische Operation, die darauf abzielt, die Emotionen, Einstellungen und das Verhalten von Zielgruppen zu beeinflussen, um nationale Ziele zu unterstützen.",
-  "ITALIAN: Operazione Psicologica - Un'operazione militare progettata per influenzare le emozioni, gli atteggiamenti e il comportamento del pubblico target per sostenere gli obiettivi nazionali.",
-  "PORTUGUESE: Operação Psicológica - Uma operação militar projetada para influenciar as emoções, atitudes e comportamentos de audiências-alvo para apoiar objetivos nacionais.",
-  "RUSSIAN: Психологическая операция - Военная операция, предназначенная для влияния на эмоции, отношения и поведение целевых аудиторий для поддержки национальных целей.",
-  "CHINESE (Simplified): 心理战行动 - 旨在影响目标受众情绪、态度和行为以支持国家目标的军事行动。",
-  "CHINESE (Traditional): 心理戰行動 - 旨在影響目標受眾情緒、態度和行為以支持國家目標的軍事行動。",
-  "JAPANESE: 心理作戦 - 国家目標を支援するために標的となる聴衆の感情、態度、行動に影響を与えることを目的とした軍事作戦。",
-  "KOREAN: 심리전 작전 - 국가 목표를 지원하기 위해 표적 청중의 감정, 태도, 행동에 영향을 미치도록 설계된 군사 작전。",
-  "ARABIC: العملية النفسية - عملية عسكرية مصممة للتأثير على المشاعر والمواقف وسلوك الجماهير المستهدفة لدعم الأهداف الوطنية。",
-  "HINDI: मनोवैज्ञानिक संचालन - एक सैन्य संचालन जो राष्ट्रीय उद्देश्यों का समर्थन करने के लिए लक्षित दर्शकों की भावनाओं, दृष्टिकोणों और व्यवहार को प्रभावित करने के लिए डिज़ाइन किया गया है।",
-  "BENGALI: মনস্তাত্ত্বিক অপারেশন - একটি সামরিক অপারেশন যা জাতীয় উদ্দেশ্য সমর্থন করার জন্য লক্ষ্য দর্শকদের আবেগ, মনোভাব এবং আচরণকে প্রভাবিত করার জন্য ডিজাইন করা হয়েছে।",
-  "URDU: نفسیاتی آپریشن - ایک فوجی آپریشن جو قومی مقاصد کی حمایت کے لیے ہدف کے سامعین کے جذبات، رویوں اور رویے کو متاثر کرنے کے لیے ڈیزائن کیا گیا ہے۔",
-  "TURKISH: Psikolojik Operasyon - Ulusal hedefleri desteklemek için hedef kitlelerin duygularını, tutumlarını ve davranışlarını etkilemek üzere tasarlanmış askeri bir operasyon.",
-  "PERSIAN: عملیات روانی - یک عملیات نظامی که برای تأثیرگذاری بر احساسات، نگرش‌ها و رفتار مخاطبان هدف برای پشتیبانی از اهداف ملی طراحی شده است。",
-  "HEBREW: מבצע פסיכולוגי - מבצע צבאי שנועד להשפיע על רגשות, עמדות והתנהגות של קהלי יעד כדי לתמוך במטרות לאומיות。",
-  "GREEK: Ψυχολογική Επιχείρηση - Στρατιωτική επιχείρηση σχεδιασμένη να επηρεάσει τα συναισθήματα, τις στάσεις και τη συμπεριφορά των στοχευμένων κοινοτήτων για την υποστήριξη εθνικών στόχων。",
-  "LATIN: Operatio Psychologica - Operatio militaris destinata ad movendos affectus, habitus et mores auditorum propositorum ad sustinenda proposita nationalia.",
-  "DUTCH: Psychologische Operatie - Een militaire operatie ontworpen om de emoties, houdingen en het gedrag van doelgroepen te beïnvloeden ter ondersteuning van nationale doelen.",
-  "SWEDISH: Psykologisk Operation - En militär operation utformad för att påverka känslor, attityder och beteende hos målgrupper för att stödja nationella mål.",
-  "NORWEGIAN: Psykologisk Operasjon - En militær operasjon utformet for å påvirke følelser, holdninger og atferd hos målgrupper for å støtte nasjonale mål.",
-  "DANISH: Psykologisk Operation - En militær operation udformet til at påvirke følelser, holdninger og adfærd hos målgrupper for at støtte nationale mål。",
-  "FINNISH: Psykologinen Operaatio - Sotilaallinen operaatio, joka on suunniteltu vaikuttamaan kohderyhmien tunteisiin, asenteisiin ja käyttäytymiseen kansallisten tavoitteiden tukemiseksi.",
-  "POLISH: Operacja Psychologiczna - Operacja wojskowa zaprojektowana w celu wpłynięcia na emocje, postawy i zachowania docelowych odbiorców w celu wsparcia celów narodowych.",
-  "CZECH: Psychologická Operace - Vojenská operace navržená k ovlivnění emocí, postojů a chování cílových skupin pro podporu národních cílů.",
-  "HUNGARIAN: Pszichológiai Művelet - Katonai művelet, amelyet a nemzeti célok támogatására a célközönségek érzelmeit, attitűdjeit és viselkedését befolyásolni tervezték.",
-  "ROMANIAN: Operațiunea Psihologică - O operațiune militară concepută pentru a influența emoțiile, atitudinile și comportamentul audiențelor țintă pentru a sprijini obiectivele naționale。",
-  "BULGARIAN: Психологическа Операция - Военна операция, предназначена за влияние върху емоциите, отношенията и поведението на целевите аудитории за подкрепа на националните цели.",
-  "SERBIAN: Психолошка Операција - Војна операција дизајнирана да утиче на емоције, ставове и понашање циљних публика за подршку националним циљевима.",
-  "CROATIAN: Psihološka Operacija - Vojna operacija dizajnirana za utjecanje na emocije, stavove i ponašanje ciljnih publika za podršku nacionalnim ciljevima.",
-  "SLOVENIAN: Psihološka Operacija - Vojaška operacija, zasnovana za vplivanje na čustva, stališča in vedenje ciljnih občinstev za podporo nacionalnim ciljem.",
-  "ESTONIAN: Psühholoogiline Operatsioon - Sõjaline operatsioon, mis on mõeldud mõjutama sihtrühmade emotsioone, hoiakuid ja käitumist rahvuslike eesmärkide toetamiseks.",
-  "LATVIAN: Psiholoģiskā Operācija - Militāra operācija, kas paredzēta ietekmēt mērķauditorijas emocijas, attieksmes un uzvedību, lai atbalstītu nacionālos mērķus.",
-  "LITHUANIAN: Psichologinė Operacija - Karinė operacija, skirta paveikti tikslinės auditorijos emocijas, požiūrius ir elgesį, siekiant palaikyti nacionalinius tikslus.",
-  "MALTESE: Operazzjoni Psikoloġika - Operazzjoni militari maħduma biex tinfluwenza l-emozzjonijiet, l-attitudnijiet u l-imġieba tal-udjenza fil-mira biex tappoġġa l-għanijiet nazzjonali.",
-  "ICELANDIC: Sálfræðileg Aðgerð - Herleg aðgerð sem er hönnuð til að hafa áhrif á tilfinningar, viðhorf og hegðun markhópa til að styðja við þjóðleg markmið."
+  {
+    "language": "ENGLISH",
+    "word": "Psyop",
+    "definition": "Psychological Operation - A military operation designed to influence the emotions, attitudes, and behavior of target audiences to support national objectives."
+  },
+  {
+    "language": "SPANISH",
+    "word": "Psyop",
+    "definition": "Operación Psicológica - Una operación militar diseñada para influir en las emociones, actitudes y comportamiento de audiencias objetivo para apoyar objetivos nacionales."
+  },
+  {
+    "language": "FRENCH",
+    "word": "Psyop",
+    "definition": "Opération Psychologique - Une opération militaire conçue pour influencer les émotions, les attitudes et le comportement des publics cibles afin de soutenir les objectifs nationaux."
+  },
+  {
+    "language": "GERMAN",
+    "word": "Psyop",
+    "definition": "Psychologische Operation - Eine militärische Operation, die darauf abzielt, die Emotionen, Einstellungen und das Verhalten von Zielgruppen zu beeinflussen, um nationale Ziele zu unterstützen."
+  },
+  {
+    "language": "ITALIAN",
+    "word": "Psyop",
+    "definition": "Operazione Psicologica - Un'operazione militare progettata per influenzare le emozioni, gli atteggiamenti e il comportamento del pubblico target per sostenere gli obiettivi nazionali."
+  },
+  {
+    "language": "PORTUGUESE",
+    "word": "Psyop",
+    "definition": "Operação Psicológica - Uma operação militar projetada para influenciar as emoções, atitudes e comportamentos de audiências-alvo para apoiar objetivos nacionais."
+  },
+  {
+    "language": "RUSSIAN",
+    "word": "Psyop",
+    "definition": "Психологическая операция - Военная операция, предназначенная для влияния на эмоции, отношения и поведение целевых аудиторий для поддержки национальных целей."
+  },
+  {
+    "language": "CHINESE_SIMPLIFIED",
+    "word": "Psyop",
+    "definition": "心理战行动 - 旨在影响目标受众情绪、态度和行为以支持国家目标的军事行动。"
+  },
+  {
+    "language": "CHINESE_TRADITIONAL",
+    "word": "Psyop",
+    "definition": "心理戰行動 - 旨在影響目標受眾情緒、態度和行為以支持國家目標的軍事行動。"
+  },
+  {
+    "language": "JAPANESE",
+    "word": "Psyop",
+    "definition": "心理作戦 - 国家目標を支援するために標的となる聴衆の感情、態度、行動に影響を与えることを目的とした軍事作戦。"
+  },
+  {
+    "language": "KOREAN",
+    "word": "Psyop",
+    "definition": "심리전 작전 - 국가 목표를 지원하기 위해 표적 청중의 감정, 태도, 행동에 영향을 미치도록 설계된 군사 작전。"
+  },
+  {
+    "language": "ARABIC",
+    "word": "Psyop",
+    "definition": "العملية النفسية - عملية عسكرية مصممة للتأثير على المشاعر والمواقف وسلوك الجماهير المستهدفة لدعم الأهداف الوطنية。"
+  },
+  {
+    "language": "HINDI",
+    "word": "Psyop",
+    "definition": "मनोवैज्ञानिक संचालन - एक सैन्य संचालन जो राष्ट्रीय उद्देश्यों का समर्थन करने के लिए लक्षित दर्शकों की भावनाओं, दृष्टिकोणों और व्यवहार को प्रभावित करने के लिए डिज़ाइन किया गया है।"
+  },
+  {
+    "language": "BENGALI",
+    "word": "Psyop",
+    "definition": "মনস্তাত্ত্বিক অপারেশন - একটি সামরিক অপারেশন যা জাতীয় উদ্দেশ্য সমর্থন করার জন্য লক্ষ্য দর্শকদের আবেগ, মনোভাব এবং আচরণকে প্রভাবিত করার জন্য ডিজাইন করা হয়েছে।"
+  },
+  {
+    "language": "URDU",
+    "word": "Psyop",
+    "definition": "نفسیاتی آپریشن - ایک فوجی آپریشن جو قومی مقاصد کی حمایت کے لیے ہدف کے سامعین کے جذبات، رویوں اور رویے کو متاثر کرنے کے لیے ڈیزائن کیا گیا ہے۔"
+  },
+  {
+    "language": "TURKISH",
+    "word": "Psyop",
+    "definition": "Psikolojik Operasyon - Ulusal hedefleri desteklemek için hedef kitlelerin duygularını, tutumlarını ve davranışlarını etkilemek üzere tasarlanmış askeri bir operasyon."
+  },
+  {
+    "language": "PERSIAN",
+    "word": "Psyop",
+    "definition": "عملیات روانی - یک عملیات نظامی که برای تأثیرگذاری بر احساسات، نگرش‌ها و رفتار مخاطبان هدف برای پشتیبانی از اهداف ملی طراحی شده است。"
+  },
+  {
+    "language": "HEBREW",
+    "word": "Psyop",
+    "definition": "מבצע פסיכולוגי - מבצע צבאי שנועד להשפיע על רגשות, עמדות והתנהגות של קהלי יעד כדי לתמוך במטרות לאומיות。"
+  },
+  {
+    "language": "GREEK",
+    "word": "Psyop",
+    "definition": "Ψυχολογική Επιχείρηση - Στρατιωτική επιχείρηση σχεδιασμένη να επηρεάσει τα συναισθήματα, τις στάσεις και τη συμπεριφορά των στοχευμένων κοινοτήτων για την υποστήριξη εθνικών στόχων。"
+  },
+  {
+    "language": "LATIN",
+    "word": "Psyop",
+    "definition": "Operatio Psychologica - Operatio militaris destinata ad movendos affectus, habitus et mores auditorum propositorum ad sustinenda proposita nationalia."
+  },
+  {
+    "language": "DUTCH",
+    "word": "Psyop",
+    "definition": "Psychologische Operatie - Een militaire operatie ontworpen om de emoties, houdingen en het gedrag van doelgroepen te beïnvloeden ter ondersteuning van nationale doelen."
+  },
+  {
+    "language": "SWEDISH",
+    "word": "Psyop",
+    "definition": "Psykologisk Operation - En militär operation utformad för att påverka känslor, attityder och beteende hos målgrupper för att stödja nationella mål."
+  },
+  {
+    "language": "NORWEGIAN",
+    "word": "Psyop",
+    "definition": "Psykologisk Operasjon - En militær operasjon utformet for å påvirke følelser, holdninger og atferd hos målgrupper for å støtte nasjonale mål."
+  },
+  {
+    "language": "DANISH",
+    "word": "Psyop",
+    "definition": "Psykologisk Operation - En militær operation udformet til at påvirke følelser, holdninger og adfærd hos målgrupper for at støtte nationale mål。"
+  },
+  {
+    "language": "FINNISH",
+    "word": "Psyop",
+    "definition": "Psyholooginen Operaatio - Sotilaallinen operaatio, joka on suunniteltu vaikuttamaan kohderyhmien tunteisiin, asenteisiin ja käyttäytymiseen kansallisten tavoitteiden tukemiseksi."
+  },
+  {
+    "language": "POLISH",
+    "word": "Psyop",
+    "definition": "Operacja Psychologiczna - Operacja wojskowa zaprojektowana w celu wpłynięcia na emocje, postawy i zachowania docelowych odbiorców w celu wsparcia celów narodowych."
+  },
+  {
+    "language": "CZECH",
+    "word": "Psyop",
+    "definition": "Psychologická Operace - Vojenská operace navržená k ovlivnění emocí, postojů a chování cílových skupin pro podporu národních cílů."
+  },
+  {
+    "language": "HUNGARIAN",
+    "word": "Psyop",
+    "definition": "Pszichológiai Művelet - Katonai művelet, amelyet a nemzeti célok támogatására a célközönségek érzelmeit, attitűdjeit és viselkedését befolyásolni tervezték."
+  },
+  {
+    "language": "ROMANIAN",
+    "word": "Psyop",
+    "definition": "Operațiunea Psihologică - O operațiune militară concepută pentru a influența emoțiile, atitudinile și comportamentul audiențelor țintă pentru a sprijini obiectivele naționale。"
+  },
+  {
+    "language": "BULGARIAN",
+    "word": "Psyop",
+    "definition": "Психологическа Операция - Военна операция, предназначена за влияние върху емоциите, отношенията и поведението на целевите аудитории за подкрепа на националните цели."
+  },
+  {
+    "language": "SERBIAN",
+    "word": "Psyop",
+    "definition": "Психолошка Операција - Војна операција дизајнирана да утиче на емоције, ставове и понашање циљних публика за подршку националним циљевима."
+  },
+  {
+    "language": "CROATIAN",
+    "word": "Psyop",
+    "definition": "Psihološka Operacija - Vojna operacija dizajnirana za utjecanje na emocije, stavove i ponašanje ciljnih publika za podršku nacionalnim ciljevima."
+  },
+  {
+    "language": "SLOVENIAN",
+    "word": "Psyop",
+    "definition": "Psihološka Operacija - Vojaška operacija, zasnovana za vplivanje na čustva, stališča in vedenje ciljnih občinstev za podporo nacionalnim ciljem."
+  },
+  {
+    "language": "ESTONIAN",
+    "word": "Psyop",
+    "definition": "Psühholoogiline Operatsioon - Sõjaline operatsioon, mis on mõeldud mõjutama sihtrühmade emotsioone, hoiakuid ja käitumist rahvuslike eesmärkide toetamiseks."
+  },
+  {
+    "language": "LATVIAN",
+    "word": "Psyop",
+    "definition": "Psiholoģiskā Operācija - Militāra operācija, kas paredzēta ietekmēt mērķauditorijas emocijas, attieksmes un uzvedību, lai atbalstītu nacionālos mērķus."
+  },
+  {
+    "language": "LITHUANIAN",
+    "word": "Psyop",
+    "definition": "Psichologinė Operacija - Karinė operacija, skirta paveikti tikslinės auditorijos emocijas, požiūrius ir elgesį, siekiant palaikyti nacionalinius tikslus."
+  },
+  {
+    "language": "MALTESE",
+    "word": "Psyop",
+    "definition": "Operazzjoni Psikoloġika - Operazzjoni militari maħduma biex tinfluwenza l-emozzjonijiet, l-attitudnijiet u l-imġieba tal-udjenza fil-mira biex tappoġġa l-għanijiet nazzjonali."
+  },
+  {
+    "language": "ICELANDIC",
+    "word": "Psyop",
+    "definition": "Sálfræðileg Aðgerð - Herleg aðgerð sem er hönnuð til að hafa áhrif á tilfinningar, viðhorf og hegðun markhópa til að styðja við þjóðleg markmið."
+  }
 ]

@@ -1,0 +1,210 @@
+title: "PSYOP Fallback Rendering - Server-side Implementation"
+owner: "admin@psyop.ca"
+branch: "shahzebqazi/fallback"
+last_updated: "2025-08-26"
+
+context:
+  purpose: "Provide a minimal, reliable site variant that loads without JS/WebGL and is safe during SSL/HTTPS work or maintenance."
+  tech_stack: [Haskell, WAI, Warp, blaze-html]
+
+goals:
+  - "Serve fallback at '/', '/index', '/index.html', '/home' (with minimal inline CSS)"
+  - "Serve an ultra-minimal no-CSS variant at '/lite' and '/lite.html' for bots/SEO"
+  - "No WebGL/ASCII; black background only"
+  - "Avoid MenuBar/Footer and any enhanced UI in this branch"
+  - "Expose simple health check endpoint (optional)"
+  - "Enable canonical HTTPS + WWW with exceptions for ACME and /health"
+
+control_signals:
+  order_of_precedence:
+    - header: {name: "X-Fallback-Mode", value: "1"}
+    - env_var: {name: "FALLBACK_MODE", values_true: ["1", "true", "TRUE"]}
+    - query_param: {name: "fallback", values_true: ["1", "true"]}
+  behavior: "If any signal is present, serve fallback at the requested path."
+
+routes:
+  fallback_pages:
+    - "/"
+    - "/index"
+    - "/index.html"
+    - "/home"
+  lite_no_css:
+    - "/lite"
+    - "/lite.html"
+  production:
+    behavior: "404 (not present) on this fallback-only branch"
+  healthcheck:
+    path: "/health"
+    method: "GET"
+    response:
+      status: 200
+      content_type: "text/plain"
+      body: "ok"
+    required: false
+
+fallback_page_spec:
+  background: "#000000"
+  components_order:
+    - logo: {source: "assets/graphics/white/promo_1.jpg", alt: "PSYOP"}
+    - subtext: "lite edition"
+    - links:
+        - {label: "Instagram", url: "https://instagram.com/psyopband"}
+        - {label: "TikTok", url: "https://tiktok.com/@psyopsucks"}
+        - {label: "Spotify", url: "https://open.spotify.com/artist/2bRWBW2Km3N9MSXY90QKb7?si=oVutT8ZFTxylihcAk-_sHg"}
+    - band_bio: |
+        Psyop (ˈsaɪ.ɑp) is a 4 piece Metal Machine from Toronto, Canada.
+        Rooted in nu‑metal foundations with addictive hooks and ruthless breakdowns.
+        Psyop is James, Max, Miles and Willy.
+    - definition_random_language: "One randomized translation of 'Psychological Operation …' on each request"
+  notes:
+    - "No MenuBar/Footer; render as a single left-aligned column"
+    - "Minimal CSS: inline styles only (fallback). Lite variant uses no CSS."
+
+lite_page_spec:
+  description: "Ultra-minimal HTML (no CSS) optimized for bots and lowest-capability clients"
+  head:
+    title_suffix: " - Lite"
+    meta:
+      - name: description
+      - og:title
+      - og:description
+      - og:image
+      - link[rel=canonical]
+  body:
+    - h1: site.name
+    - h2: "Lite"
+    - p: shortDescription(site.bio)
+    - links_inline: site.social_links (text-only)
+
+haskell_changes:
+  files:
+    - path: "Src/App.hs"
+      edits:
+        - add_function: "renderFallbackPage :: Html"
+          description: "Constructs the minimal fallback page per fallback_page_spec."
+        - add_function: "renderLitePage :: Html"
+          description: "Constructs the ultra-minimal page with no CSS per lite_page_spec."
+        - route_logic: |
+            Routing (fallback-only branch):
+              * '/' | '/index' | '/index.html' | '/home' → Fallback page
+              * '/lite' | '/lite.html' → Lite page (no CSS)
+              * '/production' → 404
+              * Redirect policy applied before routing
+        - optional_route: "GET /health" returns (200, text/plain, "ok")
+  css:
+    approach: "Inline-only for fallback; lite has no CSS. No external CSS endpoints in this branch."
+
+testing:
+  manual:
+    - "curl -i http://localhost:PORT/?fallback=1  # forced fallback"
+    - "curl -i -H 'X-Fallback-Mode: 1' http://localhost:PORT/"
+    - "FALLBACK_MODE=1 stack run && visit http://localhost:PORT/"
+    - "curl -i http://localhost:PORT/health  # if enabled"
+    - "curl -i -H 'User-Agent: Googlebot' https://localhost/  # bot → fallback"
+  browser:
+    - "Verify black background, logo, 'lite edition', links, bio, randomized definition"
+
+seo_robots:
+  strategy: "Allow all by default; during rebuilds you may Disallow all to avoid indexing temporary states."
+  samples:
+    allow_all: |
+      User-agent: *
+      Disallow:
+    disallow_all: |
+      User-agent: *
+      Disallow: /
+  bot_detection:
+    approach: "Detect common crawlers by User-Agent and serve fallback for fast indexing."
+    user_agents:
+      - Googlebot
+      - Bingbot
+      - DuckDuckBot
+      - YandexBot
+      - Baiduspider
+      - AhrefsBot
+      - SemrushBot
+      - PetalBot
+    notes:
+      - "Case-insensitive substring match on User-Agent"
+      - "Add meta description, Open Graph, canonical URL to fallback"
+      - "Provide /robots.txt and optional /sitemap.xml"
+
+redirect_policy:
+  enable_https_redirect: true
+  enable_www_canonical: true
+  notes:
+    - "Return 308 redirect to https://www.psyop.ca{path}?{query} when scheme!=https or host!=www.psyop.ca"
+    - "Run HTTP listener on 80 (or separate unit) to redirect to HTTPS"
+    - "Exceptions: '/.well-known/acme-challenge/*' and '/health' do not redirect"
+
+fallback_decision_function:
+  order:
+    - "Hard signals: X-Fallback-Mode header, FALLBACK_MODE env, ?fallback=1"
+    - "Bot detection by User-Agent → fallback"
+    - "Heuristics (optional): very old mobile UAs → fallback"
+    - "Default: enhanced"
+  pseudocode: |
+    shouldServeFallback req =
+      hasHeader "X-Fallback-Mode" "1"
+      || envVarTrue "FALLBACK_MODE"
+      || queryParamTrue "fallback"
+      || isBotUserAgent (lookupHeader "User-Agent")
+      || isOldMobile (lookupHeader "User-Agent")
+
+rollout:
+  branch: "shahzebqazi/fallback"
+  steps:
+    - "Implement functions and routes in src/App.hs per haskell_changes"
+    - "Build: stack build"
+    - "Commit & push to 'shahzebqazi/fallback'"
+    - "Deploy systemd services: HTTPS on 443, redirect on 80"
+
+risks_and_mitigations:
+  - risk: "Routing regressions at root path if fallback logic mis-ordered"
+    mitigation: "Guard with explicit path matches and only switch to fallback when control signals are on"
+  - risk: "MenuBar bug side-effects if reused"
+    mitigation: "Do not import MenuBar/Footer on fallback path; separate rendering function"
+
+acceptance_criteria:
+  - "Accessing '/', '/index.html', '/lite', '/lite.html' with fallback signal returns minimal page"
+  - "No WebGL/ASCII code runs in fallback"
+  - "Background is solid black"
+  - "Health check returns 200 text/plain 'ok' if enabled"
+
+# -----------------------------------------------------------------------------
+# CONTENT STRUCTURE (CONFIG-DRIVEN)
+# -----------------------------------------------------------------------------
+content_structure:
+  goal: "Keep links and written content in a single YAML doc, loaded at startup"
+  file: "Private/content/site.yaml"
+  load_strategy: "Read once at startup into FallbackEnv; no per-request disk I/O"
+  schema:
+    site:
+      name: string
+      subtitle: string
+      hero_image: string  # path under assets/
+      bio: |
+        multiline string
+      social_links:
+        - label: string
+          url: string
+      random_definitions_file: string  # e.g., psyop.txt (one per line)
+  example:
+    site:
+      name: "PSYOP"
+      subtitle: "lite edition"
+      hero_image: "assets/graphics/white/promo_1.jpg"
+      bio: |
+        Psyop (ˈsaɪ.ɑp) is a 4 piece Metal Machine from Toronto, Canada.
+        Rooted in nu‑metal foundations with addictive hooks and ruthless breakdowns.
+        Psyop is James, Max, Miles and Willy.
+      social_links:
+        - { label: "Instagram", url: "https://instagram.com/psyopband" }
+        - { label: "TikTok", url: "https://tiktok.com/@psyopsucks" }
+        - { label: "Spotify", url: "https://open.spotify.com/artist/2bRWBW2Km3N9MSXY90QKb7?si=oVutT8ZFTxylihcAk-_sHg" }
+      random_definitions_file: "psyop.txt"
+  haskell_integration_notes:
+    - "Extend FallbackEnv to include SiteConfig loaded from YAML (use 'yaml' package)."
+    - "Prefer content values from SiteConfig; keep current defaults as fallback."
+    - "Retain round-robin selection for definitions; source lines from 'random_definitions_file'."
+

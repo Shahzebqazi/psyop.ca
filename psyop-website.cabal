@@ -76,12 +76,14 @@ library
     , containers
     , directory
     , filepath
+    , hspec
     , http-types
     , process
     , random
     , text
     , time
     , wai
+    , wai-extra
     , warp
     , warp-tls
     , yaml
@@ -101,6 +103,7 @@ executable psyop-website-exe
     , containers
     , directory
     , filepath
+    , hspec
     , http-types
     , process
     , psyop-website
@@ -108,6 +111,7 @@ executable psyop-website-exe
     , text
     , time
     , wai
+    , wai-extra
     , warp
     , warp-tls
     , yaml
@@ -121,7 +125,7 @@ test-suite psyop-website-test
   autogen-modules:
       Paths_psyop_website
   hs-source-dirs:
-      Tests
+      Private/Tests
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -140,6 +144,7 @@ test-suite psyop-website-test
     , text
     , time
     , wai
+    , wai-extra
     , warp
     , warp-tls
     , yaml

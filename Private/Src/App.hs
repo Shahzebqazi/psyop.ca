@@ -46,6 +46,20 @@ instance FromJSON SocialLink where
         linkUrl   <- o .: "url"
         pure SocialLink {.. }
 
+-- New data structure for language-specific content
+data LanguageContent = LanguageContent
+    { language   :: T.Text
+    , word       :: T.Text
+    , definition :: T.Text
+    } deriving (Show, Eq, Generic)
+
+instance FromJSON LanguageContent where
+    parseJSON = withObject "LanguageContent" $ \o -> do
+        language   <- o .: "language"
+        word       <- o .: "word"
+        definition <- o .: "definition"
+        pure LanguageContent {.. }
+
 data Site = Site
     { siteName                 :: T.Text
     , siteSubtitle             :: T.Text
@@ -73,21 +87,21 @@ instance FromJSON SiteConfig where
         pure (SiteConfig s)
 
 data FallbackEnv = FallbackEnv
-    { fallbackDefinitions :: [T.Text]
-    , rrIndexRef          :: IORef Int
-    , siteConfig          :: Site
+    { fallbackLanguageContents :: [LanguageContent]
+    , currentLanguageIndex     :: IORef Int
+    , siteConfig               :: Site
     }
 
--- Load definitions from psyop.txt once at startup
+-- Load language content from psyop.json once at startup
 loadFallbackEnv :: IO FallbackEnv
 loadFallbackEnv = do
     site0 <- loadSite
     -- Ensure hero asset is published to Public/Assets and optimized
     let heroPath = siteHeroImage site0
     publishWebAsset heroPath
-    defs <- loadDefinitions ("Private/Content/" ++ T.unpack (siteDefinitionsFile site0))
+    langContents <- loadLanguageContents ("Private/Content/" ++ T.unpack (siteDefinitionsFile site0))
     idxRef <- newIORef 0
-    pure FallbackEnv { fallbackDefinitions = defs, rrIndexRef = idxRef, siteConfig = site0 }
+    pure FallbackEnv { fallbackLanguageContents = langContents, currentLanguageIndex = idxRef, siteConfig = site0 }
 
 loadSite :: IO Site
 loadSite = do
@@ -101,25 +115,26 @@ loadSite = do
                 Right (SiteConfig s) -> pure s
                 Left _err            -> pure defaultSite
 
-loadDefinitions :: FilePath -> IO [T.Text]
-loadDefinitions path = do
+loadLanguageContents :: FilePath -> IO [LanguageContent]
+loadLanguageContents path = do
     fileExists <- doesFileExist path
     if not fileExists
-        then pure [defaultDefinition]
+        then pure [defaultLanguageContent]
         else if ".json" `isSuffixOf` path
             then do
                 lbs <- LBS.readFile path
-                let decoded :: Either String [T.Text]
+                let decoded :: Either String [LanguageContent]
                     decoded = eitherDecode lbs
                 case decoded of
-                    Right arr -> pure (if null arr then [defaultDefinition] else arr)
-                    Left _    -> pure [defaultDefinition]
+                    Right arr -> pure (if null arr then [defaultLanguageContent] else arr)
+                    Left _    -> pure [defaultLanguageContent]
             else do
+                -- Fallback to old text format if needed
                 content <- TIO.readFile path
                 let rawLines = T.lines content
                     cleaned  = Prelude.map extractDefinitionT rawLines
                     nonEmpty = Prelude.filter (not . T.null . T.strip) cleaned
-                pure (if null nonEmpty then [defaultDefinition] else nonEmpty)
+                pure (if null nonEmpty then [defaultLanguageContent] else Prelude.map (\def -> LanguageContent "ENGLISH" "Psyop" def) nonEmpty)
 
 defaultSite :: Site
 defaultSite = Site
@@ -184,16 +199,16 @@ runIfAvailable cmd args = do
             pure ()
         ExitFailure _ -> pure ()
 
--- Get next definition via round-robin
-nextDefinition :: FallbackEnv -> IO T.Text
-nextDefinition env = do
-    let defs = fallbackDefinitions env
-        n    = length defs
+-- Get next language content via round-robin
+nextLanguageContent :: FallbackEnv -> IO LanguageContent
+nextLanguageContent env = do
+    let contents = fallbackLanguageContents env
+        n        = length contents
     if n <= 1
-        then pure (Prelude.head defs)
+        then pure (Prelude.head contents)
         else do
-            i <- atomicModifyIORef' (rrIndexRef env) (\i -> let j = (i + 1) `mod` n in (j, j))
-            pure (defs !! i)
+            i <- atomicModifyIORef' (currentLanguageIndex env) (\i -> let j = (i + 1) `mod` n in (j, j))
+            pure (contents !! i)
 
 -- Extract definition part after the first ':' if present
 extractDefinitionT :: T.Text -> T.Text
@@ -203,8 +218,8 @@ extractDefinitionT line =
             then T.strip line
             else T.strip (T.drop 1 rest) -- drop the ':'
 
-defaultDefinition :: T.Text
-defaultDefinition = "Psychological Operation - Military operation designed to influence emotions, attitudes, and behavior of target audiences to support national objectives."
+defaultLanguageContent :: LanguageContent
+defaultLanguageContent = LanguageContent "ENGLISH" "Psyop" "Psychological Operation - Military operation designed to influence emotions, attitudes, and behavior of target audiences to support national objectives."
 
 -- WAI application serving enhanced MenuBar with mobile support
 app :: FallbackEnv -> Application
@@ -233,74 +248,83 @@ app env request respond = do
     case maybeRedirect of
         Just loc -> respond $ responseLBS status308 [("Location", loc)] ""
         Nothing -> do
-            let pathSegs = pathInfo request
-            case pathSegs of
+            case path of
                 -- Fallback-only site routes
-                [] -> do
+                "/" -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
-                ["index"] -> do
+                "/index" -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
-                ["index.html"] -> do
+                "/index.html" -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
-                ["lite"] -> do
+                "/lite" -> do
                     html <- renderLitePage env
                     respond $ waiResponse (htmlResponse html)
-                ["lite.html"] -> do
+                "/lite.html" -> do
                     html <- renderLitePage env
                     respond $ waiResponse (htmlResponse html)
-                ["home"] -> do
+                "/home" -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
-                
-                -- Removed production-only endpoints (background generation, CSS, enhanced site)
+
                 -- SEO files
-                ["robots.txt"] -> do
+                "/robots.txt" -> do
                     response <- serveTextFile "Public/robots.txt" "text/plain"
                     respond response
-                ["sitemap.xml"] -> do
+                "/sitemap.xml" -> do
                     response <- serveTextFile "Public/sitemap.xml" "application/xml"
                     respond response
 
-                ["health"] -> do
+                "/health" -> do
                     respond $ responseLBS status200 [("Content-Type", "text/plain")] "ok"
-                
-                -- Static asset routes
-                ["assets", "album-covers", filename] -> do
-                    publishWebAsset (T.concat ["/assets/album-covers/", filename])
-                    let filePath = "Public/Assets/album-covers/" ++ T.unpack filename
-                    response <- serveStaticFile filePath
-                    respond response
-                
-                ["assets", "graphics", "white", filename] -> do
-                    publishWebAsset (T.concat ["/assets/graphics/white/", filename])
-                    let filePath = "Public/Assets/graphics/white/" ++ T.unpack filename
-                    response <- serveStaticFile filePath
-                    respond response
-                
-                ["assets", "graphics", "red_white", filename] -> do
-                    publishWebAsset (T.concat ["/assets/graphics/red_white/", filename])
-                    let filePath = "Public/Assets/graphics/red_white/" ++ T.unpack filename
-                    response <- serveStaticFile filePath
-                    respond response
-                
-                ["assets", "graphics", filename] -> do
-                    publishWebAsset (T.concat ["/assets/graphics/", filename])
-                    let filePath = "Public/Assets/graphics/" ++ T.unpack filename
-                    response <- serveStaticFile filePath
-                    respond response
 
-                ["assets", "icons", "streaming", filename] -> do
-                    publishWebAsset (T.concat ["/assets/webdev/icons/streaming/", filename])
-                    let filePath = "Public/Assets/webdev/icons/streaming/" ++ T.unpack filename
-                    response <- serveStaticFile filePath
-                    respond response
-                
-                -- 404 for unmatched routes
-                _ -> respond $ responseLBS status404 [("Content-Type", "text/html")] 
-                    "<html><body><h1>404 - Page Not Found</h1><p><a href='/'>Return to Home</a></p></body></html>"
+                -- Static asset routes using raw path
+                _ | "/assets/album-covers/" `isPrefixOf` path -> do
+                        let prefix :: String
+                            prefix = "/assets/album-covers/"
+                            rel = drop (Prelude.length prefix) path
+                        publishWebAsset (T.pack ("/assets/album-covers/" ++ rel))
+                        let filePath = "Public/Assets/album-covers/" ++ rel
+                        response <- serveStaticFile filePath
+                        respond response
+                  | "/assets/graphics/white/" `isPrefixOf` path -> do
+                        let prefix :: String
+                            prefix = "/assets/graphics/white/"
+                            rel = drop (Prelude.length prefix) path
+                        publishWebAsset (T.pack ("/assets/graphics/white/" ++ rel))
+                        let filePath = "Public/Assets/graphics/white/" ++ rel
+                        response <- serveStaticFile filePath
+                        respond response
+                  | "/assets/graphics/red_white/" `isPrefixOf` path -> do
+                        let prefix :: String
+                            prefix = "/assets/graphics/red_white/"
+                            rel = drop (Prelude.length prefix) path
+                        publishWebAsset (T.pack ("/assets/graphics/red_white/" ++ rel))
+                        let filePath = "Public/Assets/graphics/red_white/" ++ rel
+                        response <- serveStaticFile filePath
+                        respond response
+                  | "/assets/graphics/" `isPrefixOf` path -> do
+                        let prefix :: String
+                            prefix = "/assets/graphics/"
+                            rel = drop (Prelude.length prefix) path
+                        publishWebAsset (T.pack ("/assets/graphics/" ++ rel))
+                        let filePath = "Public/Assets/graphics/" ++ rel
+                        response <- serveStaticFile filePath
+                        respond response
+                  | "/assets/webdev/icons/streaming/" `isPrefixOf` path -> do
+                        let prefix :: String
+                            prefix = "/assets/webdev/icons/streaming/"
+                            rel = drop (Prelude.length prefix) path
+                        publishWebAsset (T.pack ("/assets/webdev/icons/streaming/" ++ rel))
+                        let filePath = "Public/Assets/webdev/icons/streaming/" ++ rel
+                        response <- serveStaticFile filePath
+                        respond response
+
+                  -- 404 for unmatched routes
+                  | otherwise -> respond $ responseLBS status404 [("Content-Type", "text/html")] 
+                        "<html><body><h1>404 - Page Not Found</h1><p><a href='/'>Return to Home</a></p></body></html>"
 
 -- ACME challenge exceptions for HTTP->HTTPS redirect
 isAcmePath :: String -> Bool
@@ -309,17 +333,17 @@ isAcmePath p = "/.well-known/acme-challenge/" `isPrefixOf` p
 -- Render the minimal fallback page (black background, logo, lite edition, links, bio, randomized definition)
 renderFallbackPage :: FallbackEnv -> IO Html
 renderFallbackPage env = do
-    defn <- nextDefinition env
+    langContent <- nextLanguageContent env
     let s = siteConfig env
     pure $ H.docTypeHtml $ do
         H.head $ do
             H.meta ! A.charset "UTF-8"
             H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1.0"
-            H.title $ toHtml (siteName s <> " - Lite")
+            H.title $ toHtml (word langContent <> " - Lite")
             -- SEO Meta
             H.meta ! A.name "description" ! A.content (toValue (shortDescription (siteBio s)))
             H.link ! A.rel "canonical" ! A.href "https://www.psyop.ca/"
-            H.meta ! H.customAttribute "property" "og:title" ! A.content (toValue (siteName s))
+            H.meta ! H.customAttribute "property" "og:title" ! A.content (toValue (word langContent))
             H.meta ! H.customAttribute "property" "og:description" ! A.content (toValue (shortDescription (siteBio s)))
             H.meta ! H.customAttribute "property" "og:image" ! A.content (toValue (absoluteImageURL (siteHeroImage s)))
             -- Minimal inline CSS for black background and centered column
@@ -329,6 +353,7 @@ renderFallbackPage env = do
                 , ".page-title { font-weight: 700; font-style: italic; font-size: 2rem; margin: 0; }"
                 , ".title-row { display: flex; align-items: baseline; gap: 0.5rem; }"
                 , ".subtitle { font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }"
+                , ".language-info { font-size: 0.9rem; color: #888; font-style: italic; }"
                 , ".links { display:flex; flex-direction:row; gap:0.25rem; flex-wrap:wrap; align-items:center; }"
                 , ".links a { color:#f5f5dc; text-decoration:none; border-bottom:1px solid rgba(245,245,220,0.3); padding-bottom:2px; }"
                 , ".links a:hover { color:#ff6347; border-bottom-color:#ff6347; }"
@@ -339,8 +364,9 @@ renderFallbackPage env = do
         H.body $ do
             H.div ! A.class_ "container" $ do
                 H.div ! A.class_ "title-row" $ do
-                    H.h1 ! A.class_ "page-title" $ toHtml (siteName s)
+                    H.h1 ! A.class_ "page-title" $ toHtml (word langContent)
                     H.span ! A.class_ "subtitle" $ toHtml (siteSubtitle s)
+                H.div ! A.class_ "language-info" $ toHtml (language langContent)
                 -- Inline menu items separated by ~ and left-aligned
                 H.div ! A.class_ "links" $ do
                     renderLinks (siteSocialLinks s)
@@ -348,26 +374,29 @@ renderFallbackPage env = do
                     mapM_ (\line -> H.p (toHtml line)) (T.lines (siteBio s))
                 -- Hero image placed between bio and definition
                 H.img ! A.class_ "hero-image-sq" ! A.src (toValue (siteHeroImage s)) ! A.alt "Psyop hero"
-                H.div ! A.class_ "definition" $ H.toHtml defn
+                H.div ! A.class_ "definition" $ H.toHtml (definition langContent)
 
 -- Ultra-minimal lite page without CSS for bots/SEO and low-capability clients
 renderLitePage :: FallbackEnv -> IO Html
 renderLitePage env = do
+    langContent <- nextLanguageContent env
     let s = siteConfig env
     pure $ H.docTypeHtml $ do
         H.head $ do
             H.meta ! A.charset "UTF-8"
             H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1.0"
-            H.title $ toHtml (siteName s <> " - Lite")
+            H.title $ toHtml (word langContent <> " - Lite")
             H.meta ! A.name "description" ! A.content (toValue (shortDescription (siteBio s)))
             H.link ! A.rel "canonical" ! A.href "https://www.psyop.ca/"
-            H.meta ! H.customAttribute "property" "og:title" ! A.content (toValue (siteName s))
+            H.meta ! H.customAttribute "property" "og:title" ! A.content (toValue (word langContent))
             H.meta ! H.customAttribute "property" "og:description" ! A.content (toValue (shortDescription (siteBio s)))
             H.meta ! H.customAttribute "property" "og:image" ! A.content (toValue (absoluteImageURL (siteHeroImage s)))
         H.body $ do
-            H.h1 $ toHtml (siteName s)
+            H.h1 $ toHtml (word langContent)
             H.h2 "Lite"
             H.p  $ toHtml (shortDescription (siteBio s))
+            H.p  $ toHtml (language langContent)
+            H.p  $ toHtml (definition langContent)
             H.p  $ do
                 mapM_ renderPlainLink (siteSocialLinks s)
             where

@@ -1,0 +1,64 @@
+title: "PSYOP Website - Technical Requirements Document (TRD)"
+branch: "shahzebqazi/fallback"
+scope: "Fallback site and minimal enhanced access"
+last_updated: "2025-08-26"
+
+objectives:
+  - "Provide reliable fallback experience over HTTPS"
+  - "Serve fallback or enhanced at '/' based on decision function"
+  - "Expose fallback always at '/lite' and '/lite.html'"
+  - "Expose enhanced at '/production'"
+  - "Canonicalize to https://www.psyop.ca/"
+
+non_goals:
+  - "Do not merge with main branch"
+  - "No WebGL/ASCII systems in fallback"
+
+functional_requirements:
+  routing:
+    dynamic:
+      - "/"
+      - "/index"
+      - "/index.html"
+    fallback_always:
+      - "/lite"
+      - "/lite.html"
+    enhanced_always:
+      - "/production"
+  redirects:
+    http_to_https: true
+    non_www_to_www: true
+    exceptions:
+      - "/.well-known/acme-challenge/*"
+      - "/health"
+  seo:
+    robots_txt: true
+    sitemap_xml: true
+    meta_tags: [description, og:title, og:description, og:image, canonical]
+
+decision_function:
+  signals: [X-Fallback-Mode header, FALLBACK_MODE env, fallback query]
+  bot_detection: true
+  heuristics_old_mobile: true
+  default: enhanced
+
+config:
+  content_yaml: "Private/content/site.yaml"
+  env_vars:
+    - FALLBACK_MODE
+    - REDIRECT_HTTPS
+    - WWW_CANONICAL
+
+operational:
+  service: psyop-website.service
+  port: 443
+  certs: /etc/letsencrypt/live/psyop.ca/{fullchain.pem,privkey.pem}
+  capability: cap_net_bind_service
+
+acceptance:
+  - "https://www.psyop.ca/ serves fallback by default"
+  - "https://www.psyop.ca/production serves enhanced"
+  - "https://www.psyop.ca/lite and /lite.html serve fallback"
+  - "robots.txt and sitemap.xml available"
+  - "Bots receive fallback with SEO meta"
+

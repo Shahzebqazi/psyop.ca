@@ -36,6 +36,8 @@ dependencies:
 - containers
 - random
 - process
+- hspec
+- wai-extra
 
 library:
   source-dirs:         Private/Src
@@ -58,7 +60,7 @@ executables:
 tests:
   psyop-website-test:
     main:                Spec.hs
-    source-dirs:         Tests
+    source-dirs:         Private/Tests
     ghc-options:
     - -threaded
     - -rtsopts
@@ -67,6 +69,7 @@ tests:
     - psyop-website
     - base
     - hspec
+    - wai-extra
     - text
     - wai
     - http-types
