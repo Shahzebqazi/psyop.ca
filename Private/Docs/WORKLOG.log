@@ -1,0 +1,26 @@
+ - 26-08-2025 20:05:00 : Created production branch shahzebqazi/production from fallback branch; pushed to remote (UTC)
+ - 26-08-2025 19:50:00 : Implemented language synchronization system; converted psyop.txt to JSON; renamed docs folder; updated PSYOP to Psyop; consolidated environment config; deleted auto-deployment branch (UTC)
+ - 26-08-2025 19:45:00 : Investigated hero image "bug" - confirmed working correctly; redirects are intentional production behavior (UTC)
+ - 26-08-2025 19:37:00 : Committed all language sync changes; pushed to origin/shahzebqazi/fallback (UTC)
+ - 26-08-2025 19:30:00 : Refactored App.hs for language content; added LanguageContent data structure; updated rendering functions (UTC)
+ - 26-08-2025 19:25:00 : Created psyop.json with 40+ languages; moved from Private/Content/; updated Site.yaml (UTC)
+ - 26-08-2025 19:20:00 : Renamed Private/docs to Docs; updated README references (UTC)
+ - 26-08-2025 17:38:18 : Implemented HTTPS unit (443) and HTTP redirect unit (80); added ACME and /health exceptions; updated App.hs and envs (UTC)
+ - 26-08-2025 17:36:00 : Unified routing case; fixed header lookups; added case-insensitive dependency; rebuilt and deployed (UTC)
+ - 26-08-2025 17:34:30 : Updated README for fallback-only branch; renamed branch to shahzebqazi/fallback; content YAML updated (UTC)
+ - 26-08-2025 17:40:00 : Created SEO.d.yaml (score 63/100), removed production-only routes/UI; fallback-only routing (UTC)
+ - 26-08-2025 18:27:05 : Added no-CSS lite renderer at /lite and /lite.html; pruned Components and legacy Models; updated fallback doc; rebuilt and restarted services (UTC)
+ - 26-08-2025 18:30:00 : Moved tests to src/Spec.hs; updated package.yaml; App.hs refactor committed (UTC)
+2025-08-26
+- Created fallback implementation docs; added YAML content structure
+- Implemented fallback env cache and routes
+- Configured Warp TLS and systemd; verified HTTPS
+- Fixed assets via WorkingDirectory; hero image 200 OK
+- Updated links (Instagram, TikTok, Spotify)
+- Adjusted fallback layout per request (inline title/subtitle, ~ menu, hero placement)
+- Switched root to fallback; added '/production'
+- Implemented canonical redirects and bot-aware fallback decision
+- Added robots.txt and sitemap.xml; meta tags in fallback
+
+
+- 26-08-2025 17:05:48 : Plan: Move `assets/` to `private/`; Haskell server to serve optimized `public/assets/` with only user-needed files (UTC)

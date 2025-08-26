@@ -1,0 +1,50 @@
+### 26-08-2025 20:05:00 — Production branch creation and branch strategy
+- Created production branch `shahzebqazi/production` from fallback branch
+- Established clear separation between development and production code
+- Pushed production branch to remote repository
+- Set up foundation for main website deployment workflow
+
+### 26-08-2025 19:50:00 — Language synchronization and environment consolidation
+- Implemented language synchronization in App.hs (same language for logo and definition)
+- Converted psyop.txt to structured JSON with 40+ languages
+- Removed hardcoded content; now dynamically loads from psyop.json
+- Renamed Private/docs to Docs for better organization
+- Updated PSYOP to Psyop throughout codebase and documentation
+- Consolidated environment variables documentation in README
+- Removed redundant env.example and env.template files
+- Ensured Psyop is italicized everywhere in the UI
+- Deleted origin/auto-deployment branch for cleaner repository structure
+
+### 26-08-2025 17:38:18 — Fallback branch, HTTPS, redirects, SEO, content
+- Renamed branch to `shahzebqazi/fallback`; README notes fallback-only
+- Unified routing case in `src/App.hs`; added /health and ACME redirect exceptions
+- Enabled Warp TLS on 443; added port-80 redirect unit; canonical to www
+- Updated env templates and package deps; added case-insensitive headers
+- Verified endpoints: /, /lite, robots.txt, sitemap.xml (200 OK)
+- Updated site content YAML (title/subtitle, YouTube/Bandcamp)
+### 26-08-2025 17:40:00 — SEO doc and fallback-only cleanup
+- Added `private/docs/SEO.d.yaml` with audit (score: 63/100) and recommendations
+- Removed production-only handlers and UI scaffolding from App/Lib for fallback-only
+### 26-08-2025 18:30:00 — Tests relocation and App.hs refactor
+- Moved tests to `src/Spec.hs` and updated package test path
+- Added assertions for /lite(.html) no-CSS and SEO tags
+- Refactored `App.hs` to remove dead code and CSS blocks
+
+26-08-2025 00:00:00 — Repository documentation and infrastructure updates
+- Added fallback implementation docs; YAML content structure
+- Implemented fallback env cache and routes
+- Configured Warp TLS and systemd; verified HTTPS
+- Fixed static assets via WorkingDirectory; hero image 200 OK
+- Updated social links (Instagram, TikTok, Spotify)
+- Adjusted fallback layout (inline title/subtitle, menu, hero placement)
+- Switched root to fallback; added '/production'
+- Implemented canonical redirects and bot-aware fallback decision
+- Added robots.txt and sitemap.xml; updated meta tags
+
+26-08-2025 00:00:01 — Additional entries from root changelog
+- Add closure-based fallback env and routes (/index.html, /lite, /lite.html)
+- Switch '/' to dynamic fallback/main; add '/production' for enhanced
+- Add YAML-driven content loader (private/content/site.yaml)
+- Add bot-aware fallback decision and env/header/query overrides
+- Add HTTPS via Warp TLS, systemd unit; assets fixed via WorkingDirectory
+- Add robots.txt and sitemap.xml; basic SEO meta and canonical

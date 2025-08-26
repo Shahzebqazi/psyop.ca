@@ -12,43 +12,44 @@ description:         "Modern electronic music website featuring WebGL-powered dy
 category:            Web, Music, Electronic, WebGL
 extra-source-files:
 - LICENSE
-- assets/*
-- assets/graphics/*
-- assets/graphics/white/*
-- assets/graphics/red_white/*
-- assets/webdev/icons/streaming/*
+- Private/Assets/*
+- Private/Assets/graphics/*
+- Private/Assets/graphics/white/*
+- Private/Assets/graphics/red_white/*
+- Private/Assets/webdev/icons/streaming/*
 
 dependencies:
 - base >= 4.7 && < 5
 - wai
 - warp
+- warp-tls
+- yaml
+- aeson
 - blaze-html
 - text
 - bytestring
 - http-types
+- case-insensitive
 - filepath
 - directory
 - time
 - containers
 - random
+- process
+- hspec
+- wai-extra
 
 library:
-  source-dirs:         src
+  source-dirs:         Private/Src
   exposed-modules:
-    - Lib
-    - Models
     - App
-    - Views
-    - Components.MenuBar
-    - Components.Footer
+    - Models
 
 executables:
   psyop-website-exe:
     main:                Main.hs
-    source-dirs:         src
-    other-modules:
-      - Components.MenuBar
-      - Components.Footer
+    source-dirs:         Private/Src
+    other-modules: []
     ghc-options:
     - -threaded
     - -rtsopts
@@ -59,7 +60,7 @@ executables:
 tests:
   psyop-website-test:
     main:                Spec.hs
-    source-dirs:         src/tests
+    source-dirs:         Private/Tests
     ghc-options:
     - -threaded
     - -rtsopts
@@ -68,7 +69,10 @@ tests:
     - psyop-website
     - base
     - hspec
+    - wai-extra
     - text
+    - wai
+    - http-types
 
 ghc-options:
 - -Wall

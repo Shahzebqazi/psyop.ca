@@ -19,6 +19,37 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     LICENSE
+    Private/Assets/graphics/white/promo_1.jpg
+    Private/Assets/graphics/white/promo_10.jpg
+    Private/Assets/graphics/white/promo_11.jpg
+    Private/Assets/graphics/white/promo_12.jpg
+    Private/Assets/graphics/white/promo_2.jpg
+    Private/Assets/graphics/white/promo_3.jpg
+    Private/Assets/graphics/white/promo_4.jpg
+    Private/Assets/graphics/white/promo_5.jpg
+    Private/Assets/graphics/white/promo_6.jpg
+    Private/Assets/graphics/white/promo_7.jpg
+    Private/Assets/graphics/white/promo_7.kra
+    Private/Assets/graphics/white/promo_7.png
+    Private/Assets/graphics/white/promo_8.jpg
+    Private/Assets/graphics/white/promo_9.jpg
+    Private/Assets/graphics/red_white/promo_1.jpg
+    Private/Assets/graphics/red_white/promo_2.jpg
+    Private/Assets/graphics/red_white/promo_3.jpg
+    Private/Assets/graphics/red_white/promo_4.jpg
+    Private/Assets/graphics/red_white/promo_5.jpg
+    Private/Assets/graphics/red_white/promo_6.jpg
+    Private/Assets/webdev/icons/streaming/anghami.svg
+    Private/Assets/webdev/icons/streaming/apple-music.svg
+    Private/Assets/webdev/icons/streaming/bandcamp.svg
+    Private/Assets/webdev/icons/streaming/distrokid.svg
+    Private/Assets/webdev/icons/streaming/email.svg
+    Private/Assets/webdev/icons/streaming/instagram.svg
+    Private/Assets/webdev/icons/streaming/soundcloud.svg
+    Private/Assets/webdev/icons/streaming/spotify.svg
+    Private/Assets/webdev/icons/streaming/tiktok.svg
+    Private/Assets/webdev/icons/streaming/youtube-music.svg
+    Private/Assets/webdev/icons/streaming/youtube.svg
 
 source-repository head
   type: git
@@ -26,64 +57,64 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
-      Models
       App
-      Views
-      Components.MenuBar
-      Components.Footer
+      Models
   other-modules:
       Main
       Paths_psyop_website
   autogen-modules:
       Paths_psyop_website
   hs-source-dirs:
-      src
+      Private/Src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
     , blaze-html
     , bytestring
+    , case-insensitive
     , containers
     , directory
     , filepath
+    , hspec
     , http-types
+    , process
     , random
     , text
     , time
     , wai
+    , wai-extra
     , warp
+    , warp-tls
+    , yaml
   default-language: Haskell2010
 
 executable psyop-website-exe
   main-is: Main.hs
-  other-modules:
-      App
-      Lib
-      Models
-      Views
-      Components.MenuBar
-      Components.Footer
-      Paths_psyop_website
-  autogen-modules:
-      Paths_psyop_website
   hs-source-dirs:
-      src
+      Private/Src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
     , blaze-html
     , bytestring
+    , case-insensitive
     , containers
     , directory
     , filepath
+    , hspec
     , http-types
+    , process
     , psyop-website
     , random
     , text
     , time
     , wai
+    , wai-extra
     , warp
+    , warp-tls
+    , yaml
   default-language: Haskell2010
 
 test-suite psyop-website-test
@@ -94,21 +125,27 @@ test-suite psyop-website-test
   autogen-modules:
       Paths_psyop_website
   hs-source-dirs:
-      src/tests
+      Private/Tests
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base
+      aeson
+    , base
     , blaze-html
     , bytestring
+    , case-insensitive
     , containers
     , directory
     , filepath
     , hspec
     , http-types
+    , process
     , psyop-website
     , random
     , text
     , time
     , wai
+    , wai-extra
     , warp
+    , warp-tls
+    , yaml
   default-language: Haskell2010
