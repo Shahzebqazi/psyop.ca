@@ -39,20 +39,15 @@ dependencies:
 library:
   source-dirs:         src
   exposed-modules:
-    - Lib
+    - 
     - Models
     - App
-    - Views
-    - Components.MenuBar
-    - Components.Footer
 
 executables:
   psyop-website-exe:
     main:                Main.hs
     source-dirs:         src
-    other-modules:
-      - Components.MenuBar
-      - Components.Footer
+    other-modules: []
     ghc-options:
     - -threaded
     - -rtsopts
@@ -63,7 +58,7 @@ executables:
 tests:
   psyop-website-test:
     main:                Spec.hs
-    source-dirs:         src/tests
+    source-dirs:         Tests
     ghc-options:
     - -threaded
     - -rtsopts
@@ -73,6 +68,8 @@ tests:
     - base
     - hspec
     - text
+    - wai
+    - http-types
 
 ghc-options:
 - -Wall

@@ -191,10 +191,10 @@ app env request respond = do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
                 ["lite"] -> do
-                    html <- renderFallbackPage env
+                    html <- renderLitePage env
                     respond $ waiResponse (htmlResponse html)
                 ["lite.html"] -> do
-                    html <- renderFallbackPage env
+                    html <- renderLitePage env
                     respond $ waiResponse (htmlResponse html)
                 ["home"] -> do
                     html <- renderFallbackPage env
@@ -290,6 +290,31 @@ renderFallbackPage env = do
                 H.img ! A.class_ "hero-image-sq" ! A.src (toValue (siteHeroImage s)) ! A.alt "Psyop hero"
                 H.div ! A.class_ "definition" $ H.toHtml defn
 
+-- Ultra-minimal lite page without CSS for bots/SEO and low-capability clients
+renderLitePage :: FallbackEnv -> IO Html
+renderLitePage env = do
+    let s = siteConfig env
+    pure $ H.docTypeHtml $ do
+        H.head $ do
+            H.meta ! A.charset "UTF-8"
+            H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1.0"
+            H.title $ toHtml (siteName s <> " - Lite")
+            H.meta ! A.name "description" ! A.content (toValue (shortDescription (siteBio s)))
+            H.link ! A.rel "canonical" ! A.href "https://www.psyop.ca/"
+            H.meta ! H.customAttribute "property" "og:title" ! A.content (toValue (siteName s))
+            H.meta ! H.customAttribute "property" "og:description" ! A.content (toValue (shortDescription (siteBio s)))
+            H.meta ! H.customAttribute "property" "og:image" ! A.content (toValue (absoluteImageURL (siteHeroImage s)))
+        H.body $ do
+            H.h1 $ toHtml (siteName s)
+            H.h2 "Lite"
+            H.p  $ toHtml (shortDescription (siteBio s))
+            H.p  $ do
+                mapM_ renderPlainLink (siteSocialLinks s)
+            where
+                renderPlainLink (SocialLink lbl href) = do
+                    H.a ! A.href (toValue href) $ toHtml lbl
+                    H.toHtml (" " :: T.Text)
+
 -- Render social links with ~ separators
 renderLinks :: [SocialLink] -> Html
 renderLinks [] = mempty
@@ -377,8 +402,7 @@ waiResponse :: LBS.ByteString -> Response
 waiResponse content = responseLBS status200 [("Content-Type", "text/html")] content
 
 -- Helper function to create CSS response
-cssResponse :: LBS.ByteString -> Response
-cssResponse content = responseLBS status200 [("Content-Type", "text/css")] content
+-- (Removed CSS response helpers in fallback-only build)
 
 -- Helper function to serve static files
 serveStaticFile :: String -> IO Response
@@ -397,8 +421,8 @@ serveStaticFile filePath = do
             return $ responseLBS status404 [("Content-Type", "text/plain")] $ LBS.fromStrict $ encodeUtf8 $ T.pack $ "File not found: " ++ filePath
 
 -- Serve main CSS with enhanced styling
-serveMainCSS :: LBS.ByteString
-serveMainCSS = LBS.fromStrict $ encodeUtf8 $ T.pack $ unlines [
+-- (Removed enhanced CSS in fallback-only build)
+{-
     "/* Main CSS for PSYOP Website */"
     , "body {"
     , "    margin: 0;"
@@ -1121,10 +1145,11 @@ serveMainCSS = LBS.fromStrict $ encodeUtf8 $ T.pack $ unlines [
     , "}"
 
     ]
+-}
 
 -- Serve components CSS
-serveComponentsCSS :: LBS.ByteString
-serveComponentsCSS = LBS.fromStrict $ encodeUtf8 $ T.pack $ unlines [
+-- (Removed components CSS in fallback-only build)
+{-
     "/* Components CSS */"
     , ""
     , "/* MenuBar Styles */"
@@ -1440,10 +1465,11 @@ serveComponentsCSS = LBS.fromStrict $ encodeUtf8 $ T.pack $ unlines [
     , "    color: #666;"
     , "}"
     ]
+-}
 
 -- Serve responsive CSS
-serveResponsiveCSS :: LBS.ByteString
-serveResponsiveCSS = LBS.fromStrict $ encodeUtf8 $ T.pack $ unlines [
+-- (Removed responsive CSS in fallback-only build)
+{-
     "/* Responsive CSS */"
     , ""
     , "/* Mobile MenuBar Styles */"
@@ -1564,3 +1590,4 @@ serveResponsiveCSS = LBS.fromStrict $ encodeUtf8 $ T.pack $ unlines [
     , "    }"
     , "}"
     ]
+-}
