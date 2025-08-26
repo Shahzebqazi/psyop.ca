@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module App (app) where
+module App (app, FallbackEnv(..), loadFallbackEnv) where
 
 import Network.Wai (Application, Response, responseLBS, pathInfo)
 import Network.HTTP.Types (status200, status404)
@@ -9,6 +9,7 @@ import Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.String (renderHtml)
 import Data.Text.Encoding (encodeUtf8)
 import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString as BS
 import Data.List (isSuffixOf)
@@ -18,6 +19,8 @@ import Components.Footer (Footer(..), mkFooter, renderFooter)
 import Views (renderHomePage)
 import Models (generateOptimizedWallpaper, createBackgroundSystem, getBackgroundPriority, generateBackgroundFallback, BackgroundType(..))
 import Lib (SiteSection(..))
+import Data.IORef (IORef, newIORef, atomicModifyIORef')
+import Control.Monad (when)
 
 -- Helper function to parse query string
 parseQueryString :: String -> [(String, String)]
@@ -28,13 +31,67 @@ parseQueryString query =
 
 -- Fallback background functions moved to Models.hs for better organization
 
+-- Simple environment for fallback content, cached at startup
+data FallbackEnv = FallbackEnv
+    { fallbackDefinitions :: [T.Text]
+    , rrIndexRef :: IORef Int
+    }
+
+-- Load definitions from psyop.txt once at startup
+loadFallbackEnv :: IO FallbackEnv
+loadFallbackEnv = do
+    fileExists <- doesFileExist "psyop.txt"
+    defs <- if fileExists
+        then do
+            content <- TIO.readFile "psyop.txt"
+            let rawLines = T.lines content
+                cleaned  = Prelude.map extractDefinitionT rawLines
+                nonEmpty = Prelude.filter (not . T.null . T.strip) cleaned
+            pure (if null nonEmpty then [defaultDefinition] else nonEmpty)
+        else pure [defaultDefinition]
+    idxRef <- newIORef 0
+    pure FallbackEnv { fallbackDefinitions = defs, rrIndexRef = idxRef }
+
+-- Get next definition via round-robin
+nextDefinition :: FallbackEnv -> IO T.Text
+nextDefinition env = do
+    let defs = fallbackDefinitions env
+        n    = length defs
+    if n <= 1
+        then pure (Prelude.head defs)
+        else do
+            i <- atomicModifyIORef' (rrIndexRef env) (\i -> let j = (i + 1) `mod` n in (j, j))
+            pure (defs !! i)
+
+-- Extract definition part after the first ':' if present
+extractDefinitionT :: T.Text -> T.Text
+extractDefinitionT line =
+    case T.breakOn ":" line of
+        (before, rest) -> if T.null rest
+            then T.strip line
+            else T.strip (T.drop 1 rest) -- drop the ':'
+
+defaultDefinition :: T.Text
+defaultDefinition = "Psychological Operation - Military operation designed to influence emotions, attitudes, and behavior of target audiences to support national objectives."
+
 -- WAI application serving enhanced MenuBar with mobile support
-app :: Application
-app request respond = do
+app :: FallbackEnv -> Application
+app env request respond = do
     let path = pathInfo request
     case path of
         -- Main route - serve enhanced MenuBar
         [] -> respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
+
+        -- Fallback minimal routes (unconditional)
+        ["index.html"] -> do
+            html <- renderFallbackPage env
+            respond $ waiResponse (htmlResponse html)
+        ["lite"] -> do
+            html <- renderFallbackPage env
+            respond $ waiResponse (htmlResponse html)
+        ["lite.html"] -> do
+            html <- renderFallbackPage env
+            respond $ waiResponse (htmlResponse html)
         
                 -- Intelligent background system route
         ["generate-background"] -> do
@@ -83,6 +140,45 @@ app request respond = do
         -- 404 for unmatched routes
         _ -> respond $ responseLBS status404 [("Content-Type", "text/html")] 
             "<html><body><h1>404 - Page Not Found</h1><p><a href='/'>Return to Home</a></p></body></html>"
+
+-- Render the minimal fallback page (black background, logo, lite edition, links, bio, randomized definition)
+renderFallbackPage :: FallbackEnv -> IO Html
+renderFallbackPage env = do
+    defn <- nextDefinition env
+    pure $ H.docTypeHtml $ do
+        H.head $ do
+            H.meta ! A.charset "UTF-8"
+            H.meta ! A.name "viewport" ! A.content "width=device-width, initial-scale=1.0"
+            H.title "PSYOP - Lite"
+            -- Minimal inline CSS for black background and centered column
+            H.style ! A.type_ "text/css" $ H.toHtml (T.unlines
+                [ "html, body { margin:0; padding:0; background:#000; color:#f5f5dc; font-family: Arial, sans-serif; }"
+                , ".container { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1rem; padding:2rem; text-align:center; }"
+                , ".logo { max-width: 300px; width: 80%; height: auto; border: 2px solid #f5f5dc; box-shadow: 0 8px 32px rgba(245,245,220,0.2); }"
+                , ".subtitle { font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }"
+                , ".links { display:flex; flex-direction:column; gap:0.5rem; }"
+                , ".links a { color:#f5f5dc; text-decoration:none; border-bottom:1px solid rgba(245,245,220,0.3); padding-bottom:2px; }"
+                , ".links a:hover { color:#ff6347; border-bottom-color:#ff6347; }"
+                , ".bio { max-width: 600px; }"
+                , ".definition { max-width: 600px; font-style: italic; color:#e6e6cc; }"
+                ])
+        H.body $ do
+            H.div ! A.class_ "container" $ do
+                H.img ! A.class_ "logo" ! A.src "/assets/graphics/white/promo_1.jpg" ! A.alt "PSYOP"
+                H.div ! A.class_ "subtitle" $ "lite edition"
+                H.div ! A.class_ "links" $ do
+                    H.a ! A.href "https://instagram.com/psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Instagram"
+                    H.a ! A.href "https://tiktok.com/@psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "TikTok"
+                    H.a ! A.href "https://open.spotify.com/artist/psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Spotify"
+                    H.a ! A.href "https://youtube.com/@psyop" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "YouTube"
+                    H.a ! A.href "https://distrokid.com/hyperfollow/psyop-moonlight-paradox" ! A.target "_blank" ! A.rel "noopener noreferrer" $ "Music Link"
+                H.div ! A.class_ "bio" $ do
+                    H.p $ do
+                        H.em "Psyop"
+                        " (ˈsaɪ.ɑp) is a 4 piece Metal Machine from Toronto, Canada."
+                    H.p "Rooted in nu-metal foundations with addictive hooks and ruthless breakdowns."
+                    H.p "Psyop is James, Max, Miles and Willy."
+                H.div ! A.class_ "definition" $ H.toHtml defn
 
 -- Render enhanced MenuBar with proper HTML structure
 renderEnhancedMenuBar :: MenuBar -> Html
