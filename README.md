@@ -1,7 +1,7 @@
 ### LLM Review Instructions
 ```yaml
 llm_review:
-  goal: "Take over development on the fallback branch via SSH; read private/docs and continue tests/deploy"
+  goal: "Maintain and develop the live production website branch"
   scope:
     - path: "Private/docs/TRD.yaml"
     - path: "Private/docs/fallback-server-implementation.yaml"
@@ -17,7 +17,7 @@ llm_review:
     ssh: true
     server: "psyop.ca host (Ubuntu, systemd)"
     cwd: "/opt/psyop/psyop.ca"
-    branch: "shahzebqazi/fallback"
+    branch: "main (live deployment)"
     notes:
       - "Use Host header with 127.0.0.1 for local HTTPS curls"
       - "After stack build, run setcap on /opt/psyop/bin/psyop-website-exe"
@@ -25,12 +25,12 @@ llm_review:
   update_readme_logs:
     worklog:
       enabled: true
-      location: "private/docs/WORKLOG.log"
+      location: "Private/docs/WORKLOG.log"
       format: "- DD-MM-YYYY hh:mm:ss : entry (UTC)"
       order: "newest_first"
     changelog:
       enabled: true
-      location: "private/docs/CHANGELOG.log"
+      location: "Private/docs/CHANGELOG.log"
       format: "### DD-MM-YYYY hh:mm:ss — summary"
       order: "newest_first"
   rules:
@@ -41,13 +41,12 @@ llm_review:
 
 # Psyop - Website
 
-> Note: Fallback branch only — not merging to `main`. This branch must contain only the minimal fallback website. All production front-end code (enhanced UI/components/assets not required for the fallback) should be removed or kept disabled. The canonical production site should not be built from this branch.
+> **🚀 LIVE DEPLOYMENT BRANCH** — This is now the main production branch that serves psyop.ca live. All production functionality, enhanced UI components, and assets are included and actively maintained.
 
-A modern, responsive website for the metal band PSYOP, built with Haskell featuring a component-based architecture and tomato red accent styling. **✅ All critical functionality has been restored and the website is now fully operational.**
+A modern, responsive website for the metal band PSYOP, built with Haskell featuring a component-based architecture, WebGL-powered dynamic backgrounds, and comprehensive fallback systems. **✅ Fully operational and serving live at psyop.ca**
 
 ## 📚 Documentation
-See `Docs/overview.md` for detailed documentation moved from this README.
-Environment variables are documented in the [Environment Variables](#-environment-variables) section below.
+See `Private/Docs/overview.md` for detailed documentation. Environment variables are documented in the [Environment Variables](#-environment-variables) section below.
 
 ## 🔧 Environment Variables
 
@@ -56,16 +55,16 @@ The following environment variables can be configured for the Psyop website. Cop
 ### Server Configuration
 ```bash
 # Environment
-ENVIRONMENT=development
+ENVIRONMENT=production
 
 # Server settings
-PORT=8080
-HTTPS_ENABLE=false
+PORT=443
+HTTPS_ENABLE=true
 WWW_CANONICAL=true
-REDIRECT_HTTPS=false
-CERT_FILE=
-KEY_FILE=
-SERVER_HOST=localhost
+REDIRECT_HTTPS=true
+CERT_FILE=/etc/ssl/certs/psyop.crt
+KEY_FILE=/etc/ssl/private/psyop.key
+SERVER_HOST=psyop.ca
 ```
 
 ### Security & Admin
@@ -76,25 +75,25 @@ ADMIN_USERNAME=admin
 
 # Security
 SESSION_SECRET=your_session_secret_here
-CORS_ORIGINS=http://localhost:8080,https://psyop.ca
+CORS_ORIGINS=https://psyop.ca,https://www.psyop.ca
 ```
 
 ### Development & Logging
 ```bash
 # Development
-HOT_RELOAD_ENABLED=true
-DEBUG_MODE=true
+HOT_RELOAD_ENABLED=false
+DEBUG_MODE=false
 
 # Logging
-LOG_LEVEL=debug
-LOG_FILE=./logs/psyop.log
+LOG_LEVEL=info
+LOG_FILE=/var/log/psyop/server.log
 ```
 
 ### Asset Configuration
 ```bash
 # Assets
 ASSET_CDN_URL=
-ASSET_LOCAL_PATH=./assets
+ASSET_LOCAL_PATH=./Private/Assets
 ```
 
 ### Future Extensions (commented out)
@@ -135,7 +134,7 @@ stack run
 stack build
 
 # Run with hot-reload development server
-./Private/dev/hot-reload.sh
+./Private/Dev/hot-reload.sh
 
 # Start server manually
 stack run
@@ -144,13 +143,25 @@ stack run
 stack clean
 ```
 
+### Production Deployment
+```bash
+# Deploy to production server
+./Private/Dev/deploy.sh
+
+# Check service status
+systemctl status psyop-website.service
+
+# View logs
+journalctl -u psyop-website.service -f
+```
+
 ## 📦 Changelog
 
-See `Docs/CHANGELOG.log` for the full, timestamped changelog.
+See `Private/Docs/CHANGELOG.log` for the full, timestamped changelog.
 
 ## 🧰 Worklog
 
-See `Docs/WORKLOG.log` for the full, timestamped worklog.
+See `Private/Docs/WORKLOG.log` for the full, timestamped worklog.
 
 ## 📄 License
 
@@ -169,6 +180,6 @@ Psyop is a metal band focused on creating powerful, atmospheric music. The websi
 
 ---
 
-**⚠️ WARNING: This branch is fallback-only and intentionally strips production front-end code. Do not use for production builds of the full site.**
+**✅ This is the live production branch serving psyop.ca. All production features are included and actively maintained.**
 
 **Built with ❤️ and Haskell**
