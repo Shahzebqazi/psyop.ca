@@ -38,25 +38,10 @@ app request respond = do
         
                 -- Intelligent background system route
         ["generate-background"] -> do
-            let seed = 0  -- For now, use fixed seed for testing
-            let bgSystem = createBackgroundSystem
-            let priorities = getBackgroundPriority bgSystem
-            
-            -- Try to generate the highest priority background
-            case priorities of
-                (WebGLBackground:_) -> do
-                    background <- generateBackgroundFallback WebGLBackground seed
-                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack background
-                (AsciiWallpaper:_) -> do
-                    background <- generateBackgroundFallback AsciiWallpaper seed
-                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack background
-                (GradientFallback:_) -> do
-                    background <- generateBackgroundFallback GradientFallback seed
-                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack background
-                _ -> do
-                    -- Ultimate fallback
-                    let fallback = "<div class=\"ultimate-fallback\" style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000000; z-index: 1;\"></div>"
-                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack fallback
+            -- Fallback site: force gradient background only (no WebGL/ASCII)
+            let seed = 0
+            background <- generateBackgroundFallback GradientFallback seed
+            respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack background
         
         -- Legacy ASCII wallpaper generation route (for backward compatibility)
         ["generate-wallpaper"] -> do

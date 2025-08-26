@@ -19,6 +19,37 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     LICENSE
+    assets/graphics/white/promo_1.jpg
+    assets/graphics/white/promo_10.jpg
+    assets/graphics/white/promo_11.jpg
+    assets/graphics/white/promo_12.jpg
+    assets/graphics/white/promo_2.jpg
+    assets/graphics/white/promo_3.jpg
+    assets/graphics/white/promo_4.jpg
+    assets/graphics/white/promo_5.jpg
+    assets/graphics/white/promo_6.jpg
+    assets/graphics/white/promo_7.jpg
+    assets/graphics/white/promo_7.kra
+    assets/graphics/white/promo_7.png
+    assets/graphics/white/promo_8.jpg
+    assets/graphics/white/promo_9.jpg
+    assets/graphics/red_white/promo_1.jpg
+    assets/graphics/red_white/promo_2.jpg
+    assets/graphics/red_white/promo_3.jpg
+    assets/graphics/red_white/promo_4.jpg
+    assets/graphics/red_white/promo_5.jpg
+    assets/graphics/red_white/promo_6.jpg
+    assets/webdev/icons/streaming/anghami.svg
+    assets/webdev/icons/streaming/apple-music.svg
+    assets/webdev/icons/streaming/bandcamp.svg
+    assets/webdev/icons/streaming/distrokid.svg
+    assets/webdev/icons/streaming/email.svg
+    assets/webdev/icons/streaming/instagram.svg
+    assets/webdev/icons/streaming/soundcloud.svg
+    assets/webdev/icons/streaming/spotify.svg
+    assets/webdev/icons/streaming/tiktok.svg
+    assets/webdev/icons/streaming/youtube-music.svg
+    assets/webdev/icons/streaming/youtube.svg
 
 source-repository head
   type: git
@@ -58,15 +89,8 @@ library
 executable psyop-website-exe
   main-is: Main.hs
   other-modules:
-      App
-      Lib
-      Models
-      Views
       Components.MenuBar
       Components.Footer
-      Paths_psyop_website
-  autogen-modules:
-      Paths_psyop_website
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
