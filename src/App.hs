@@ -4,7 +4,7 @@
 
 module App (app, FallbackEnv(..), loadFallbackEnv) where
 
-import Network.Wai (Application, Response, responseLBS, pathInfo, requestHeaders, isSecure, rawPathInfo, rawQueryString, queryString)
+import Network.Wai (Application, Response, Request, responseLBS, pathInfo, requestHeaders, isSecure, rawPathInfo, rawQueryString, queryString)
 import qualified Network.Wai as Wai
 import Network.HTTP.Types (status200, status404, status308)
 import Text.Blaze.Html5 as H
@@ -165,7 +165,7 @@ app env request respond = do
     let httpsRedirectEnabled = maybe False truthy redirectConfigured
         wwwCanonicalEnabled  = maybe False truthy canonicalConfigured
         secure               = isSecure request
-        hostHeader           = lookup "Host" (requestHeaders request)
+        hostHeader           = getHostHeader (requestHeaders request)
         pathBs               = rawPathInfo request
         queryBs              = rawQueryString request
         pathAndQuery         = B8.unpack pathBs ++ B8.unpack queryBs
@@ -179,8 +179,8 @@ app env request respond = do
     case maybeRedirect of
         Just loc -> respond $ responseLBS status308 [("Location", loc)] ""
         Nothing -> do
-            let path = pathInfo request
-    case path of
+            let pathSegs = pathInfo request
+            case pathSegs of
         -- Main route - dynamic decision
         [] -> do
             useFallback <- shouldServeFallback request
@@ -280,9 +280,9 @@ renderFallbackPage env = do
             -- SEO Meta
             H.meta ! A.name "description" ! A.content (toValue (shortDescription (siteBio s)))
             H.link ! A.rel "canonical" ! A.href "https://www.psyop.ca/"
-            H.meta ! A.customAttribute "property" "og:title" ! A.content (toValue (siteName s))
-            H.meta ! A.customAttribute "property" "og:description" ! A.content (toValue (shortDescription (siteBio s)))
-            H.meta ! A.customAttribute "property" "og:image" ! A.content (toValue (absoluteImageURL (siteHeroImage s)))
+            H.meta ! H.customAttribute "property" "og:title" ! A.content (toValue (siteName s))
+            H.meta ! H.customAttribute "property" "og:description" ! A.content (toValue (shortDescription (siteBio s)))
+            H.meta ! H.customAttribute "property" "og:image" ! A.content (toValue (absoluteImageURL (siteHeroImage s)))
             -- Minimal inline CSS for black background and centered column
             H.style ! A.type_ "text/css" $ H.toHtml (T.unlines
                 [ "html, body { margin:0; padding:0; background:#000; color:#f5f5dc; font-family: Arial, sans-serif; }"
@@ -333,7 +333,7 @@ serveTextFile filePath contentType = do
         else return $ responseLBS status404 [("Content-Type", "text/plain")] "Not Found"
 
 -- Fallback decision logic
-shouldServeFallback :: Network.Wai.Request -> IO Bool
+shouldServeFallback :: Request -> IO Bool
 shouldServeFallback req = do
     envSwitch <- lookupEnv "FALLBACK_MODE"
     let headerSwitch = lookup "X-Fallback-Mode" (requestHeaders req)
@@ -345,26 +345,26 @@ shouldServeFallback req = do
     pure (envTrue || headerTrue || querySwitch || bot || oldMobile)
 
 truthy :: String -> Bool
-truthy s = let ls = map toLower s in ls == "1" || ls == "true" || ls == "yes"
+truthy s = let ls = Prelude.map toLower s in ls == "1" || ls == "true" || ls == "yes"
 
 toLowerStr :: String -> String
-toLowerStr = map toLower
+toLowerStr = Prelude.map toLower
 
 toLowerChar :: Char -> Char
 toLowerChar = toLower
 
-queryParamTrue' :: BS.ByteString -> Network.Wai.Request -> Bool
+queryParamTrue' :: BS.ByteString -> Request -> Bool
 queryParamTrue' key req =
     let qs = Network.Wai.queryString req
     in any (\(k,v) -> k == key && maybe False (\x -> let t = B8.map toLowerChar x in t == "1" || t == "true") v) qs
 
-isBotUserAgent :: Network.Wai.Request -> Bool
+isBotUserAgent :: Request -> Bool
 isBotUserAgent req =
     let ua = fmap (B8.map toLowerChar) (lookup "User-Agent" (requestHeaders req))
         bots = ["googlebot","bingbot","duckduckbot","yandexbot","baiduspider","ahrefsbot","semrushbot","petalbot"]
     in maybe False (\u -> any (`B8.isInfixOf` u) bots) ua
 
-isOldMobile :: Network.Wai.Request -> Bool
+isOldMobile :: Request -> Bool
 isOldMobile req =
     let ua = fmap (B8.map toLowerChar) (lookup "User-Agent" (requestHeaders req))
         needles = ["nokia","blackberry","msie 6","msie 7","android 4."]
@@ -381,6 +381,12 @@ headDef _ (x:_) = x
 
 absoluteImageURL :: T.Text -> T.Text
 absoluteImageURL rel = if "/" `T.isPrefixOf` rel then T.concat ["https://www.psyop.ca", rel] else T.concat ["https://www.psyop.ca/", rel]
+
+-- Extract Host or :authority header (HTTP/2)
+getHostHeader :: [ (BS.ByteString, BS.ByteString) ] -> Maybe BS.ByteString
+getHostHeader hdrs = case lookup "Host" hdrs of
+    Just h  -> Just h
+    Nothing -> lookup ":authority" hdrs
 
 -- Render enhanced MenuBar with proper HTML structure
 renderEnhancedMenuBar :: MenuBar -> Html
