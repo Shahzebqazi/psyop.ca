@@ -1,0 +1,30 @@
+[Unit]
+Description=PSYOP Git Monitor - Real-Time Deployment
+After=network.target psyop-website.service
+Wants=psyop-website.service
+
+[Service]
+Type=simple
+User=psyop
+Group=psyop
+WorkingDirectory=/opt/psyop/psyop.ca
+Environment=CHECK_INTERVAL=30
+Environment=BRANCH=main
+Environment=GIT_REMOTE=origin
+Environment=APP_DIR=/opt/psyop
+Environment=SERVICE_NAME=psyop-website
+ExecStart=/opt/psyop/psyop.ca/Private/Dev/monitor-git.sh
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/psyop/git-monitor.log
+StandardError=append:/var/log/psyop/git-monitor.log
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/psyop /var/log/psyop
+
+[Install]
+WantedBy=multi-user.target
