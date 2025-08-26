@@ -1,405 +1,355 @@
-/* ===== PSYOP RESPONSIVE STYLESHEET ===== */
-/* Media queries and responsive design rules */
+/* PSYOP Website - Responsive CSS */
+/* Mobile and tablet specific styles */
 
-/* ===== MOBILE FIRST APPROACH ===== */
-
-/* Extra small devices (phones, 320px and down) */
-@media (max-width: 480px) {
-    .hero-section h1 {
-        font-size: 2.5em;
+/* Tablet Styles (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .header-container {
+        padding: 0 1.5rem;
     }
-
-    .hero-section p {
-        font-size: 1.1em;
+    
+    .page {
+        padding: 3rem 1.5rem;
     }
-
-    .polaroid-stack {
-        width: 300px;
-        height: 300px;
+    
+    .hero-title {
+        font-size: 3rem;
     }
-
-    .polaroid-frame {
-        width: 250px;
-        padding: 12px 12px 25px 12px;
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
     }
-
-    .polaroid-frame img {
-        height: 150px;
+    
+    .page h1 {
+        font-size: 2.5rem;
     }
-
-    .nav-arrow {
-        width: 35px;
-        height: 35px;
-        font-size: 18px;
+    
+    .cta-buttons {
+        gap: 1.5rem;
     }
-
-    .nav-left {
-        left: -50px;
-    }
-
-    .nav-right {
-        right: -50px;
-    }
-
-    .track-item {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-        padding: 20px;
-    }
-
-    .track-artwork {
-        width: 80px;
-        height: 80px;
-    }
-
-    .track-info h3 {
-        font-size: 1.5em;
-    }
-
-    .links-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 0 15px;
-    }
-
-    .link-category {
-        padding: 15px;
-    }
-
-    .link-category h2 {
-        font-size: 1.5em;
-    }
-}
-
-/* Small devices (landscape phones, 576px and down) */
-@media (max-width: 576px) {
-    .main-nav {
-        padding: 10px 0;
-    }
-
-    .nav-container {
-        padding: 0 15px;
-    }
-
-    .brand-logo {
-        font-size: 1.5em;
-    }
-
-    .nav-links {
-        gap: 15px;
-    }
-
-    .nav-link {
-        font-size: 1em;
-        padding: 6px 12px;
-    }
-
-    .page-content {
-        padding: 20px 15px;
-    }
-
+    
     .footer-content {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        padding: 0 15px;
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* Medium devices (tablets, 768px and down) */
-@media (max-width: 768px) {
-    .hero-section h1 {
-        font-size: 3em;
+/* Mobile Styles (max-width: 767px) */
+@media (max-width: 767px) {
+    /* Header adjustments */
+    .header-container {
+        padding: 0 1rem;
+        height: 70px;
     }
-
-    .polaroid-stack {
-        width: 350px;
-        height: 350px;
+    
+    .brand-text {
+        font-size: 1.8rem;
     }
-
-    .polaroid-frame {
-        width: 280px;
-        padding: 15px 15px 30px 15px;
+    
+    .brand-subtitle {
+        font-size: 0.7rem;
     }
-
-    .polaroid-frame img {
-        height: 180px;
+    
+    /* Navigation */
+    .nav-desktop {
+        display: none;
     }
-
-    .nav-arrow {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+    
+    .mobile-menu-btn {
+        display: flex;
     }
-
-    .nav-left {
-        left: -60px;
+    
+    .mobile-menu {
+        display: block;
+        top: 70px;
     }
-
-    .nav-right {
-        right: -60px;
-    }
-
-    .track-item {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-        padding: 25px;
-    }
-
-    .track-artwork {
-        width: 100px;
-        height: 100px;
-    }
-
-    .track-info h3 {
-        font-size: 1.8em;
-    }
-
-    .links-grid {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        padding: 0 20px;
-    }
-
-    .link-category {
-        padding: 20px;
-    }
-
-    .link-category h2 {
-        font-size: 1.8em;
-    }
-
+    
+    /* Content adjustments */
     .main-content {
         padding-top: 70px;
     }
-
-    .main-header {
-        backdrop-filter: blur(15px);
-    }
-}
-
-/* Large devices (desktops, 992px and down) */
-@media (max-width: 992px) {
-    .page-content {
-        max-width: 100%;
-        padding: 30px 20px;
-    }
-
-    .music-tracks {
-        max-width: 100%;
-        padding: 15px;
-    }
-
-    .links-grid {
-        max-width: 100%;
-        gap: 30px;
-    }
-
-    .footer-content {
-        max-width: 100%;
-        gap: 30px;
-    }
-}
-
-/* ===== WIDESCREEN LAYOUTS ===== */
-
-/* Wide screens (landscape orientation) */
-@media (min-aspect-ratio: 1/1) {
+    
     .page {
-        flex-direction: row;
-        justify-content: flex-end;
-        align-items: stretch;
-        text-align: left;
-        padding: 0;
+        padding: 2rem 1rem;
     }
-
-    .page-content {
-        flex: 1;
-        background: transparent;
-        color: white;
-        padding: 60px 40px 40px 40px;
-        overflow-y: auto;
-        z-index: 2;
-        backdrop-filter: none;
+    
+    .page h1 {
+        font-size: 2rem;
+        margin-bottom: 0.8rem;
     }
-
-    .page h2 {
-        margin-bottom: 30px;
-        text-align: left;
-        color: white;
-        font-size: 2.5em;
+    
+    .page-description {
+        font-size: 1rem;
+        margin-bottom: 2rem;
     }
-
-    .page h3 {
-        margin-top: 30px;
-        margin-bottom: 20px;
-        text-align: left;
-        color: white;
-        font-size: 1.8em;
+    
+    /* Hero section */
+    .hero-section {
+        margin-bottom: 3rem;
     }
-
-    .page p {
-        color: white;
-        font-size: 1.1em;
-        line-height: 1.6;
-        margin-bottom: 20px;
+    
+    .hero-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.8rem;
     }
-
-    .page ul {
-        text-align: left;
-        margin: 20px 0;
-        color: white;
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
     }
-
-    .page li {
-        margin-bottom: 15px;
-        text-align: left;
-        color: white;
-        font-size: 1.0em;
-        line-height: 1.5;
+    
+    .hero-description {
+        font-size: 1rem;
     }
-
-    .page strong {
-        color: white;
+    
+    /* Bio section */
+    .bio-section {
+        margin-bottom: 3rem;
     }
-
-    /* Ensure polaroid captions are visible in widescreen */
-    .polaroid-caption {
-        color: #333 !important;
-        background: rgba(255, 255, 255, 0.95) !important;
-        text-shadow: none !important;
+    
+    .bio-section h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
     }
-
-    /* Ensure music track info is visible */
-    .track-info h3 {
-        color: white !important;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8) !important;
+    
+    .bio-content p {
+        font-size: 1rem;
+        margin-bottom: 1rem;
     }
-
-    .track-status {
-        color: white !important;
-        text-shadow: 0 1px 5px rgba(0, 0, 0, 0.8) !important;
+    
+    /* CTA section */
+    .cta-section {
+        margin-bottom: 3rem;
     }
-}
-
-/* Extra wide screens (ultra-wide monitors) */
-@media (min-width: 1400px) {
-    .page-content {
-        max-width: 1400px;
-        margin: 0 auto;
+    
+    .cta-section h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
     }
-
-    .music-tracks {
-        max-width: 1000px;
+    
+    .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
     }
-
-    .links-grid {
-        max-width: 1200px;
+    
+    .cta-button {
+        width: 100%;
+        max-width: 300px;
+        text-align: center;
     }
-
+    
+    /* Footer */
+    .footer {
+        padding: 2rem 0 1rem;
+        margin-top: 3rem;
+    }
+    
+    .footer-container {
+        padding: 0 1rem;
+    }
+    
     .footer-content {
-        max-width: 1400px;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .footer-section h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .footer-bottom {
+        padding-top: 1.5rem;
     }
 }
 
-/* ===== PRINT STYLES ===== */
-@media print {
+/* Small Mobile Styles (max-width: 480px) */
+@media (max-width: 480px) {
+    .header-container {
+        padding: 0 0.8rem;
+        height: 65px;
+    }
+    
+    .brand-text {
+        font-size: 1.5rem;
+    }
+    
+    .brand-subtitle {
+        font-size: 0.6rem;
+    }
+    
+    .mobile-menu {
+        top: 65px;
+    }
+    
+    .main-content {
+        padding-top: 65px;
+    }
+    
+    .page {
+        padding: 1.5rem 0.8rem;
+    }
+    
+    .page h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-description {
+        font-size: 0.9rem;
+    }
+    
+    .bio-section h2 {
+        font-size: 1.3rem;
+    }
+    
+    .bio-content p {
+        font-size: 0.9rem;
+    }
+    
+    .cta-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .cta-button {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .footer {
+        padding: 1.5rem 0 1rem;
+    }
+    
+    .footer-content {
+        gap: 1rem;
+    }
+}
 
-    .main-header,
-    .main-footer,
-    .scroll-indicator,
-    .nav-arrow {
+/* Extra Small Mobile Styles (max-width: 360px) */
+@media (max-width: 360px) {
+    .header-container {
+        padding: 0 0.6rem;
+        height: 60px;
+    }
+    
+    .brand-text {
+        font-size: 1.3rem;
+    }
+    
+    .brand-subtitle {
+        font-size: 0.5rem;
+    }
+    
+    .mobile-menu {
+        top: 60px;
+    }
+    
+    .main-content {
+        padding-top: 60px;
+    }
+    
+    .page {
+        padding: 1rem 0.6rem;
+    }
+    
+    .page h1 {
+        font-size: 1.6rem;
+    }
+    
+    .hero-title {
+        font-size: 1.8rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .hero-description {
+        font-size: 0.8rem;
+    }
+    
+    .cta-button {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Landscape Mobile Styles */
+@media (max-height: 500px) and (orientation: landscape) {
+    .header-container {
+        height: 60px;
+    }
+    
+    .mobile-menu {
+        top: 60px;
+    }
+    
+    .main-content {
+        padding-top: 60px;
+    }
+    
+    .page {
+        padding: 1.5rem 1rem;
+    }
+    
+    .hero-section {
+        margin-bottom: 2rem;
+    }
+    
+    .bio-section {
+        margin-bottom: 2rem;
+    }
+    
+    .cta-section {
+        margin-bottom: 2rem;
+    }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .webgl-canvas {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .header,
+    .mobile-menu,
+    .webgl-canvas {
         display: none !important;
     }
-
+    
+    .main-content {
+        padding-top: 0;
+    }
+    
     .page {
-        min-height: auto;
-        padding: 20px;
+        padding: 1rem 0;
     }
-
-    .page-content {
-        padding: 0;
+    
+    body {
+        background: white !important;
+        color: black !important;
     }
-
-    .polaroid-frame {
-        transform: none !important;
-        box-shadow: none !important;
-        border: 1px solid #ccc;
+    
+    .hero-title {
+        background: none !important;
+        -webkit-text-fill-color: black !important;
+        color: black !important;
     }
-
-    .track-item {
-        break-inside: avoid;
-        margin-bottom: 20px;
-    }
-
-    * {
-        color: #000 !important;
-        background: #fff !important;
-    }
-}
-
-/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    .polaroid-frame {
-        border: 2px solid #000;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-    }
-
-    .nav-arrow {
-        border: 2px solid #fff;
-        background: #000;
-    }
-
-    .track-link {
-        border: 2px solid #fff;
-    }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-
-    .scroll-arrow {
-        animation: none;
-    }
-
-    .polaroid-frame:hover {
-        transform: none;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .polaroid-frame {
-        background: #1a1a1a;
-        color: #fff;
-    }
-
-    .polaroid-caption {
-        background: rgba(26, 26, 26, 0.95);
-        color: #fff;
-    }
-}
-
-/* Light mode support */
-@media (prefers-color-scheme: light) {
-    .polaroid-frame {
-        background: #fff;
-        color: #333;
-    }
-
-    .polaroid-caption {
-        background: rgba(255, 255, 255, 0.95);
-        color: #333;
+    
+    .cta-button {
+        border: 1px solid black !important;
+        background: white !important;
+        color: black !important;
     }
 }
