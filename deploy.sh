@@ -66,20 +66,28 @@ ssh ${REMOTE_USER}@${REMOTE_HOST} bash -s <<'REMOTE_SERVICE'
 set -euo pipefail
 cat >/etc/systemd/system/psyop-website.service <<SERVICE
 [Unit]
-Description=PSYOP Website (Haskell WAI/Warp)
+Description=PSYOP Website (Warp TLS)
 After=network.target
 
 [Service]
 User=psyop
 Group=psyop
 WorkingDirectory=/opt/psyop
-Environment=PORT=8080
+Environment=PORT=443
 Environment=ENVIRONMENT=production
+Environment=HTTPS_ENABLE=true
+Environment=WWW_CANONICAL=true
+Environment=REDIRECT_HTTPS=false
+Environment=CERT_FILE=/etc/ssl/certs/psyop.crt
+Environment=KEY_FILE=/etc/ssl/private/psyop.key
 ExecStart=/opt/psyop/bin/psyop-website-exe
 Restart=on-failure
 RestartSec=5
 StandardOutput=append:/var/log/psyop/server.log
 StandardError=append:/var/log/psyop/server.log
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
 
 [Install]
 WantedBy=multi-user.target
@@ -90,6 +98,52 @@ systemctl enable psyop-website.service
 systemctl restart psyop-website.service
 systemctl status --no-pager psyop-website.service || true
 REMOTE_SERVICE
+
+echo "Setting cap_net_bind_service on binary for privileged ports"
+ssh ${REMOTE_USER}@${REMOTE_HOST} bash -s <<'REMOTE_SETCAP'
+set -euo pipefail
+if command -v setcap >/dev/null 2>&1; then
+  setcap 'cap_net_bind_service=+ep' /opt/psyop/bin/psyop-website-exe || true
+fi
+REMOTE_SETCAP
+
+if [[ "${INSTALL_HTTP_REDIRECT:-false}" == "true" ]]; then
+  echo "Installing HTTP->HTTPS redirect unit on port 80"
+  ssh ${REMOTE_USER}@${REMOTE_HOST} bash -s <<'REDIRECT_UNIT'
+set -euo pipefail
+cat >/etc/systemd/system/psyop-website-redirect.service <<SERVICE
+[Unit]
+Description=PSYOP HTTP Redirect (Warp)
+After=network.target
+
+[Service]
+User=psyop
+Group=psyop
+WorkingDirectory=/opt/psyop
+Environment=PORT=80
+Environment=ENVIRONMENT=production
+Environment=HTTPS_ENABLE=false
+Environment=REDIRECT_HTTPS=true
+Environment=WWW_CANONICAL=true
+ExecStart=/opt/psyop/bin/psyop-website-exe
+Restart=on-failure
+RestartSec=3
+StandardOutput=append:/var/log/psyop/server.log
+StandardError=append:/var/log/psyop/server.log
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+systemctl daemon-reload
+systemctl enable psyop-website-redirect.service
+systemctl restart psyop-website-redirect.service
+systemctl status --no-pager psyop-website-redirect.service || true
+REDIRECT_UNIT
+fi
 
 echo "Running remote smoke tests"
 HOST=http://${REMOTE_HOST}:8080 bash -c '"$(dirname "$0")"/private/dev/smoke-tests.sh'

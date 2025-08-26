@@ -32,6 +32,8 @@ llm_review:
 
 # Psyop - Website
 
+> Note: Fallback branch only — not merging to `main`. This branch must contain only the minimal fallback website. All production front-end code (enhanced UI/components/assets not required for the fallback) should be removed or kept disabled. The canonical production site should not be built from this branch.
+
 A modern, responsive website for the metal band PSYOP, built with Haskell featuring a component-based architecture and tomato red accent styling. **✅ All critical functionality has been restored and the website is now fully operational.**
 
 ## 📚 Documentation
@@ -104,6 +106,6 @@ PSYOP is a metal band focused on creating powerful, atmospheric music. The websi
 
 ---
 
-**⚠️ WARNING: This website currently has critical functionality issues that need immediate attention before it can be considered production-ready.**
+**⚠️ WARNING: This branch is fallback-only and intentionally strips production front-end code. Do not use for production builds of the full site.**
 
 **Built with ❤️ and Haskell**

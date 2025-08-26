@@ -29,6 +29,7 @@ dependencies:
 - text
 - bytestring
 - http-types
+- case-insensitive
 - filepath
 - directory
 - time

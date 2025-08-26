@@ -5,6 +5,8 @@
 module App (app, FallbackEnv(..), loadFallbackEnv) where
 
 import Network.Wai (Application, Response, Request, responseLBS, pathInfo, requestHeaders, isSecure, rawPathInfo, rawQueryString, queryString)
+import Network.HTTP.Types (RequestHeaders)
+import qualified Data.CaseInsensitive as CI
 import qualified Network.Wai as Wai
 import Network.HTTP.Types (status200, status404, status308)
 import Text.Blaze.Html5 as H
@@ -168,104 +170,115 @@ app env request respond = do
         hostHeader           = getHostHeader (requestHeaders request)
         pathBs               = rawPathInfo request
         queryBs              = rawQueryString request
-        pathAndQuery         = B8.unpack pathBs ++ B8.unpack queryBs
+        path                 = B8.unpack pathBs
+        pathAndQuery         = path ++ B8.unpack queryBs
         needsWww h           = toLowerStr h /= "www.psyop.ca"
-        maybeRedirect = case (hostHeader, httpsRedirectEnabled, wwwCanonicalEnabled) of
-            (Just h, _, True) | needsWww (B8.unpack h) -> Just (B8.pack ("https://www.psyop.ca" ++ pathAndQuery))
-            (Just h, True, _) | not secure ->
-                let targetHost = if wwwCanonicalEnabled then "www.psyop.ca" else B8.unpack h
-                in Just (B8.pack ("https://" ++ targetHost ++ pathAndQuery))
-            _ -> Nothing
+        isRedirectException  = path == "/health" || isAcmePath path
+        maybeRedirect = if isRedirectException
+            then Nothing
+            else case (hostHeader, httpsRedirectEnabled, wwwCanonicalEnabled) of
+                (Just h, _, True) | needsWww (B8.unpack h) -> Just (B8.pack ("https://www.psyop.ca" ++ pathAndQuery))
+                (Just h, True, _) | not secure ->
+                    let targetHost = if wwwCanonicalEnabled then "www.psyop.ca" else B8.unpack h
+                    in Just (B8.pack ("https://" ++ targetHost ++ pathAndQuery))
+                _ -> Nothing
     case maybeRedirect of
         Just loc -> respond $ responseLBS status308 [("Location", loc)] ""
         Nothing -> do
             let pathSegs = pathInfo request
             case pathSegs of
-        -- Main route - dynamic decision
-        [] -> do
-            useFallback <- shouldServeFallback request
-            if useFallback
-                then do
+                -- Main route - dynamic decision
+                [] -> do
+                    useFallback <- shouldServeFallback request
+                    if useFallback
+                        then do
+                            html <- renderFallbackPage env
+                            respond $ waiResponse (htmlResponse html)
+                        else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
+
+                ["index"] -> do
+                    useFallback <- shouldServeFallback request
+                    if useFallback
+                        then do
+                            html <- renderFallbackPage env
+                            respond $ waiResponse (htmlResponse html)
+                        else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
+
+                -- Access to the enhanced site (optional)
+                ["production"] -> respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
+
+                -- Fallback minimal routes (unconditional)
+                ["index.html"] -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
-                else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
-
-        ["index"] -> do
-            useFallback <- shouldServeFallback request
-            if useFallback
-                then do
+                ["lite"] -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
-                else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
-
-        -- Access to the enhanced site (optional)
-        ["production"] -> respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
-
-        -- Fallback minimal routes (unconditional)
-        ["index.html"] -> do
-            html <- renderFallbackPage env
-            respond $ waiResponse (htmlResponse html)
-        ["lite"] -> do
-            html <- renderFallbackPage env
-            respond $ waiResponse (htmlResponse html)
-        ["lite.html"] -> do
-            html <- renderFallbackPage env
-            respond $ waiResponse (htmlResponse html)
-        
+                ["lite.html"] -> do
+                    html <- renderFallbackPage env
+                    respond $ waiResponse (htmlResponse html)
+                
                 -- Intelligent background system route
-        ["generate-background"] -> do
-            -- Fallback site: force gradient background only (no WebGL/ASCII)
-            let seed = 0
-            background <- generateBackgroundFallback GradientFallback seed
-            respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack background
-        
-        -- Legacy ASCII wallpaper generation route (for backward compatibility)
-        ["generate-wallpaper"] -> do
-            let seed = 0  -- For now, use fixed seed for testing
-            wallpaper <- generateOptimizedWallpaper seed
-            respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack wallpaper
-        
-        -- CSS routes for responsive design
-        ["css", "style.css"] -> respond $ cssResponse serveMainCSS
-        ["css", "responsive.css"] -> respond $ cssResponse serveResponsiveCSS
-        ["css", "components.css"] -> respond $ cssResponse serveComponentsCSS
-        -- SEO files
-        ["robots.txt"] -> do
-            response <- serveTextFile "public/robots.txt" "text/plain"
-            respond response
-        ["sitemap.xml"] -> do
-            response <- serveTextFile "public/sitemap.xml" "application/xml"
-            respond response
-        
-        -- Static asset routes
-        ["assets", "album-covers", filename] -> do
-            let filePath = "assets/album-covers/" ++ T.unpack filename
-            response <- serveStaticFile filePath
-            respond response
-        
-        ["assets", "graphics", "white", filename] -> do
-            let filePath = "assets/graphics/white/" ++ T.unpack filename
-            response <- serveStaticFile filePath
-            respond response
-        
-        ["assets", "graphics", "red_white", filename] -> do
-            let filePath = "assets/graphics/red_white/" ++ T.unpack filename
-            response <- serveStaticFile filePath
-            respond response
-        
-        ["assets", "graphics", filename] -> do
-            let filePath = "assets/graphics/" ++ T.unpack filename
-            response <- serveStaticFile filePath
-            respond response
+                ["generate-background"] -> do
+                    -- Fallback site: force gradient background only (no WebGL/ASCII)
+                    let seed = 0
+                    background <- generateBackgroundFallback GradientFallback seed
+                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack background
+                
+                -- Legacy ASCII wallpaper generation route (for backward compatibility)
+                ["generate-wallpaper"] -> do
+                    let seed = 0  -- For now, use fixed seed for testing
+                    wallpaper <- generateOptimizedWallpaper seed
+                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack wallpaper
+                
+                -- CSS routes for responsive design
+                ["css", "style.css"] -> respond $ cssResponse serveMainCSS
+                ["css", "responsive.css"] -> respond $ cssResponse serveResponsiveCSS
+                ["css", "components.css"] -> respond $ cssResponse serveComponentsCSS
+                -- SEO files
+                ["robots.txt"] -> do
+                    response <- serveTextFile "public/robots.txt" "text/plain"
+                    respond response
+                ["sitemap.xml"] -> do
+                    response <- serveTextFile "public/sitemap.xml" "application/xml"
+                    respond response
 
-        ["assets", "icons", "streaming", filename] -> do
-            let filePath = "assets/webdev/icons/streaming/" ++ T.unpack filename
-            response <- serveStaticFile filePath
-            respond response
-        
-        -- 404 for unmatched routes
-        _ -> respond $ responseLBS status404 [("Content-Type", "text/html")] 
-            "<html><body><h1>404 - Page Not Found</h1><p><a href='/'>Return to Home</a></p></body></html>"
+                ["health"] -> do
+                    respond $ responseLBS status200 [("Content-Type", "text/plain")] "ok"
+                
+                -- Static asset routes
+                ["assets", "album-covers", filename] -> do
+                    let filePath = "assets/album-covers/" ++ T.unpack filename
+                    response <- serveStaticFile filePath
+                    respond response
+                
+                ["assets", "graphics", "white", filename] -> do
+                    let filePath = "assets/graphics/white/" ++ T.unpack filename
+                    response <- serveStaticFile filePath
+                    respond response
+                
+                ["assets", "graphics", "red_white", filename] -> do
+                    let filePath = "assets/graphics/red_white/" ++ T.unpack filename
+                    response <- serveStaticFile filePath
+                    respond response
+                
+                ["assets", "graphics", filename] -> do
+                    let filePath = "assets/graphics/" ++ T.unpack filename
+                    response <- serveStaticFile filePath
+                    respond response
+
+                ["assets", "icons", "streaming", filename] -> do
+                    let filePath = "assets/webdev/icons/streaming/" ++ T.unpack filename
+                    response <- serveStaticFile filePath
+                    respond response
+                
+                -- 404 for unmatched routes
+                _ -> respond $ responseLBS status404 [("Content-Type", "text/html")] 
+                    "<html><body><h1>404 - Page Not Found</h1><p><a href='/'>Return to Home</a></p></body></html>"
+
+-- ACME challenge exceptions for HTTP->HTTPS redirect
+isAcmePath :: String -> Bool
+isAcmePath p = "/.well-known/acme-challenge/" `isPrefixOf` p
 
 -- Render the minimal fallback page (black background, logo, lite edition, links, bio, randomized definition)
 renderFallbackPage :: FallbackEnv -> IO Html
@@ -336,7 +349,7 @@ serveTextFile filePath contentType = do
 shouldServeFallback :: Request -> IO Bool
 shouldServeFallback req = do
     envSwitch <- lookupEnv "FALLBACK_MODE"
-    let headerSwitch = lookup "X-Fallback-Mode" (requestHeaders req)
+    let headerSwitch = lookup (CI.mk (B8.pack "X-Fallback-Mode")) (requestHeaders req)
         querySwitch  = queryParamTrue' "fallback" req
         bot          = isBotUserAgent req
         oldMobile    = isOldMobile req
@@ -360,13 +373,13 @@ queryParamTrue' key req =
 
 isBotUserAgent :: Request -> Bool
 isBotUserAgent req =
-    let ua = fmap (B8.map toLowerChar) (lookup "User-Agent" (requestHeaders req))
+    let ua = fmap (B8.map toLowerChar) (lookup (CI.mk (B8.pack "User-Agent")) (requestHeaders req))
         bots = ["googlebot","bingbot","duckduckbot","yandexbot","baiduspider","ahrefsbot","semrushbot","petalbot"]
     in maybe False (\u -> any (`B8.isInfixOf` u) bots) ua
 
 isOldMobile :: Request -> Bool
 isOldMobile req =
-    let ua = fmap (B8.map toLowerChar) (lookup "User-Agent" (requestHeaders req))
+    let ua = fmap (B8.map toLowerChar) (lookup (CI.mk (B8.pack "User-Agent")) (requestHeaders req))
         needles = ["nokia","blackberry","msie 6","msie 7","android 4."]
     in maybe False (\u -> any (`B8.isInfixOf` u) needles) ua
 
@@ -383,10 +396,10 @@ absoluteImageURL :: T.Text -> T.Text
 absoluteImageURL rel = if "/" `T.isPrefixOf` rel then T.concat ["https://www.psyop.ca", rel] else T.concat ["https://www.psyop.ca/", rel]
 
 -- Extract Host or :authority header (HTTP/2)
-getHostHeader :: [ (BS.ByteString, BS.ByteString) ] -> Maybe BS.ByteString
-getHostHeader hdrs = case lookup "Host" hdrs of
+getHostHeader :: RequestHeaders -> Maybe BS.ByteString
+getHostHeader hdrs = case lookup (CI.mk (B8.pack "Host")) hdrs of
     Just h  -> Just h
-    Nothing -> lookup ":authority" hdrs
+    Nothing -> lookup (CI.mk (B8.pack ":authority")) hdrs
 
 -- Render enhanced MenuBar with proper HTML structure
 renderEnhancedMenuBar :: MenuBar -> Html
