@@ -7,7 +7,6 @@ module App (app, FallbackEnv(..), loadFallbackEnv) where
 import Network.Wai (Application, Response, Request, responseLBS, pathInfo, requestHeaders, isSecure, rawPathInfo, rawQueryString, queryString)
 import Network.HTTP.Types (RequestHeaders)
 import qualified Data.CaseInsensitive as CI
-import qualified Network.Wai as Wai
 import Network.HTTP.Types (status200, status404, status308)
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
@@ -22,13 +21,7 @@ import Data.List (isSuffixOf, isPrefixOf)
 import System.Directory (doesFileExist)
 import System.Environment (lookupEnv)
 import Data.Char (toLower)
-import Components.MenuBar (MenuBar(..), mkMenuBar, renderMenuBar)
-import Components.Footer (Footer(..), mkFooter, renderFooter)
-import Views (renderHomePage)
-import Models (generateOptimizedWallpaper, createBackgroundSystem, getBackgroundPriority, generateBackgroundFallback, BackgroundType(..))
-import Lib (SiteSection(..))
 import Data.IORef (IORef, newIORef, atomicModifyIORef')
-import Control.Monad (when)
 import GHC.Generics (Generic)
 import qualified Data.Yaml as Y
 import Data.Aeson (FromJSON(..), withObject, (.:))
@@ -187,27 +180,13 @@ app env request respond = do
         Nothing -> do
             let pathSegs = pathInfo request
             case pathSegs of
-                -- Main route - dynamic decision
+                -- Fallback-only site routes
                 [] -> do
-                    useFallback <- shouldServeFallback request
-                    if useFallback
-                        then do
-                            html <- renderFallbackPage env
-                            respond $ waiResponse (htmlResponse html)
-                        else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
-
+                    html <- renderFallbackPage env
+                    respond $ waiResponse (htmlResponse html)
                 ["index"] -> do
-                    useFallback <- shouldServeFallback request
-                    if useFallback
-                        then do
-                            html <- renderFallbackPage env
-                            respond $ waiResponse (htmlResponse html)
-                        else respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
-
-                -- Access to the enhanced site (optional)
-                ["production"] -> respond $ waiResponse (htmlResponse (renderEnhancedMenuBar (mkMenuBar Home)))
-
-                -- Fallback minimal routes (unconditional)
+                    html <- renderFallbackPage env
+                    respond $ waiResponse (htmlResponse html)
                 ["index.html"] -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
@@ -217,24 +196,11 @@ app env request respond = do
                 ["lite.html"] -> do
                     html <- renderFallbackPage env
                     respond $ waiResponse (htmlResponse html)
+                ["home"] -> do
+                    html <- renderFallbackPage env
+                    respond $ waiResponse (htmlResponse html)
                 
-                -- Intelligent background system route
-                ["generate-background"] -> do
-                    -- Fallback site: force gradient background only (no WebGL/ASCII)
-                    let seed = 0
-                    background <- generateBackgroundFallback GradientFallback seed
-                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack background
-                
-                -- Legacy ASCII wallpaper generation route (for backward compatibility)
-                ["generate-wallpaper"] -> do
-                    let seed = 0  -- For now, use fixed seed for testing
-                    wallpaper <- generateOptimizedWallpaper seed
-                    respond $ responseLBS status200 [("Content-Type", "text/html")] $ LBS.fromStrict $ encodeUtf8 $ T.pack wallpaper
-                
-                -- CSS routes for responsive design
-                ["css", "style.css"] -> respond $ cssResponse serveMainCSS
-                ["css", "responsive.css"] -> respond $ cssResponse serveResponsiveCSS
-                ["css", "components.css"] -> respond $ cssResponse serveComponentsCSS
+                -- Removed production-only endpoints (background generation, CSS, enhanced site)
                 -- SEO files
                 ["robots.txt"] -> do
                     response <- serveTextFile "public/robots.txt" "text/plain"

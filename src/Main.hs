@@ -14,7 +14,7 @@ import App (app, loadFallbackEnv, FallbackEnv)
 main :: IO ()
 main = do
     putStrLn "🚀 Starting PSYOP Server..."
-    putStrLn $ "🌐 Starting server on port " ++ show (getServerPort defaultConfig)
+    putStrLn $ "🌐 Starting fallback server on port " ++ show (getServerPort defaultConfig)
     env <- loadFallbackEnv
     startServer env
 
@@ -34,16 +34,16 @@ startServer env = do
                 putStrLn $ "🔐 Starting HTTPS server on port " ++ show port
                 putStrLn $ "    cert: " ++ cert
                 putStrLn $ "    key : " ++ key
-                putStrLn $ "🧭 Visit https://localhost:" ++ show port ++ "/index.html for fallback"
+                putStrLn $ "🧭 Visit https://localhost:" ++ show port ++ "/index.html"
                 runTLS (tlsSettings cert key) (setPort port defaultSettings) (app env)
             _ -> do
                 putStrLn "⚠️ HTTPS_ENABLE=true but CERT_FILE or KEY_FILE not set; starting HTTP instead"
                 putStrLn $ "🌐 Server running at http://localhost:" ++ show port
-                putStrLn $ "🧭 Visit http://localhost:" ++ show port ++ "/index.html for fallback"
+                putStrLn $ "🧭 Visit http://localhost:" ++ show port ++ "/index.html"
                 run port (app env)
         _ -> do
             putStrLn $ "🌐 Server running at http://localhost:" ++ show port
-            putStrLn $ "🧭 Visit http://localhost:" ++ show port ++ "/index.html for fallback"
+            putStrLn $ "🧭 Visit http://localhost:" ++ show port ++ "/index.html"
             run port (app env)
 
 
